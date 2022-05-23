@@ -104,7 +104,7 @@ class Dataset():
     def split(self, test_size = 0.20, seed = 123456):
         
         """
-        Splits dataset into training and testing sets.
+        Splits dataset into train and test sets.
         
         Parameters
         ----------
