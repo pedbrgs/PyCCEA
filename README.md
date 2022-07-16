@@ -8,4 +8,4 @@
 
 ### About
 
-This repository contains the source codes of some Cooperative Co-Evolutionary Algorithms (CCEAs) implemented in Python.
+This repository will contain the source codes of some Cooperative Co-Evolutionary Algorithms (CCEAs) implemented in Python.
