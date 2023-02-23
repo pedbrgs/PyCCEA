@@ -29,7 +29,7 @@ class UniformStaticGrouping():
 
     def _decompose(self):
         # Number of variables in each subcomponent
-        if int(self.n/self.m) % 2 == 0:
+        if self.n % self.m != 0:
             raise AssertionError(
                 f"{self.n} decision variables is not divisible by {self.m} subcomponents"
                 )
