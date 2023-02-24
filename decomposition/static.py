@@ -1,9 +1,9 @@
 import  numpy as np
-import pandas as pd
+
 
 class UniformStaticGrouping():
     """
-    Decompose the set of decision variables evenly.
+    Decompose the set of decision variables uniformly.
 
     Attributes
     ----------
@@ -13,43 +13,40 @@ class UniformStaticGrouping():
         Number of variables in a subcomponent.
     """
 
-    def __init__(self, X: pd.DataFrame, m: int):
+    def __init__(self, m: int):
         """
         Parameters
         ----------
-        X: pd.DataFrame
-            n-dimensional input data.
         m: int
             Number of subcomponents, where each subcomponent is a subset of decision variables.
         """
 
-        self.X = X
-        self.n = X.shape[1]
         self.m = m
 
-    def _decompose(self):
-        # Number of variables in each subcomponent
-        if self.n % self.m != 0:
-            raise AssertionError(
-                f"{self.n} decision variables is not divisible by {self.m} subcomponents"
-                )
-        self.s = int(self.n/self.m)
-        # Split problem into m n/m-dimensional subproblems
-        subproblems = np.array_split(self.X.to_numpy(), indices_or_sections=self.m, axis=1)
-
-        return subproblems
-
-    def run(self):
+    def decompose(self, X: np.array):
         """
         Divide an n-dimensional problem into m n/m-dimensional subproblems.
+
+        Parameters
+        ----------
+        X: np.array
+            n-dimensional input data.
 
         Returns
         -------
         subproblems: list
-            Subproblems, where each subproblem is an numpy array that can be accessed by indexing
-            the list.
+            Subproblems, where each subproblem is an array that can be accessed by indexing the
+            list.
         """
+        # Number of decision variables
+        self.n = X.shape[1]
+        if self.n % self.m != 0:
+            raise AssertionError(
+                f"{self.n} decision variables is not divisible by {self.m} subcomponents"
+                )
+        # Number of decision variables in each subcomponent
+        self.s = int(self.n/self.m)
         # Decompose n-dimensional problem into m n/m-dimensional subproblems
-        subproblems = self._decompose()
+        subproblems = np.array_split(X, indices_or_sections=self.m, axis=1)
 
         return subproblems
