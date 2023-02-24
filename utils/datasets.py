@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 
 class DataLoader():
     """
-    Loads dataset and preprocesses it to train machine learning algorithms.
+    Load dataset and preprocess it to train machine learning algorithms.
 
     Attributes
     ----------
@@ -15,15 +15,15 @@ class DataLoader():
         Raw dataset.
     X: pd.DataFrame
         Raw input data.
-    y: pd.DataFrame
+    y: pd.Series
         Raw output data.
-    X_train: pd.DataFrame
+    X_train: np.array
         Train input data.
-    X_test: pd.DataFrame
+    X_test: np.array
         Test input data.
-    y_train: pd.DataFrame
+    y_train: np.array
         Train output data.
-    y_test: pd.DataFrame
+    y_test: np.array
         Test output data.
     """
     
@@ -47,9 +47,8 @@ class DataLoader():
         
     def load(self):
         """
-        Loads dataset according to dataset given as a parameter.
+        Load dataset according to dataset given as a parameter.
         """
-        
         try:
             path = {
                 'breast_cancer': self.root + 'breast_cancer/wdbc.csv',
@@ -65,10 +64,9 @@ class DataLoader():
         
     def preprocess(self):
         """
-        Preprocesses dataset according to dataset given as a parameter, i.e., splits the data
-        into input X and output Y, handles categorical variables and normalizes all variables.
+        Preprocess dataset according to dataset given as a parameter, i.e., splits the data into
+        input X and output Y, handles categorical variables and normalizes all variables.
         """
-        
         # Setting a default representation for NaN values 
         self.data.replace(to_replace = '?', value=np.nan, inplace=True)
         # Removing rows with at least one NaN value
@@ -106,7 +104,7 @@ class DataLoader():
             
     def split(self, test_size: float = 0.20, seed: int = 123456):
         """
-        Splits dataset into train and test sets.
+        Split dataset into train and test sets.
         
         Parameters
         ----------
@@ -117,6 +115,8 @@ class DataLoader():
         seed: int, default 123456
             Controls the shuffling applied to the data before applying the split.
         """
-
-        subsets = train_test_split(self.X, self.y, test_size=test_size, random_state=seed)
+        subsets = train_test_split(self.X.to_numpy(),
+                                   self.y.to_numpy(),
+                                   test_size=test_size,
+                                   random_state=seed)
         self.X_train, self.X_test, self.y_train, self.y_test = subsets
