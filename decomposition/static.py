@@ -3,25 +3,25 @@ import  numpy as np
 
 class UniformStaticGrouping():
     """
-    Decompose the set of decision variables uniformly.
+    Decompose the problem (a collection of features) uniformly.
 
     Attributes
     ----------
-    n: int
-        Number of decision variables.
-    s: int
-        Number of variables in a subcomponent.
+    n_features: int
+        Number of features.
+    subcomp_size: int
+        Number of features in a subcomponent.
     """
 
-    def __init__(self, m: int):
+    def __init__(self, n_subcomps: int):
         """
         Parameters
         ----------
-        m: int
-            Number of subcomponents, where each subcomponent is a subset of decision variables.
+        n_subcomps: int
+            Number of subcomponents, where each subcomponent is a subset of features.
         """
 
-        self.m = m
+        self.n_subcomps = n_subcomps
 
     def decompose(self, X: np.array):
         """
@@ -38,15 +38,15 @@ class UniformStaticGrouping():
             Subproblems, where each subproblem is an array that can be accessed by indexing the
             list.
         """
-        # Number of decision variables
-        self.n = X.shape[1]
-        if self.n % self.m != 0:
+        # Number of features
+        self.n_features = X.shape[1]
+        if self.n_features % self.n_subcomps != 0:
             raise AssertionError(
-                f"{self.n} decision variables is not divisible by {self.m} subcomponents"
+                f"{self.n_features} features is not divisible by {self.n_subcomps} subcomponents"
                 )
-        # Number of decision variables in each subcomponent
-        self.s = int(self.n/self.m)
+        # Number of features in each subcomponent
+        self.subcomp_size = int(self.n_features/self.n_subcomps)
         # Decompose n-dimensional problem into m n/m-dimensional subproblems
-        subproblems = np.array_split(X, indices_or_sections=self.m, axis=1)
+        subproblems = np.array_split(X, indices_or_sections=self.n_subcomps, axis=1)
 
         return subproblems
