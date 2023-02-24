@@ -14,9 +14,9 @@ class ClassificationMetrics():
         Values of classification metrics.
     """
     def __init__(self):
-
-        logging.basicConfig(encoding='utf-8', level=logging.INFO)
         self.values = dict()
+        # Initialize logger with info level
+        logging.basicConfig(encoding='utf-8', level=logging.INFO)
 
     def compute(self, y_pred: np.array, y_test: np.array, verbose: bool=False):
         """

@@ -42,6 +42,7 @@ class DataLoader():
         self.dataset = dataset
         self.root = root
         self.encode = encode
+        # Initialize logger with info level
         logging.basicConfig(encoding='utf-8', level=logging.INFO)
         logging.info(f"Dataset: {self.dataset}")
         
@@ -56,7 +57,6 @@ class DataLoader():
                 'divorce': self.root + 'divorce/divorce.csv',
                 'qsar_toxicity': self.root + 'qsar_toxicity/qsar_oral_toxicity.csv'
             }[self.dataset]
-            
         except:
             raise AssertionError(f"The {self.dataset} dataset is not available.")
             

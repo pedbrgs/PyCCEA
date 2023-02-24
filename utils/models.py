@@ -38,7 +38,9 @@ class ClassificationModel():
         # Initialize classification model
         self.model_type = model_type
         self.estimator = ClassificationModel.models[self.model_type]()
+        # Initialize logger with info level
         logging.basicConfig(encoding='utf-8', level=logging.INFO)
+        # Supress divide-by-zero warnings
         warnings.filterwarnings(action='ignore', category=UndefinedMetricWarning)
 
     def _model_selection(self, 
