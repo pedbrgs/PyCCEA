@@ -5,7 +5,7 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.exceptions import UndefinedMetricWarning
 from sklearn.model_selection import RandomizedSearchCV
-from sklearn.metrics import make_scorer, precision_score, recall_score, accuracy_score, f1_score
+from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score
 
 
 class ClassificationModel():
