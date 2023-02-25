@@ -15,10 +15,11 @@ class ClassificationModel():
     Attributes
     ----------
     estimator: sklearn model object
-        Model that was chosen by the Randomized Search, i.e., estimator which gave the best result
-        on the validation data.
+        Trained model. In case optimize is True, it is the model that was chosen by the Randomized
+        Search, i.e., estimator which gave the best result on the validation data.
     hyperparams: dict
-        Best hyperparameters used to fit the machine learning model.
+        Hyperparameters of the model. In case optimize is True, it is the best hyperparameters
+        used to fit the machine learning model.
     """
 
     models = {'svm': SVC, 'random_forest': RandomForestClassifier}
