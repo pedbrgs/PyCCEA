@@ -13,6 +13,9 @@ class ClassificationMetrics():
     values: dict()
         Values of classification metrics.
     """
+
+    metrics = ['accuracy', 'f1_score', 'precision', 'recall', 'specificity']
+
     def __init__(self):
         self.values = dict()
         # Initialize logger with info level

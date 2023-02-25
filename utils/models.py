@@ -30,6 +30,7 @@ class ClassificationModel():
         model_type: str
             Name of the machine learning model that will be fitted for a classification task.
         """
+        # Check if the chosen classification model is available
         if not model_type in ClassificationModel.models.keys():
             raise AssertionError(
                 f"Model type '{model_type}' was not found. "
