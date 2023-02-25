@@ -26,40 +26,43 @@ class DataLoader():
     y_test: np.array
         Test output data.
     """
-    
-    def __init__(self, dataset: str, root: str = './datasets/', encode: bool = False):
+
+    datasets = {
+        'breast_cancer': './datasets/breast_cancer/wdbc.csv',
+        'dermatology': './datasets/dermatology/dermatology.csv',
+        'divorce': './datasets/divorce/divorce.csv',
+        'qsar_toxicity': './datasets/qsar_toxicity/qsar_oral_toxicity.csv'
+        }
+
+    def __init__(self, dataset: str, encode: bool = False):
         """
         Parameters
         ----------
         dataset: str
             Name of the dataset that will be loaded and processed.
-        root: str
-            Root directory of the datasets.
         encode: bool
             Converts categorical variables into numerical values with One Hot Encoding. 
         """
         
         self.dataset = dataset
-        self.root = root
         self.encode = encode
         # Initialize logger with info level
         logging.basicConfig(encoding='utf-8', level=logging.INFO)
-        logging.info(f"Dataset: {self.dataset}")
         
     def load(self):
         """
         Load dataset according to dataset given as a parameter.
         """
         try:
-            path = {
-                'breast_cancer': self.root + 'breast_cancer/wdbc.csv',
-                'dermatology': self.root + 'dermatology/dermatology.csv',
-                'divorce': self.root + 'divorce/divorce.csv',
-                'qsar_toxicity': self.root + 'qsar_toxicity/qsar_oral_toxicity.csv'
-            }[self.dataset]
+            path = DataLoader.datasets[self.dataset]
         except:
-            raise AssertionError(f"The {self.dataset} dataset is not available.")
-            
+            # Check if the chosen dataset is available
+            raise AssertionError(
+                f"The '{self.dataset}' dataset is not available. "
+                f"The available datasets are {', '.join(DataLoader.datasets.keys())}."
+            )
+        # Load dataset
+        logging.info(f"Dataset: {self.dataset}")
         self.data = pd.read_csv(path)
         
     def preprocess(self):
