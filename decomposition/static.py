@@ -1,7 +1,7 @@
 import  numpy as np
 
 
-class UniformStaticGrouping():
+class UniformSequentialGrouping():
     """
     Decompose the problem (a collection of features) uniformly.
 
