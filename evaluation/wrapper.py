@@ -58,19 +58,19 @@ class WrapperEvaluation():
         logging.basicConfig(encofing='utf-8', level=logging.INFO)
 
     def evaluate(self,
-                 indiv: np.array,
+                 solution: np.array,
                  X_train: np.array,
                  y_train: np.array,
                  X_test: np.array,
                  y_test: np.array):
         """
-        Evaluate an individual from a subpopulation through the predictive performance of a model
-        and according to an evaluation metric.
+        Evaluate an individual represented by a complete solution through the predictive
+        performance of a model and according to an evaluation metric.
 
         Parameters
         ----------
-        indiv: np.array
-            Individual represented by a binary n-dimensional array, where n is the number of
+        solution: np.array
+            Solution represented by a binary n-dimensional array, where n is the number of
             features.
         X_train: np.array
             Train input data.
@@ -82,7 +82,7 @@ class WrapperEvaluation():
             Test output data.
         """
         # Boolean array used to filter which features will be used to fit the model
-        var_mask = indiv.astype(bool)
+        var_mask = solution.astype(bool)
         X_train = X_train[:, var_mask].copy()
         X_test = X_test[:, var_mask].copy()
         # Get model that has not been previously fitted
@@ -91,7 +91,7 @@ class WrapperEvaluation():
         self.model.train(X_train=X_train, y_train=y_train, optimize=False, verbose=False)
         # Predict
         y_pred = self.model.estimator.predict(X_test)
-        # Evaluate individual
+        # Evaluate the individual
         self.model_evaluator.compute(y_pred=y_pred, y_test=y_test, verbose=False)
         # Get evaluation
         evaluation = self.model_evaluator.values[self.eval_function]
