@@ -1,4 +1,4 @@
-## Cooperative Co-Evolutionary Algorithms (CCEAs)
+# Cooperative Co-Evolutionary Algorithms (CCEAs)
 
 **Author:** [Pedro Vinícius A. B. Venâncio](https://www.linkedin.com/in/pedbrgs/)<sup>1</sup> <br />
 
