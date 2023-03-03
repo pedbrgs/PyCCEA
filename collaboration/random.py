@@ -5,16 +5,16 @@ import numpy as np
 class SingleRandomCollaboration():
     """
     Randomly find a single collaborator from each subpopulation for individuals.
-
-    Attributes
-    ----------
-    seed: int
-        Numerical value that generates a new set or repeats pseudo-random numbers. It is defined
-        in stochastic processes to ensure reproducibility.
     """
 
     def __init__(self, seed: int = None):
-
+        """
+        Parameters
+        ----------
+        seed: int
+            Numerical value that generates a new set or repeats pseudo-random numbers. It is
+            defined in stochastic processes to ensure reproducibility.
+        """
         # Set the seed value
         self.seed = seed
         random.seed(seed)
