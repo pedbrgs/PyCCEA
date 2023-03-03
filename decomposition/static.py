@@ -1,16 +1,9 @@
 import  numpy as np
 
 
-class UniformSequentialGrouping():
+class SequentialFeatureGrouping():
     """
-    Decompose the problem (a collection of features) uniformly.
-
-    Attributes
-    ----------
-    n_features: int
-        Number of features.
-    subcomp_size: int
-        Number of features in a subcomponent.
+    Decompose the problem (a collection of features) sequentially.
     """
 
     def __init__(self, n_subcomps: int):
@@ -25,7 +18,7 @@ class UniformSequentialGrouping():
 
     def decompose(self, X: np.array):
         """
-        Divide an n-dimensional problem into m n/m-dimensional subproblems.
+        Divide an n-dimensional problem into m subproblems.
 
         Parameters
         ----------
@@ -34,19 +27,15 @@ class UniformSequentialGrouping():
 
         Returns
         -------
-        subproblems: list
-            Subproblems, where each subproblem is an array that can be accessed by indexing the
-            list.
+        subcomponents: list
+            Subcomponents, where each subcomponent is an array that can be accessed by indexing
+            the list.
+        subcomp_sizes: list
+            Number of features in each subcomponent.
         """
-        # Number of features
-        self.n_features = X.shape[1]
-        if self.n_features % self.n_subcomps != 0:
-            raise AssertionError(
-                f"{self.n_features} features is not divisible by {self.n_subcomps} subcomponents"
-                )
+        # Decompose n-dimensional problem into m subproblems
+        subcomponents = np.array_split(X, indices_or_sections=self.n_subcomps, axis=1)
         # Number of features in each subcomponent
-        self.subcomp_size = int(self.n_features/self.n_subcomps)
-        # Decompose n-dimensional problem into m n/m-dimensional subproblems
-        subproblems = np.array_split(X, indices_or_sections=self.n_subcomps, axis=1)
+        subcomp_sizes = [subcomp.shape[1] for subcomp in subcomponents]
 
-        return subproblems
+        return subcomponents, subcomp_sizes
