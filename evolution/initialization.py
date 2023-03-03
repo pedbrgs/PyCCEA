@@ -19,55 +19,49 @@ class RandomBinaryInitialization():
     """
 
     def __init__(self,
-                 S_train: list,
-                 S_test: list,
-                 subpop_sizes: list,
                  data: DataLoader,
+                 subcomp_sizes: list,
+                 subpop_sizes: list,
                  evaluator,
                  collaborator):
         """
         Parameters
         ----------
-        S_train: list
-           Subproblems related to the training set, where each subproblem is an numpy array that
-           can be accessed by indexing the list.
-        S_test: list
-           Subproblems related to the test set, where each subproblem is an numpy array that can
-           be accessed by indexing the list.
-        subpop_sizes: list
-            Subpopulation sizes, that is, the number of individuals in each subpopulation.
         data: DataLoader
             Container with process data and training and test sets.
+        subcomp_sizes: list
+            Number of features in each subcomponent.
+        subpop_sizes: list
+            Subpopulation sizes, that is, the number of individuals in each subpopulation.
         evaluator: object of one of the evaluation classes
             Responsible for evaluating individuals, that is, subsets of features.
         collaborator: object of one of the collaboration classes.
             Responsible for selecting collaborators for individuals.
         """
-        self.S_train = S_train
-        self.S_test = S_test
-        self.subpop_sizes = subpop_sizes
+        # Parameters as attributes
         self.data = data
+        self.subpop_sizes = subpop_sizes
         self.evaluator = evaluator
         self.collaborator = collaborator
         # Individuals of all subpopulations
         self.subpops = list()
         # List to store the evaluations of the individuals of all subpopulations
         self.fobjs = list()
-        # Number of subproblems
-        self.n_subprobs = len(self.S_train)
-        # Number of variables in each subproblem
-        self.nvars = list(map(lambda subprob: subprob.shape[1], self.S_train))
+        # Number of subcomponents
+        self.n_subcomps = len(subcomp_sizes)
+        # Number of features in each subcomponent
+        self.subcomp_sizes = subcomp_sizes
 
     def build_subpopulations(self):
         """
         Randomly initializes individuals from all subpopulations.
         """
         # Initialize the progress bar
-        progress_bar = tqdm(total=self.n_subprobs, desc="Building subpopulations")
-        # For each subproblem with a specific number of decision variables, build a subpopulation
-        for i, (nvar, subpop_size) in enumerate(zip(self.nvars, self.subpop_sizes)):
-            # Initialize subpop_size individuals of size nvar with only 0's and 1's
-            subpop = np.random.choice([0, 1], size=(subpop_size, nvar))
+        progress_bar = tqdm(total=self.n_subcomps, desc="Building subpopulations")
+        # For each subcomponent with a specific number of features, build a subpopulation
+        for subcomp_size, subpop_size in zip(self.subcomp_sizes, self.subpop_sizes):
+            # Initialize subpop_size individuals of size subcomp_size with only 0's and 1's
+            subpop = np.random.choice([0, 1], size=(subpop_size, subcomp_size))
             # Store all individuals of the current subpopulation
             self.subpops.append(subpop)
             # Update progress bar
@@ -80,7 +74,7 @@ class RandomBinaryInitialization():
         Evaluate all individuals from all subpopulations.
         """
         # Initialize the progress bar
-        progress_bar = tqdm(total=self.n_subprobs, desc="Evaluating individuals")
+        progress_bar = tqdm(total=self.n_subcomps, desc="Evaluating individuals")
         # For each subpopulation
         for i, subpop in enumerate(self.subpops):
             subpop_fobjs = list()
