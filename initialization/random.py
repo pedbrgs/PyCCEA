@@ -16,6 +16,8 @@ class RandomBinaryInitialization():
         there is a 0, it indicates that the feature should not be considered.
     fobjs: list
         Evaluation of all individuals from all subpopulations.
+    context_vectors: list
+        Complete problem solutions that were randomly initialized.
     """
 
     def __init__(self,
@@ -43,6 +45,10 @@ class RandomBinaryInitialization():
         self.subpop_sizes = subpop_sizes
         self.evaluator = evaluator
         self.collaborator = collaborator
+        # Complete problem solutions
+        self.context_vectors = list()
+        # Best individual of each subpopulation
+        self.best_individuals = list()
         # Individuals of all subpopulations
         self.subpops = list()
         # List to store the evaluations of the individuals of all subpopulations
@@ -78,6 +84,7 @@ class RandomBinaryInitialization():
         # For each subpopulation
         for i, subpop in enumerate(self.subpops):
             subpop_fobjs = list()
+            subpop_context_vectors = list()
             # Evaluate each individual in the subpopulation
             for j, indiv in enumerate(subpop):
                 # Find random collaborator(s) for the current individual
@@ -97,8 +104,12 @@ class RandomBinaryInitialization():
                                                  y_train=self.data.y_train,
                                                  X_test=self.data.X_test,
                                                  y_test=self.data.y_test)
+                # Store the complete problem solution related to the current individual
+                subpop_context_vectors.append(complete_solution)
                 # Store evaluation of the current individual
                 subpop_fobjs.append(metric)
+            # Store all complete problem solutions related to the current subpopulation
+            self.context_vectors.append(np.vstack(subpop_context_vectors))
             # Store evaluation of all individuals of the current subpopulation
             self.fobjs.append(subpop_fobjs)
             # Update progress bar
