@@ -102,8 +102,8 @@ class RandomBinaryInitialization():
                 metric = self.evaluator.evaluate(solution=complete_solution,
                                                  X_train=self.data.X_train,
                                                  y_train=self.data.y_train,
-                                                 X_test=self.data.X_test,
-                                                 y_test=self.data.y_test)
+                                                 X_test=self.data.X_val,
+                                                 y_test=self.data.y_val)
                 # Store the complete problem solution related to the current individual
                 subpop_context_vectors.append(complete_solution)
                 # Store evaluation of the current individual

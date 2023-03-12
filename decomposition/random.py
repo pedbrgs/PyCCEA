@@ -24,7 +24,7 @@ class RandomFeatureGrouping():
         random.seed(seed)
         np.random.seed(seed=seed)
 
-    def decompose(self, X: np.array):
+    def decompose(self, X: np.array, feature_idxs: np.array = None):
         """
         Divide an n-dimensional problem into m subproblems.
 
@@ -32,6 +32,8 @@ class RandomFeatureGrouping():
         ----------
         X: np.array
             n-dimensional input data.
+        feature_idxs: np.array, default None
+            Shuffled list of feature indexes.
 
         Returns
         -------
@@ -43,10 +45,11 @@ class RandomFeatureGrouping():
         feature_idxs: np.array
             Shuffled list of feature indexes.
         """
-        # List of feature indexes
-        feature_idxs = np.arange(X.shape[1])
-        # Shuffle the list of feature indexes
-        np.random.shuffle(feature_idxs)
+        if not isinstance(feature_idxs, np.ndarray):
+            # List of feature indexes
+            feature_idxs = np.arange(X.shape[1])
+            # Shuffle the list of feature indexes
+            np.random.shuffle(feature_idxs)
         # Shuffle the data features according to the indexes
         X = X[:, feature_idxs].copy()
         # Decompose n-dimensional problem into m subproblems
