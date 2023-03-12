@@ -105,21 +105,32 @@ class DataLoader():
         # Labels as integer values
         self.y = self.y.astype('int')
             
-    def split(self, test_size: float = 0.20, seed: int = 123456):
+    def split(self, val_size: float = 0.10, test_size: float = 0.10, seed: int = 123456):
         """
-        Split dataset into train and test sets.
+        Split dataset into training, validation and test sets.
         
         Parameters
         ----------
-        test_size: float, default 0.20
+        val_size: float, default 0.10
+            Proportion of the dataset to include in the validation set. It should be between 0 and
+            1. It can be an integer too, but it refers to the number of observations in the
+            validation set, in this case.
+        test_size: float, default 0.10
             Proportion of the dataset to include in the test set. It should be between 0 and 1.
-            It can be integer too, but it refers to the number of observations in the test set, in
-            this case.
+            It can be an integer too, but it refers to the number of observations in the test set,
+            in this case.
         seed: int, default 123456
             Controls the shuffling applied to the data before applying the split.
         """
+        # Split data into training and test sets
         subsets = train_test_split(self.X.to_numpy(),
                                    self.y.to_numpy(),
                                    test_size=test_size,
                                    random_state=seed)
         self.X_train, self.X_test, self.y_train, self.y_test = subsets
+        # Split training set into training and validation sets
+        subsets = train_test_split(self.X_train,
+                                   self.y_train,
+                                   test_size=val_size/(1-test_size),
+                                   random_state=seed)
+        self.X_train, self.X_val, self.y_train, self.y_val = subsets
