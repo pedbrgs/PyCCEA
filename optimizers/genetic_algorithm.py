@@ -143,6 +143,7 @@ class BinaryGeneticAlgorithm():
 
     def _evaluate(self, individual):
         """ Evaluate the current individual using the evaluator. """
+
         # If no feature is selected
         if individual.sum() == 0:
             # Select one at random
