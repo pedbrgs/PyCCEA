@@ -111,19 +111,21 @@ class BinaryGeneticAlgorithm():
         """ Tournament selection. """
 
         # Indexes of selected parents
-        idxs = np.zeros((2,))
+        selected_idxs = np.zeros((2,))
 
         for i in range(2):
 
             # Candidate individuals
-            idxs = np.random.choice(range(self.subpop_size), size=self.sample_size, replace=False)
-            candidate_fitness = np.array(fobjs)[idxs]        
+            sample_idxs = np.random.choice(range(self.subpop_size),
+                                           size=self.sample_size,
+                                           replace=False)
+            candidate_fitness = np.array(fobjs)[sample_idxs]        
 
             # Select the best individual in the tournament
-            idxs[i] = np.argmax(candidate_fitness)
+            selected_idxs[i] = np.argmax(candidate_fitness)
 
         # Selected parents
-        parent_a, parent_b = subpop[idxs.astype(int)]
+        parent_a, parent_b = subpop[selected_idxs.astype(int)]
 
         return parent_a, parent_b
 
