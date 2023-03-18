@@ -143,7 +143,12 @@ class BinaryGeneticAlgorithm():
 
     def _evaluate(self, individual):
         """ Evaluate the current individual using the evaluator. """
-
+        # If no feature is selected
+        if individual.sum() == 0:
+            # Select one at random
+            pos = np.random.choice(np.arange(individual.shape[0]))
+            individual[pos] = 1
+        # Evaluate individual
         metric = self.evaluator.evaluate(solution=individual,
                                          X_train=self.X_train,
                                          y_train=self.y_train,
