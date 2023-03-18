@@ -16,13 +16,13 @@ class SequentialFeatureGrouping():
 
         self.n_subcomps = n_subcomps
 
-    def decompose(self, X: np.array):
+    def decompose(self, X: np.ndarray):
         """
         Divide an n-dimensional problem into m subproblems.
 
         Parameters
         ----------
-        X: np.array
+        X: np.ndarray
             n-dimensional input data.
 
         Returns

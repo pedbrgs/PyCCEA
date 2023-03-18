@@ -63,7 +63,7 @@ class SingleRandomCollaboration():
 
         Returns
         -------
-        complete_solution: np.array
+        complete_solution: np.ndarray
             Complete problem solution composed of one individual from each subpopulation.
         """
         complete_solution = np.hstack(collaborators)

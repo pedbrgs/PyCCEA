@@ -58,27 +58,27 @@ class WrapperEvaluation():
         logging.basicConfig(encofing='utf-8', level=logging.INFO)
 
     def evaluate(self,
-                 solution: np.array,
-                 X_train: np.array,
-                 y_train: np.array,
-                 X_test: np.array,
-                 y_test: np.array):
+                 solution: np.ndarray,
+                 X_train: np.ndarray,
+                 y_train: np.ndarray,
+                 X_test: np.ndarray,
+                 y_test: np.ndarray):
         """
         Evaluate an individual represented by a complete solution through the predictive
         performance of a model and according to an evaluation metric.
 
         Parameters
         ----------
-        solution: np.array
+        solution: np.ndarray
             Solution represented by a binary n-dimensional array, where n is the number of
             features.
-        X_train: np.array
+        X_train: np.ndarray
             Train input data.
-        X_test: np.array
+        X_test: np.ndarray
             Test input data.
-        y_train: np.array
+        y_train: np.ndarray
             Train output data.
-        y_test: np.array
+        y_test: np.ndarray
             Test output data.
         """
         # Boolean array used to filter which features will be used to fit the model

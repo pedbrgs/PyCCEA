@@ -21,13 +21,13 @@ class ClassificationMetrics():
         # Initialize logger with info level
         logging.basicConfig(encoding='utf-8', level=logging.INFO)
 
-    def compute(self, y_pred: np.array, y_test: np.array, verbose: bool=False):
+    def compute(self, y_pred: np.ndarray, y_test: np.ndarray, verbose: bool=False):
         """
         Parameters
         ----------
-        y_pred: np.array
+        y_pred: np.ndarray
             Output predicted by the machine learning model in the test set.
-        y_test: np.array
+        y_test: np.ndarray
             Test output data.
         verbose: bool, default False
             If True, show evaluation metrics in the test set.

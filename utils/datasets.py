@@ -17,13 +17,13 @@ class DataLoader():
         Raw input data.
     y: pd.Series
         Raw output data.
-    X_train: np.array
+    X_train: np.ndarray
         Train input data.
-    X_test: np.array
+    X_test: np.ndarray
         Test input data.
-    y_train: np.array
+    y_train: np.ndarray
         Train output data.
-    y_test: np.array
+    y_test: np.ndarray
         Test output data.
     """
 

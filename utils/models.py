@@ -46,8 +46,8 @@ class ClassificationModel():
         warnings.filterwarnings(action='ignore', category=UndefinedMetricWarning)
 
     def _model_selection(self, 
-                         X_train: np.array,
-                         y_train: np.array,
+                         X_train: np.ndarray,
+                         y_train: np.ndarray,
                          n_iter: int = 100,
                          seed: int = 123456,
                          kfolds: int = 5):
@@ -93,8 +93,8 @@ class ClassificationModel():
         return estimator, hyperparams 
 
     def train(self,
-              X_train: np.array,
-              y_train: np.array,
+              X_train: np.ndarray,
+              y_train: np.ndarray,
               seed: int = 123456,
               kfolds: int = 5,
               n_iter: int = 100,
@@ -105,9 +105,9 @@ class ClassificationModel():
 
         Parameters
         ----------
-        X_train: np.array
+        X_train: np.ndarray
             Train input data.
-        y_train: np.array
+        y_train: np.ndarray
             Train output data.   
         seed: int, default 123456
             Controls the shuffling applied for subsampling the data.

@@ -24,15 +24,15 @@ class RandomFeatureGrouping():
         random.seed(seed)
         np.random.seed(seed=seed)
 
-    def decompose(self, X: np.array, feature_idxs: np.array = None):
+    def decompose(self, X: np.ndarray, feature_idxs: np.ndarray = None):
         """
         Divide an n-dimensional problem into m subproblems.
 
         Parameters
         ----------
-        X: np.array
+        X: np.ndarray
             n-dimensional input data.
-        feature_idxs: np.array, default None
+        feature_idxs: np.ndarray, default None
             Shuffled list of feature indexes.
 
         Returns
@@ -42,7 +42,7 @@ class RandomFeatureGrouping():
             the list.
         subcomp_sizes: list
             Number of features in each subcomponent.
-        feature_idxs: np.array
+        feature_idxs: np.ndarray
             Shuffled list of feature indexes.
         """
         if not isinstance(feature_idxs, np.ndarray):
