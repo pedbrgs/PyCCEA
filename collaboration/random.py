@@ -51,10 +51,10 @@ class SingleRandomCollaboration():
 
         return collaborators
 
-    def build_complete_solution(self, collaborators):
+    def build_context_vector(self, collaborators):
         """
-        Build a complete solution to the problem using an individual selected from each
-        subpopulation.
+        Build a context vector, i.e., a complete problem solution composed of representative
+        solutions from each subpopulation.
 
         Parameters
         ----------
@@ -63,9 +63,9 @@ class SingleRandomCollaboration():
 
         Returns
         -------
-        complete_solution: np.ndarray
+        context_vector: np.ndarray
             Complete problem solution composed of one individual from each subpopulation.
         """
-        complete_solution = np.hstack(collaborators)
+        context_vector = np.hstack(collaborators)
 
-        return complete_solution
+        return context_vector

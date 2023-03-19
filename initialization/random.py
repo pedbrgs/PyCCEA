@@ -51,8 +51,10 @@ class RandomBinaryInitialization():
         self.best_individuals = list()
         # Individuals of all subpopulations
         self.subpops = list()
+        # List to store the evaluations of the all context vectors
+        self.global_fitness = list()
         # List to store the evaluations of the individuals of all subpopulations
-        self.fobjs = list()
+        self.local_fitness = list()
         # Number of subcomponents
         self.n_subcomps = len(subcomp_sizes)
         # Number of features in each subcomponent
@@ -77,41 +79,50 @@ class RandomBinaryInitialization():
 
     def evaluate_individuals(self):
         """
-        Evaluate all individuals from all subpopulations.
+        Evaluate all individuals from all subpopulations and their respective context vectors.
         """
         # Initialize the progress bar
         progress_bar = tqdm(total=self.n_subcomps, desc="Evaluating individuals")
         # For each subpopulation
         for i, subpop in enumerate(self.subpops):
-            subpop_fobjs = list()
+            # List to store the evaluations of the individuals in the current subpopulation
+            subpop_local_fitness = list()
+            # List to store the context vectors in the current subpopulation
             subpop_context_vectors = list()
+            # List to store the evaluations of these context vectors
+            subpop_global_fitness = list()
             # Evaluate each individual in the subpopulation
             for j, indiv in enumerate(subpop):
+                # Evaluate the current individual
+                local_metric = self.evaluator.evaluate(solution=indiv,
+                                                       X_train=self.data.S_train[i],
+                                                       y_train=self.data.y_train,
+                                                       X_test=self.data.S_val[i],
+                                                       y_test=self.data.y_val)
+                # Store evaluation of the current individual
+                subpop_local_fitness.append(local_metric)
                 # Find random collaborator(s) for the current individual
                 collaborators = self.collaborator.get_collaborators(subpop_idx=i,
                                                                     indiv_idx=j,
                                                                     subpops=self.subpops)
-                # Build a complete solution to evaluate the individual
-                complete_solution = self.collaborator.build_complete_solution(collaborators)
-                # If no feature is selected
-                if complete_solution.sum() == 0:
-                    # Select one at random
-                    pos = np.random.choice(np.arange(complete_solution.shape[0]))
-                    complete_solution[pos] = 1
-                # Evaluate the current individual
-                metric = self.evaluator.evaluate(solution=complete_solution,
-                                                 X_train=self.data.X_train,
-                                                 y_train=self.data.y_train,
-                                                 X_test=self.data.X_val,
-                                                 y_test=self.data.y_val)
+                # Build a context vector to evaluate a complete solution
+                context_vector = self.collaborator.build_context_vector(collaborators)
+                # Evaluate the context vector
+                global_metric = self.evaluator.evaluate(solution=context_vector,
+                                                        X_train=self.data.X_train,
+                                                        y_train=self.data.y_train,
+                                                        X_test=self.data.X_val,
+                                                        y_test=self.data.y_val)
                 # Store the complete problem solution related to the current individual
-                subpop_context_vectors.append(complete_solution)
-                # Store evaluation of the current individual
-                subpop_fobjs.append(metric)
+                subpop_context_vectors.append(context_vector)
+                # Store evaluation of the current context vector
+                subpop_global_fitness.append(global_metric)
             # Store all complete problem solutions related to the current subpopulation
             self.context_vectors.append(np.vstack(subpop_context_vectors))
             # Store evaluation of all individuals of the current subpopulation
-            self.fobjs.append(subpop_fobjs)
+            self.local_fitness.append(subpop_local_fitness)
+            # Store evaluation of all context vectors of the current subpopulation
+            self.global_fitness.append(subpop_global_fitness)
             # Update progress bar
             progress_bar.update(1)
         # Close progress bar

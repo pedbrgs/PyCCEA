@@ -81,6 +81,9 @@ class WrapperEvaluation():
         y_test: np.ndarray
             Test output data.
         """
+        # If no feature is selected
+        if solution.sum() == 0:
+            return 0
         # Boolean array used to filter which features will be used to fit the model
         var_mask = solution.astype(bool)
         X_train = X_train[:, var_mask].copy()
