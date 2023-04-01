@@ -1,0 +1,19 @@
+# This file specifies the parameters of the Cooperative Co-Evolutionary-Based Feature Selection with Random Feature Grouping (CCFSRFG)
+
+[coevolution]
+n_subcomps = 4
+subpop_sizes = [10, 10, 8, 8]
+max_gen = 20
+penalty = true
+seed = 42
+weights = [0.6, 0.4]
+
+[wrapper]
+task = "classification"
+model_type = "random_forest"
+eval_function = "accuracy"
+
+[optimizer]
+mut_prob = 0.05
+cross_prob = 0.80
+sample_perc = 0.50
