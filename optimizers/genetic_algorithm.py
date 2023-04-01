@@ -8,46 +8,46 @@ class BinaryGeneticAlgorithm():
     Attributes
     ----------
     n_features: int
-        Number of features, that is, decision variables.
+        Number of features.
     sample_size: int
         Sample size of subpopulation to be used in Tournament Selection.
     best_individual: np.ndarray
         Individual from the subpopulation with the best evaluation.
     best_fitness: float
         Evaluation of the best individual of the subpopulation.
+    mut_prob: float
+        Probability of a mutation occurring.
+    cross_prob: float
+        Probability of a crossover occurring.
+    sample_perc: float
+        Percentage of subpopulation size that will be sampled for Tournament Selection.
     """
 
     def __init__(self,
-                 subpop_size: int,
+                 subpop_size,
                  X_train: np.ndarray,
                  y_train: np.ndarray,
                  X_test: np.ndarray,
                  y_test: np.ndarray,
                  evaluator,
-                 mut_prob: float = 0.05,
-                 cross_prob: float = 0.80,
-                 sample_perc: float = 0.10):
+                 conf: dict):
         """
         Parameters
         ----------
-            subpop_size: int
-                Number of individuals in the subpopulation.
-            X_train: np.ndarray
-                Train input data.
-            y_train: np.ndarray
-                Train output data.
-            X_test: np.ndarray
-                Test input data.
-            y_test: np.ndarray
-                Test output data.
-            evaluator: object of one of the evaluation classes
-                Responsible for evaluating individuals, that is, subsets of features.
-            mut_prob: float, default 0.05
-                Probability of a mutation occurring.
-            cross_prob: float, default 0.80
-                Probability of a crossover occurring.
-            sample_perc: float, default 0.10
-                Percentage of subpopulation size that will be sampled for Tournament Selection.
+        subpop_size: int
+            Number of individuals in the subpopulation.
+        X_train: np.ndarray
+            Train input data.
+        y_train: np.ndarray
+            Train output data.
+        X_test: np.ndarray
+            Test input data.
+        y_test: np.ndarray
+            Test output data.
+        evaluator: object of one of the evaluation classes
+            Responsible for evaluating individuals, that is, subsets of features.
+        conf: dict
+            Configuration parameters of the cooperative coevolutionary algorithm.
         """
         # Subpopulation size
         self.subpop_size = subpop_size
@@ -59,14 +59,18 @@ class BinaryGeneticAlgorithm():
         self.y_test = y_test
         # Evaluator
         self.evaluator = evaluator
+        # Configuration parameters
+        self.conf = conf
         # Mutation probability
-        self.mut_prob = mut_prob
+        self.mut_prob = self.conf["optimizer"]["mut_prob"]
         # Crossover probability
-        self.cross_prob = cross_prob
+        self.cross_prob = self.conf["optimizer"]["cross_prob"]
         # Number of features
         self.n_features = X_train.shape[1]
+        # Sample size for Tournament Selection
+        sample_size = self.conf["optimizer"]["sample_perc"] * self.subpop_size
         # At least a sample of 2 individuals
-        self.sample_size = max(round(sample_perc * subpop_size), 2)
+        self.sample_size = int(max(sample_size, 2))
         # Initialization of the best individual is utopian
         # Its representation is equivalent to selecting no features
         self.best_individual = np.zeros((self.n_features,))
@@ -75,7 +79,6 @@ class BinaryGeneticAlgorithm():
 
     def _single_point_crossover(self, parent_a, parent_b):
         """ Single point crossover. """
-
         # Random probability
         prob = float(np.random.uniform(low=0, high=1))
 
@@ -95,7 +98,6 @@ class BinaryGeneticAlgorithm():
 
     def _mutation(self, parent):
         """ Bit-flip mutation. """
-
         # Offspring
         offspring = parent.copy()
         # Random probabilities
@@ -107,9 +109,8 @@ class BinaryGeneticAlgorithm():
 
         return offspring
 
-    def _tournament_selection(self, subpop, fobjs):
+    def _tournament_selection(self, subpop, fitness):
         """ Tournament selection. """
-
         # Indexes of selected parents
         selected_idxs = np.zeros((2,))
 
@@ -119,7 +120,7 @@ class BinaryGeneticAlgorithm():
             sample_idxs = np.random.choice(range(self.subpop_size),
                                            size=self.sample_size,
                                            replace=False)
-            candidate_fitness = np.array(fobjs)[sample_idxs]        
+            candidate_fitness = np.array(fitness)[sample_idxs]
 
             # Select the best individual in the tournament
             selected_idxs[i] = np.argmax(candidate_fitness)
@@ -129,36 +130,35 @@ class BinaryGeneticAlgorithm():
 
         return parent_a, parent_b
 
-    def _survivor_selection(self, subpop, fobjs):
+    def _survivor_selection(self, subpop, fitness):
         """ Selection of individuals who will remain in the subpopulation. """
-        
         # Select the two worst individuals (lower fitness) in the subpopulation
-        idxs = np.argsort(fobjs)[:2]
+        idxs = np.argsort(fitness)[:2]
         
         # Eliminate the two worst individuals in the subpopulation
         subpop = np.delete(subpop, idxs, axis=0)
-        fobjs = np.delete(fobjs, idxs)
+        fitness = np.delete(fitness, idxs)
         
-        return subpop, fobjs
+        return subpop, fitness
 
     def _evaluate(self, individual):
         """ Evaluate the current individual using the evaluator. """
-
-        # If no feature is selected
-        if individual.sum() == 0:
-            # Select one at random
-            pos = np.random.choice(np.arange(individual.shape[0]))
-            individual[pos] = 1
         # Evaluate individual
-        metric = self.evaluator.evaluate(solution=individual,
-                                         X_train=self.X_train,
-                                         y_train=self.y_train,
-                                         X_test=self.X_test,
-                                         y_test=self.y_test)
+        fitness = self.evaluator.evaluate(solution=individual,
+                                          X_train=self.X_train,
+                                          y_train=self.y_train,
+                                          X_test=self.X_test,
+                                          y_test=self.y_test)
 
-        return metric
+        # Penalize large subsets of features
+        if self.conf["coevolution"]["penalty"]:
+            features_p = individual.sum()/individual.shape[0]
+            fitness = self.conf["coevolution"]["weights"][0] * fitness -\
+                self.conf["coevolution"]["weights"][1] * features_p
 
-    def evolve(self, subpop, fobjs):
+        return fitness
+
+    def evolve(self, subpop, fitness):
         """ Evolve a subpopulation in a single generation.
 
         Parameters
@@ -166,7 +166,7 @@ class BinaryGeneticAlgorithm():
         subpop: np.ndarray
             Individuals of the subpopulation, where each individual is an array of size equal to
             the number of features.
-        fobjs: list
+        fitness: list
             Evaluation of all individuals in the subpopulation.
 
         Returns
@@ -174,12 +174,11 @@ class BinaryGeneticAlgorithm():
         subpop: np.ndarray
             Individuals of the subpopulation, where each individual is an array of size equal to
             the number of features.
-        fobjs: list
+        fitness: list
             Evaluation of all individuals in the subpopulation.
         """
-
         # Select parents through Tournament Selection
-        parent_a, parent_b = self._tournament_selection(subpop, fobjs)
+        parent_a, parent_b = self._tournament_selection(subpop, fitness)
 
         # Recombine pairs of parents
         offspring_a, offspring_b = self._single_point_crossover(parent_a, parent_b)
@@ -194,13 +193,13 @@ class BinaryGeneticAlgorithm():
 
         # Add new individuals to the subpopulation
         subpop = np.vstack([subpop, [offspring_a, offspring_b]])
-        fobjs = np.append(fobjs, [fitness_a, fitness_b])
+        fitness = np.append(fitness, [fitness_a, fitness_b])
         
         # Select individuals for the next generation
-        subpop, fobjs = self._survivor_selection(subpop, fobjs)
+        subpop, fitness = self._survivor_selection(subpop, fitness)
 
         # Update new best individual
-        self.best_fitness = np.max(fobjs)
-        self.best_individual = subpop[np.argmax(fobjs)]
+        self.best_fitness = np.max(fitness)
+        self.best_individual = subpop[np.argmax(fitness)]
 
-        return subpop, fobjs
+        return subpop, fitness
