@@ -14,10 +14,14 @@ class RandomBinaryInitialization():
         n-dimensional array, where n is the number of features. If there is a 1 in the i-th
         position of the array, it indicates that the i-th feature should be considered and if
         there is a 0, it indicates that the feature should not be considered.
-    fobjs: list
+    local_fitness: list
         Evaluation of all individuals from all subpopulations.
+    global_fitness: list
+        Evaluation of all context vectors from all subpopulations.
     context_vectors: list
         Complete problem solutions that were randomly initialized.
+    best_individuals: list
+        Best individual of each subpopulation.
     """
 
     def __init__(self,
@@ -25,7 +29,9 @@ class RandomBinaryInitialization():
                  subcomp_sizes: list,
                  subpop_sizes: list,
                  evaluator,
-                 collaborator):
+                 collaborator,
+                 penalty: bool = False,
+                 weights: np.ndarray = None):
         """
         Parameters
         ----------
@@ -39,6 +45,11 @@ class RandomBinaryInitialization():
             Responsible for evaluating individuals, that is, subsets of features.
         collaborator: object of one of the collaboration classes.
             Responsible for selecting collaborators for individuals.
+        penalty: bool
+            If True, penalizes a large subset of features in the objective function.
+        weights: list
+            Weights of each objective, where the first element of the list weights the evaluation
+            metric and the second weights the size of the subset of features.
         """
         # Parameters as attributes
         self.data = data
@@ -59,6 +70,10 @@ class RandomBinaryInitialization():
         self.n_subcomps = len(subcomp_sizes)
         # Number of features in each subcomponent
         self.subcomp_sizes = subcomp_sizes
+        # Apply penalty on the objective function
+        self.penalty = penalty
+        # Weights of objective functions
+        self.weights = weights
 
     def build_subpopulations(self):
         """
@@ -92,13 +107,17 @@ class RandomBinaryInitialization():
             # List to store the evaluations of these context vectors
             subpop_global_fitness = list()
             # Evaluate each individual in the subpopulation
-            for j, indiv in enumerate(subpop):
+            for j, individual in enumerate(subpop):
                 # Evaluate the current individual
-                local_metric = self.evaluator.evaluate(solution=indiv,
+                local_metric = self.evaluator.evaluate(solution=individual,
                                                        X_train=self.data.S_train[i],
                                                        y_train=self.data.y_train,
                                                        X_test=self.data.S_val[i],
                                                        y_test=self.data.y_val)
+                # Penalize large subsets of features
+                if self.penalty:
+                    features_p = individual.sum()/individual.shape[0]
+                    local_metric = self.weights[0] * local_metric - self.weights[1] * features_p
                 # Store evaluation of the current individual
                 subpop_local_fitness.append(local_metric)
                 # Find random collaborator(s) for the current individual
@@ -113,6 +132,10 @@ class RandomBinaryInitialization():
                                                         y_train=self.data.y_train,
                                                         X_test=self.data.X_val,
                                                         y_test=self.data.y_val)
+                # Penalize large subsets of features
+                if self.penalty:
+                    features_p = context_vector.sum()/context_vector.shape[0]
+                    global_metric = self.weights[0] * global_metric - self.weights[1] * features_p
                 # Store the complete problem solution related to the current individual
                 subpop_context_vectors.append(context_vector)
                 # Store evaluation of the current context vector
