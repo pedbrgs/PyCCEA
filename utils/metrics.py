@@ -57,6 +57,7 @@ class ClassificationMetrics():
 
         # Show evaluation metrics
         if verbose:
+            logging.getLogger().disabled = False
             logging.info(f"Precision: {self.values['precision']}")
             logging.info(f"Recall/Sensitivity/TPR: {self.values['recall']}")
             logging.info(f"F1-score: {self.values['f1_score']}")
