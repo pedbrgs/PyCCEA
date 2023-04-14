@@ -1,7 +1,7 @@
 import logging
 import numpy as np
-from sklearn.metrics import (precision_score, recall_score, accuracy_score, f1_score,
-                             confusion_matrix)
+from imblearn.metrics import specificity_score
+from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score
 
 
 class ClassificationMetrics():
@@ -34,11 +34,7 @@ class ClassificationMetrics():
         """
         # Type of aggregation used in the evaluation metrics according to the classification task
         avg = 'macro' if np.unique(y_test).shape[0] > 2 else 'binary'
-        
-        # Square matrix (CxC), where C is the number of classes, containing the number of true
-        # positives (tp), number of false positives (fp), number of true negatives (tn) and
-        # number of false negatives (fn)
-        self.values['conf_matrix'] = confusion_matrix(y_test, y_pred)
+
         # Ratio of the correctly identified positive cases to all the predicted positive cases,
         # i.e., tp/(tp+fp).
         self.values['precision'] = round(precision_score(y_test, y_pred, average=avg), 4)
@@ -52,8 +48,7 @@ class ClassificationMetrics():
         self.values['accuracy'] = round(accuracy_score(y_test, y_pred), 4)
         # Ratio of the correctly identified negative cases to all the predicted negative cases,
         # i.e., (tn)/(tn + fp)
-        tn, fp, fn, tp = self.values['conf_matrix'].ravel()
-        self.values['specificity'] = round(tn / (tn + fp), 4)
+        self.values['specificity'] = round(specificity_score(y_test, y_pred, average=avg), 4)
 
         # Show evaluation metrics
         if verbose:

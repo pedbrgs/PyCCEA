@@ -89,6 +89,7 @@ class DataLoader():
             if self.encode:
                 self.y = self.y.values.reshape((-1,1))
                 self.y = OneHotEncoder().fit_transform(self.y).toarray()
+                self.y = pd.DataFrame(self.y)
 
         # Binary classification problem (C = 2)
         elif self.dataset == 'divorce':
