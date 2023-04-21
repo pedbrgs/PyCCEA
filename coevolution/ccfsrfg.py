@@ -93,8 +93,15 @@ class CCFSRFG():
         self._init_collaborator()
         # List to store the best global fitness in each generation
         self.convergence_curve = list()
+
         # Initialize logger with info level
         logging.basicConfig(encoding="utf-8", level=logging.INFO)
+        # Reset handlers
+        logging.getLogger().handlers = []
+        # Add a custom handler
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter('%(message)s'))
+        logging.getLogger().addHandler(handler)
 
     def _init_decomposer(self):
         """Instantiate feature grouping method."""
@@ -227,7 +234,9 @@ class CCFSRFG():
         # Number of generations that the best global fitness has not improved
         stagnation_counter = 0
         # Initialize the optimization progress bar
-        progress_bar = tqdm(total=self.conf["coevolution"]["max_gen"], desc="Generations")
+        progress_bar = tqdm(total=self.conf["coevolution"]["max_gen"],
+                            desc="Generations",
+                            leave=False)
 
         # Iterate up to the maximum number of generations
         while n_gen <= self.conf["coevolution"]["max_gen"]:
@@ -275,8 +284,9 @@ class CCFSRFG():
                 # Checks whether the optimization has been stagnant for a long time
                 if stagnation_counter >= self.conf["coevolution"]["max_gen_without_improvement"]:
                     # Enable logger
-                    progress_bar.write(
-                        "Early stopping because fitness has been stagnant for "
+                    logging.getLogger().disabled = False
+                    logging.info(
+                        "\nEarly stopping because fitness has been stagnant for "
                         f"{stagnation_counter} generations in a row."
                     )
                     break
