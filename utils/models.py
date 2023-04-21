@@ -5,6 +5,7 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.exceptions import UndefinedMetricWarning
 from sklearn.model_selection import RandomizedSearchCV
+from sklearn.naive_bayes import ComplementNB, MultinomialNB
 from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score
 
 
@@ -22,7 +23,12 @@ class ClassificationModel():
         used to fit the machine learning model.
     """
 
-    models = {'svm': SVC, 'random_forest': RandomForestClassifier}
+    models = {
+        'support_vector_machine': SVC,
+        'random_forest': RandomForestClassifier,
+        'complement_naive_bayes': ComplementNB,
+        'multinomial_naive_bayes': MultinomialNB
+    }
 
     def __init__(self, model_type: str):
         """
@@ -55,7 +61,7 @@ class ClassificationModel():
         Optimize the hyperparameters of the model and return the best model found.
         """
         # Grid of possible hyperparameter values
-        if self.model_type == 'svm':
+        if self.model_type == 'support_vector_machine':
             self.grid = {
                 'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
                 'degree': np.arange(1, 6),
@@ -73,9 +79,15 @@ class ClassificationModel():
                 'ccp_alpha': np.arange(0, 0.6, 0.1),
                 'max_samples': np.arange(0.1, 1.0, 0.1)
             }
+        elif self.model_type in ['complement_naive_bayes', 'multinomial_naive_bayes']:
+            self.grid = {
+                'alpha': [0.01, 0.1, 0.5, 1.0, 10.0],
+                'fit_prior': [True, False]
+            }
 
         # Scoring metric used according to the classification task
         scoring = 'f1_macro' if np.unique(y_train).shape[0] > 2 else 'f1'
+
         # Tuning hyperparameters with Randomized Search with Cross Validation
         search = RandomizedSearchCV(estimator=self.estimator,
                                     param_distributions=self.grid,
