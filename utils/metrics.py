@@ -33,19 +33,7 @@ class ClassificationMetrics():
             If True, show evaluation metrics in the test set.
         """
         # Type of aggregation used in the evaluation metrics according to the classification task
-        # If y has not been encoded
-        if len(y_test.shape) == 1:
-            # If there are more than 2 classes, it is a multiclass classification task
-            if np.unique(y_test).shape[0] > 2:
-                avg = 'macro'
-            # Otherwise, it is a binary classification task
-            else:
-                avg = 'binary'
-        # Otherwise, y has been encoded
-        else:
-            avg = 'macro'
-            y_test = y_test.argmax(axis=1)
-            y_pred = y_pred.argmax(axis=1)
+        avg = 'macro' if np.unique(y_test).shape[0] > 2 else 'binary'
 
         # Ratio of the correctly identified positive cases to all the predicted positive cases,
         # i.e., tp/(tp+fp).

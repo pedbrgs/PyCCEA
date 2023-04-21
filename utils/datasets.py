@@ -1,7 +1,6 @@
 import logging
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 
 
@@ -40,12 +39,9 @@ class DataLoader():
         ----------
         dataset: str
             Name of the dataset that will be loaded and processed.
-        encode: bool
-            Converts categorical variables into numerical values with One Hot Encoding. 
         """
         
         self.dataset = dataset
-        self.encode = encode
         # Initialize logger with info level
         logging.basicConfig(encoding='utf-8', level=logging.INFO)
         
@@ -86,10 +82,6 @@ class DataLoader():
         elif self.dataset == 'dermatology':
             self.X = self.data.iloc[:,:-1].copy()
             self.y = self.data.iloc[:,-1].copy()
-            if self.encode:
-                self.y = self.y.values.reshape((-1,1))
-                self.y = OneHotEncoder().fit_transform(self.y).toarray()
-                self.y = pd.DataFrame(self.y)
 
         # Binary classification problem (C = 2)
         elif self.dataset == 'divorce':
