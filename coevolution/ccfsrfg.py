@@ -224,6 +224,8 @@ class CCFSRFG():
 
         # Set the number of generations counter with the first generation
         n_gen = 1
+        # Number of generations that the best global fitness has not improved
+        stagnation_counter = 0
         # Initialize the optimization progress bar
         progress_bar = tqdm(total=self.conf["coevolution"]["max_gen"], desc="Generations")
 
@@ -255,6 +257,8 @@ class CCFSRFG():
             best_context_vector, best_global_fitness = self._get_global_best()
             # Update best context vector
             if self.best_global_fitness < best_global_fitness:
+                # Reset stagnation counter because best global fitness has improved
+                stagnation_counter = 0
                 # Enable logger if specified
                 logging.getLogger().disabled = False if self.verbose else True
                 # Show improvement
@@ -265,6 +269,17 @@ class CCFSRFG():
                 self.best_context_vector = best_context_vector
                 # Update best global fitness
                 self.best_global_fitness = best_global_fitness
+            else:
+                # Increase stagnation counter because best global fitness has not improved
+                stagnation_counter += 1
+                # Checks whether the optimization has been stagnant for a long time
+                if stagnation_counter >= self.conf["coevolution"]["max_gen_without_improvement"]:
+                    # Enable logger
+                    progress_bar.write(
+                        "Early stopping because fitness has been stagnant for "
+                        f"{stagnation_counter} generations in a row."
+                    )
+                    break
             # Increase number of generations
             n_gen += 1
             # Update progress bar
