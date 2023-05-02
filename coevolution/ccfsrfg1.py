@@ -1,17 +1,16 @@
-import copy
 import logging
-import numpy as np
 from tqdm import tqdm
-from utils.datasets import DataLoader
+from coevolution.ccea import CCEA
 from evaluation.wrapper import WrapperEvaluation
 from decomposition.random import RandomFeatureGrouping
-from collaboration.random import SingleRandomCollaboration
+from cooperation.best import SingleBestCollaboration
+from cooperation.random import SingleRandomCollaboration
 from initialization.random import RandomBinaryInitialization
 from optimizers.genetic_algorithm import BinaryGeneticAlgorithm
 
 
-class CCFSRFG():
-    """ Cooperative Co-Evolutionary-Based Feature Selection with Random Feature Grouping.
+class CCFSRFG1(CCEA):
+    """ Cooperative Co-Evolutionary-Based Feature Selection with Random Feature Grouping 1.
 
     Rashid, A. N. M., et al. "Cooperative co-evolution for feature selection in Big Data with
     random feature grouping." Journal of Big Data 7.1 (2020): 1-42.
@@ -20,88 +19,9 @@ class CCFSRFG():
     ----------
     subcomp_sizes: list
         Number of features in each subcomponent.
-    subpop_sizes: list
-        Subpopulation sizes, that is, the number of individuals in each subpopulation.
-    decomposer: object of one of the decomposition classes
-        Responsible for decompose the problem into smaller subproblems.
-    evaluator: object of one of the evaluation classes
-        Responsible for evaluating individuals, that is, subsets of features.
-    collaborator: object of one of the collaboration classes.
-        Responsible for selecting collaborators for individuals.
-    initializer: object of one of the subpopulation initializers
-        Responsible for initializing all individuals of all subpopulations.
-    optimizers: list of objects of optimizer classes
-        Responsible for evolving each of the subpopulations individually.
     feature_idxs: np.ndarray
         Shuffled list of feature indexes.
-    subpops: list
-        Individuals from all subpopulations. Each individual is represented by a binary
-        n-dimensional array, where n is the number of features. If there is a 1 in the i-th
-        position of the array, it indicates that the i-th feature should be considered and if
-        there is a 0, it indicates that the feature should not be considered.
-    local_fitness: list
-        Evaluation of all individuals from all subpopulations.
-    global_fitness: list
-        Evaluation of all context vectors from all subpopulations.
-    context_vectors: list
-        Complete problem solutions.
-    convergence_curve: list
-        Best global fitness in each generation.
-    current_best: dict
-        Current best individual of each subpopulation and its respective evaluation.
-    best_context_vector: np.ndarray
-        Best solution of the complete problem.
-    best_global_fitness: float
-        Evaluation of the best solution of the complete problem.
     """
-
-    def __init__(self,
-                 data: DataLoader,
-                 conf: dict,
-                 verbose: bool = True):
-        """
-        Parameters
-        ----------
-        data: DataLoader
-            Container with process data and training and test sets.
-        conf: dict
-            Configuration parameters of the cooperative coevolutionary algorithm.
-        verbose: bool, default True
-            If True, show the improvements obtained from the optimization process.
-        """
-        # Seed
-        self.seed = conf["coevolution"]["seed"]
-        # Verbose
-        self.verbose = verbose
-        # Data
-        self.data = data
-        # Number of subcomponents
-        self.n_subcomps = conf["coevolution"]["n_subcomps"]
-        # Size of each subpopulation
-        self.subpop_sizes = conf["coevolution"]["subpop_sizes"]
-        if self.n_subcomps != len(self.subpop_sizes):
-            raise AssertionError(
-                f"The number of components ({self.n_subcomps}) is not equal to the number of "
-                f"subpopulations ({len(self.subpop_sizes)}). Check parameters 'n_subcomps' and "
-                "'subpop_sizes' in the configuration file."
-            )
-        # Configuration parameters
-        self.conf = conf
-        # Initializes the components of the cooperative co-evolutionary algorithm
-        self._init_decomposer()
-        self._init_evaluator()
-        self._init_collaborator()
-        # List to store the best global fitness in each generation
-        self.convergence_curve = list()
-
-        # Initialize logger with info level
-        logging.basicConfig(encoding="utf-8", level=logging.INFO)
-        # Reset handlers
-        logging.getLogger().handlers = []
-        # Add a custom handler
-        handler = logging.StreamHandler()
-        handler.setFormatter(logging.Formatter('%(message)s'))
-        logging.getLogger().addHandler(handler)
 
     def _init_decomposer(self):
         """Instantiate feature grouping method."""
@@ -115,7 +35,8 @@ class CCFSRFG():
 
     def _init_collaborator(self):
         """Instantiate collaboration method."""
-        self.collaborator = SingleRandomCollaboration(seed=self.seed)
+        self.best_collaborator = SingleBestCollaboration()
+        self.random_collaborator = SingleRandomCollaboration(seed=self.seed)
 
     def _init_subpop_initializer(self):
         """Instantiate subpopulation initialization method."""
@@ -123,7 +44,7 @@ class CCFSRFG():
                                                       subcomp_sizes=self.subcomp_sizes,
                                                       subpop_sizes=self.subpop_sizes,
                                                       evaluator=self.evaluator,
-                                                      collaborator=self.collaborator,
+                                                      collaborator=self.random_collaborator,
                                                       penalty=self.conf["coevolution"]["penalty"],
                                                       weights=self.conf["coevolution"]["weights"])
 
@@ -154,48 +75,6 @@ class CCFSRFG():
         self.data.X_val = self.data.X_val[:, self.feature_idxs].copy()
         self.data.X_test = self.data.X_test[:, self.feature_idxs].copy()
 
-    def _init_subpopulations(self):
-        """Initialize all subpopulations according to their respective sizes."""
-        # Instantiate subpopulation initialization method
-        self._init_subpop_initializer()
-        # Build subpopulations
-        # Number of subpopulations is equal to the number of subcomponents
-        self.initializer.build_subpopulations()
-        # Evaluate all individuals in each subpopulation
-        # Number of individuals in each subpopulation is in the list of subcomponent sizes
-        self.initializer.evaluate_individuals()
-        # Subpopulations
-        self.subpops = copy.deepcopy(self.initializer.subpops)
-        # Evaluations of individuals
-        self.local_fitness = copy.deepcopy(self.initializer.local_fitness)
-        # Context vectors
-        self.context_vectors = copy.deepcopy(self.initializer.context_vectors)
-        # Evaluations of context vectors
-        self.global_fitness = copy.deepcopy(self.initializer.global_fitness)
-
-    def _get_best_individuals(self):
-        """Get the best individual from each subpopulation."""
-        # Current best individual of each subpopulation
-        self.current_best = dict()
-        # For each subpopulation
-        for i in range(self.n_subcomps):
-            # TODO Would the best individual be the one with the highest global fitness or the highest local fitness?
-            # best_ind_idx = np.argmax(self.local_fitness[i])
-            best_ind_idx = np.argmax(self.global_fitness[i])
-            self.current_best[i] = dict()
-            self.current_best[i]["individual"] = self.subpops[i][best_ind_idx]
-            self.current_best[i]["local_fitness"] = self.local_fitness[i][best_ind_idx]
-            self.current_best[i]["context_vector"] = self.context_vectors[i][best_ind_idx]
-            self.current_best[i]["global_fitness"] = self.global_fitness[i][best_ind_idx]
-
-    def _get_global_best(self):
-        """Get the globally best context vector."""
-        best_idx = np.argmax([best["global_fitness"] for best in self.current_best.values()])
-        best_fitness = self.current_best[best_idx]["global_fitness"]
-        best_context_vector = self.current_best[best_idx]["context_vector"]
-
-        return best_context_vector, best_fitness
-
     def _evaluate(self, context_vector):
         """Evaluate the given context vector using the evaluator."""
         # Evaluate the context vector
@@ -222,10 +101,13 @@ class CCFSRFG():
         # Instantiate optimizers
         self._init_optimizers()
 
-        # Find the best individual and context vector from each subpopulation
-        self._get_best_individuals()
-        # Best individuals in a list
-        best_individuals = [best["individual"] for best in self.current_best.values()]
+        # Get the best individual and context vector from each subpopulation
+        self.current_best = self.best_collaborator.get_best_individuals(
+            subpops=self.subpops,
+            local_fitness=self.local_fitness,
+            global_fitness=self.global_fitness,
+            context_vectors=self.context_vectors
+        )
         # Select the globally best context vector
         self.best_context_vector, self.best_global_fitness = self._get_global_best()
 
@@ -246,22 +128,30 @@ class CCFSRFG():
             for i in range(self.n_subcomps):
                 self.subpops[i], self.local_fitness[i] = self.optimizers[i].evolve(
                     self.subpops[i],
-                    self.local_fitness[i])
+                    self.local_fitness[i]
+                )
                 # Best individuals from the previous generation as collaborators for each
                 # individual in the current generation
                 for j in range(self.subpop_sizes[i]):
-                    collaborators = copy.deepcopy(best_individuals)
-                    collaborators[i] = self.subpops[i][j]
-                    context_vector = self.collaborator.build_context_vector(collaborators)
+                    collaborators = self.best_collaborator.get_collaborators(
+                        subpop_idx=i,
+                        indiv_idx=j,
+                        subpops=self.subpops,
+                        current_best=self.current_best
+                    )
+                    context_vector = self.best_collaborator.build_context_vector(collaborators)
                     # Update the context vector
                     # TODO Should I store the best context vector of each subpopulation across generations?
                     self.context_vectors[i][j] = context_vector
                     # Update the global evaluation
                     self.global_fitness[i][j] = self._evaluate(context_vector)
-            # Find the best individual from each subpopulation
-            self._get_best_individuals()
-            # Update list of best individuals
-            best_individuals = [best["individual"] for best in self.current_best.values()]
+            # Get the best individual and context vector from each subpopulation
+            self.current_best = self.best_collaborator.get_best_individuals(
+                subpops=self.subpops,
+                local_fitness=self.local_fitness,
+                global_fitness=self.global_fitness,
+                context_vectors=self.context_vectors
+            )
             # Select the globally best context vector
             best_context_vector, best_global_fitness = self._get_global_best()
             # Update best context vector
