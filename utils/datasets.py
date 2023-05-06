@@ -121,9 +121,14 @@ class DataLoader():
                                    test_size=test_size,
                                    random_state=seed)
         self.X_train, self.X_test, self.y_train, self.y_test = subsets
-        # Split training set into training and validation sets
-        subsets = train_test_split(self.X_train,
-                                   self.y_train,
-                                   test_size=val_size/(1-test_size),
-                                   random_state=seed)
-        self.X_train, self.X_val, self.y_train, self.y_val = subsets
+        # Train-validation
+        if val_size > 0:
+            # Split training set into training and validation sets
+            subsets = train_test_split(self.X_train,
+                                       self.y_train,
+                                       test_size=val_size/(1-test_size),
+                                       random_state=seed)
+            self.X_train, self.X_val, self.y_train, self.y_val = subsets
+        # Cross-validation
+        else:
+            self.X_val, self.y_val = None, None
