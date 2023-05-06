@@ -6,7 +6,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.exceptions import UndefinedMetricWarning
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.naive_bayes import ComplementNB, MultinomialNB
-from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score
 
 
 class ClassificationModel():
@@ -64,7 +63,7 @@ class ClassificationModel():
         if self.model_type == 'support_vector_machine':
             self.grid = {
                 'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
-                'degree': np.arange(1, 6),
+                'degree': np.arange(1, 3),
                 'gamma': ['scale', 'auto'],
                 'class_weight': [None, 'balanced']
             }
@@ -108,7 +107,7 @@ class ClassificationModel():
               X_train: np.ndarray,
               y_train: np.ndarray,
               seed: int = 123456,
-              kfolds: int = 5,
+              kfolds: int = 10,
               n_iter: int = 100,
               optimize: bool = False,
               verbose: bool = False):
@@ -123,7 +122,7 @@ class ClassificationModel():
             Train output data.   
         seed: int, default 123456
             Controls the shuffling applied for subsampling the data.
-        kfolds: int, default 5
+        kfolds: int, default 10
             Number of folds in the k-fold cross validation.
         n_iter: int, default 100
             Number of hyperparameter settings that are sampled. It trades off runtime and quality
