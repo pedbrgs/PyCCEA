@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 from tqdm import tqdm
 from coevolution.ccea import CCEA
 from evaluation.wrapper import WrapperEvaluation
@@ -31,7 +32,9 @@ class CCFSRFG1(CCEA):
         """Instantiate evaluation method."""
         self.evaluator = WrapperEvaluation(task=self.conf["wrapper"]["task"],
                                            model_type=self.conf["wrapper"]["model_type"],
-                                           eval_function=self.conf["wrapper"]["eval_function"])
+                                           eval_function=self.conf["wrapper"]["eval_function"],
+                                           eval_mode=self.conf["wrapper"]["eval_mode"],
+                                           kfolds=self.conf["wrapper"].get("kfolds"))
 
     def _init_collaborator(self):
         """Instantiate collaboration method."""
@@ -56,8 +59,8 @@ class CCFSRFG1(CCEA):
             optimizer = BinaryGeneticAlgorithm(subpop_size=self.subpop_sizes[i],
                                                X_train=self.data.S_train[i],
                                                y_train=self.data.y_train,
-                                               X_test=self.data.S_val[i],
-                                               y_test=self.data.y_val,
+                                               X_val=self.data.S_val[i],
+                                               y_val=self.data.y_val,
                                                evaluator=self.evaluator,
                                                conf=self.conf)
             self.optimizers.append(optimizer)
@@ -67,13 +70,22 @@ class CCFSRFG1(CCEA):
         # Decompose features in the training set
         self.data.S_train, self.subcomp_sizes, self.feature_idxs = self.decomposer.decompose(
             X=self.data.X_train)
-        # Decompose features in the validation set
-        self.data.S_val, _, _ = self.decomposer.decompose(X=self.data.X_val,
-                                                          feature_idxs=self.feature_idxs)
-        # Reorder the data according to shuffling in feature decomposition
+        # Reorder train and test data according to shuffling in feature decomposition
         self.data.X_train = self.data.X_train[:, self.feature_idxs].copy()
-        self.data.X_val = self.data.X_val[:, self.feature_idxs].copy()
         self.data.X_test = self.data.X_test[:, self.feature_idxs].copy()
+
+        # Train-validation
+        if self.conf["wrapper"]["eval_mode"] == 'train_val':
+            # Decompose features in the validation set
+            self.data.S_val, _, _ = self.decomposer.decompose(X=self.data.X_val,
+                                                              feature_idxs=self.feature_idxs)
+            # Reorder validation data according to shuffling in feature decomposition
+            self.data.X_val = self.data.X_val[:, self.feature_idxs].copy()
+        # Cross-validation
+        else:
+            # It is just to avoid crashing when initializing the optimizers.
+            # It will not be used in the cross-validation mode.
+            self.data.S_val = np.full(shape=(self.n_subcomps), fill_value=None)
 
     def _evaluate(self, context_vector):
         """Evaluate the given context vector using the evaluator."""
@@ -81,8 +93,8 @@ class CCFSRFG1(CCEA):
         fitness = self.evaluator.evaluate(solution=context_vector,
                                           X_train=self.data.X_train,
                                           y_train=self.data.y_train,
-                                          X_test=self.data.X_val,
-                                          y_test=self.data.y_val)
+                                          X_val=self.data.X_val,
+                                          y_val=self.data.y_val)
 
         # Penalize large subsets of features
         if self.conf["coevolution"]["penalty"]:

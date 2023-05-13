@@ -36,7 +36,7 @@ class RandomBinaryInitialization():
         Parameters
         ----------
         data: DataLoader
-            Container with process data and training and test sets.
+            Container with processed data and training, validation and test sets.
         subcomp_sizes: list
             Number of features in each subcomponent.
         subpop_sizes: list
@@ -112,12 +112,8 @@ class RandomBinaryInitialization():
                 local_metric = self.evaluator.evaluate(solution=individual,
                                                        X_train=self.data.S_train[i],
                                                        y_train=self.data.y_train,
-                                                       X_test=self.data.S_val[i],
-                                                       y_test=self.data.y_val)
-                # Penalize large subsets of features
-                if self.penalty:
-                    features_p = individual.sum()/individual.shape[0]
-                    local_metric = self.weights[0] * local_metric - self.weights[1] * features_p
+                                                       X_val=self.data.S_val[i],
+                                                       y_val=self.data.y_val)
                 # Store evaluation of the current individual
                 subpop_local_fitness.append(local_metric)
                 # Find random collaborator(s) for the current individual
@@ -130,8 +126,8 @@ class RandomBinaryInitialization():
                 global_metric = self.evaluator.evaluate(solution=context_vector,
                                                         X_train=self.data.X_train,
                                                         y_train=self.data.y_train,
-                                                        X_test=self.data.X_val,
-                                                        y_test=self.data.y_val)
+                                                        X_val=self.data.X_val,
+                                                        y_val=self.data.y_val)
                 # Penalize large subsets of features
                 if self.penalty:
                     features_p = context_vector.sum()/context_vector.shape[0]
