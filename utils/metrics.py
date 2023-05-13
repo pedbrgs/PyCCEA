@@ -81,7 +81,7 @@ class ClassificationMetrics():
         else:
             scoring = {'precision': make_scorer(precision_score, average=avg),
                        'recall': make_scorer(recall_score, average=avg),
-                       'f1': make_scorer(f1_score, average=avg),
+                       'f1_score': make_scorer(f1_score, average=avg),
                        'accuracy': make_scorer(accuracy_score),
                        'specificity': make_scorer(specificity_score, average=avg)}
             evaluation = cross_validate(estimator, X, y, scoring=scoring, cv=kfolds)
