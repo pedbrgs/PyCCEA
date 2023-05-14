@@ -3,18 +3,21 @@
 [coevolution]
 n_subcomps = 4
 subpop_sizes = [30, 30, 30, 30]
-max_gen = 1000
-max_gen_without_improvement = 10
+max_gen = 10000
+max_gen_without_improvement = 100
 penalty = true
 seed = 42
 weights = [0.6, 0.4]
 
 [wrapper]
 task = "classification"
-model_type = "random_forest"
+model_type = "gaussian_naive_bayes"
 eval_function = "accuracy"
+eval_mode = "kfold_cv"
+kfolds = 10
 
 [optimizer]
-mut_prob = 0.05
-cross_prob = 1.00
-sample_perc = 0.50
+mutation_rate = 0.05
+crossover_rate = 1.00
+tournament_sample_size = 1
+elite_size = 1
