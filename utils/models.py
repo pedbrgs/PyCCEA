@@ -5,7 +5,7 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.exceptions import UndefinedMetricWarning
 from sklearn.model_selection import RandomizedSearchCV
-from sklearn.naive_bayes import ComplementNB, MultinomialNB
+from sklearn.naive_bayes import ComplementNB, GaussianNB, MultinomialNB
 
 
 class ClassificationModel():
@@ -26,6 +26,7 @@ class ClassificationModel():
         'support_vector_machine': SVC,
         'random_forest': RandomForestClassifier,
         'complement_naive_bayes': ComplementNB,
+        'gaussian_naive_bayes': GaussianNB,
         'multinomial_naive_bayes': MultinomialNB
     }
 
@@ -82,6 +83,10 @@ class ClassificationModel():
             self.grid = {
                 'alpha': [0.01, 0.1, 0.5, 1.0, 10.0],
                 'fit_prior': [True, False]
+            }
+        elif self.model_type in ['gaussian_naive_bayes']:
+            self.grid = {
+                'var_smoothing': np.logspace(0,-9, num=100)
             }
 
         # Scoring metric used according to the classification task
