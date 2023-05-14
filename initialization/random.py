@@ -114,6 +114,10 @@ class RandomBinaryInitialization():
                                                        y_train=self.data.y_train,
                                                        X_val=self.data.S_val[i],
                                                        y_val=self.data.y_val)
+                # Penalize large subsets of features
+                if self.penalty:
+                    features_p = individual.sum()/individual.shape[0]
+                    local_metric = self.weights[0] * local_metric - self.weights[1] * features_p
                 # Store evaluation of the current individual
                 subpop_local_fitness.append(local_metric)
                 # Find random collaborator(s) for the current individual
