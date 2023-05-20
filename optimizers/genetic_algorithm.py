@@ -89,14 +89,13 @@ class BinaryGeneticAlgorithm():
             # Crossover point
             point = np.random.randint(low=1, high=self.n_features)
             # Offspring
-            offspring_a = np.concatenate([parent_a[:point], parent_b[point:]], axis=0)
-            offspring_b = np.concatenate([parent_b[:point], parent_a[point:]], axis=0)                
+            offspring = np.concatenate([parent_b[:point], parent_a[point:]], axis=0)
         else:
-            # Offspring will be a copy of their parents
-            offspring_a = parent_a.copy()
-            offspring_b = parent_b.copy()
+            # Offspring will be a copy of a parent
+            parent_idx = np.random.choice(range(2))
+            offspring = [parent_a, parent_b][parent_idx].copy()
 
-        return offspring_a, offspring_b
+        return offspring
 
     def _mutation(self, parent):
         """ Bit-flip mutation. """
@@ -194,24 +193,19 @@ class BinaryGeneticAlgorithm():
         next_fitness = np.array(fitness)[n_bests].tolist()
 
         # Perform (subpop_size - elite_size) Tournament Selections to build the next generation
-        for i in range(self.elite_size, self.subpop_size, 2):
+        for i in range(self.elite_size, self.subpop_size):
 
             # Select parents through Tournament Selection
             parent_a, parent_b = self._tournament_selection(subpop, fitness)
             # Recombine pairs of parents
-            offspring_a, offspring_b = self._single_point_crossover(parent_a, parent_b)
+            offspring = self._single_point_crossover(parent_a, parent_b)
             # Mutate the resulting offspring
-            offspring_a = self._mutation(offspring_a)
-            offspring_b = self._mutation(offspring_b)
-            # Evaluate new candidates
-            fitness_a = self._evaluate(offspring_a)
-            fitness_b = self._evaluate(offspring_b)
-            # Add new individuals to the subpopulation
-            next_subpop = np.vstack([next_subpop, [offspring_a, offspring_b]])
-            next_fitness = np.append(next_fitness, [fitness_a, fitness_b])
-
-        # Select individuals for the next generation
-        next_subpop, next_fitness = self._survivor_selection(next_subpop, next_fitness)
+            offspring = self._mutation(offspring)
+            # Evaluate new candidate
+            fvalue = self._evaluate(offspring)
+            # Add new individual to the subpopulation
+            next_subpop = np.vstack([next_subpop, offspring])
+            next_fitness = np.append(next_fitness, fvalue)
 
         # Update new best individual
         self.best_fitness = np.max(next_fitness)
