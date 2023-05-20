@@ -26,11 +26,23 @@ class DataLoader():
         Test output data.
     """
 
+    data_folder = './datasets/'
+
     datasets = {
-        'breast_cancer': './datasets/breast_cancer/wdbc.csv',
-        'dermatology': './datasets/dermatology/dermatology.csv',
-        'divorce': './datasets/divorce/divorce.csv',
-        'qsar_toxicity': './datasets/qsar_toxicity/qsar_oral_toxicity.csv'
+        '11_tumor': f'{data_folder}11_tumor.csv',
+        '9_tumor': f'{data_folder}9_tumor.csv',
+        'brain_tumor_1': f'{data_folder}brain_tumor_1.csv',
+        'brain_tumor_2': f'{data_folder}brain_tumor_2.csv',
+        'breast_cancer': f'{data_folder}wdbc.csv',
+        'dermatology': f'{data_folder}dermatology.csv',
+        'divorce': f'{data_folder}divorce.csv',
+        'dlbcl': f'{data_folder}dlbcl.csv',
+        'leukemia_1': f'{data_folder}leukemia_1.csv',
+        'leukemia_2': f'{data_folder}leukemia_2.csv',
+        'leukemia_3': f'{data_folder}leukemia_3.csv',
+        'lungc': f'{data_folder}lungc.csv',
+        'prostate_tumor_1': f'{data_folder}prostate_tumor_1.csv',
+        'qsar_toxicity': f'{data_folder}qsar_oral_toxicity.csv'
         }
 
     def __init__(self, dataset: str, encode: bool = False):
@@ -44,7 +56,33 @@ class DataLoader():
         self.dataset = dataset
         # Initialize logger with info level
         logging.basicConfig(encoding='utf-8', level=logging.INFO)
-        
+
+    def _check_header(self, file: str):
+        """
+        Check if a CSV file has a header.
+
+        Parameters
+        ----------
+        file: str
+            Name of the CSV file.
+
+        Returns
+        -------
+        has_header: bool
+            True if file has a header.
+        """
+        data = pd.read_csv(file, header=None, nrows=1)
+        has_header = data.dtypes.nunique() != 1
+        return has_header
+
+    def _get_input(self):
+        """Get the input data X from the dataset when the output is the last column."""
+        return self.data.iloc[:,:-1].copy()
+
+    def _get_output(self):
+        """Get the output data y from the dataset when the output is the last column."""
+        return self.data.iloc[:,-1].copy()
+
     def load(self):
         """
         Load dataset according to dataset given as a parameter.
@@ -59,8 +97,11 @@ class DataLoader():
             )
         # Load dataset
         logging.info(f"Dataset: {self.dataset}")
-        self.data = pd.read_csv(path)
-        
+        if self._check_header(path):
+            self.data = pd.read_csv(path, header=None)
+        else:
+            self.data = pd.read_csv(path)
+
     def preprocess(self):
         """
         Preprocess dataset according to dataset given as a parameter, i.e., splits the data into
@@ -70,33 +111,29 @@ class DataLoader():
         self.data.replace(to_replace = '?', value=np.nan, inplace=True)
         # Removing rows with at least one NaN value
         self.data.dropna(inplace=True)
-        
-        # Binary classification problem (C = 2)
-        if self.dataset == 'breast_cancer':
+
+        # Standard preprocessing cases
+        special_datasets = ['breast_cancer', 'qsar_toxicity']
+        standard_datasets = list(set(DataLoader.datasets.keys()).difference(special_datasets))
+
+        if self.dataset in standard_datasets:
+            self.X = self._get_input()
+            self.y = self._get_output()
+
+        elif self.dataset == 'breast_cancer':
             self.X = self.data.iloc[:,2:].copy()
             self.y = self.data.iloc[:,1].copy()
             self.y.loc[self.y == 'M'] = 1
             self.y.loc[self.y == 'B'] = 0
-        
-        # Multiclass classification problem (C = 6)
-        elif self.dataset == 'dermatology':
-            self.X = self.data.iloc[:,:-1].copy()
-            self.y = self.data.iloc[:,-1].copy()
 
-        # Binary classification problem (C = 2)
-        elif self.dataset == 'divorce':
-            self.X = self.data.iloc[:,:-1].copy()
-            self.y = self.data.iloc[:,-1].copy()
-            
-        # Binary classification problem (C = 2)
         elif self.dataset == 'qsar_toxicity':
-            self.X = self.data.iloc[:,:-1].copy()
-            self.y = self.data.iloc[:,-1].copy()
+            self.X = self._get_input()
+            self.y = self._get_output()
             self.y.loc[self.y == 'positive'] = 1
             self.y.loc[self.y == 'negative'] = 0
         
         # Labels as integer values
-        self.y = self.y.astype('int')
+        self.y = self.y.astype(int)
             
     def split(self, val_size: float = 0.10, test_size: float = 0.10, seed: int = 123456):
         """
@@ -116,19 +153,35 @@ class DataLoader():
             Controls the shuffling applied to the data before applying the split.
         """
         # Split data into training and test sets
-        subsets = train_test_split(self.X.to_numpy(),
-                                   self.y.to_numpy(),
-                                   test_size=test_size,
-                                   random_state=seed)
-        self.X_train, self.X_test, self.y_train, self.y_test = subsets
-        # Train-validation
-        if val_size > 0:
-            # Split training set into training and validation sets
-            subsets = train_test_split(self.X_train,
-                                       self.y_train,
-                                       test_size=val_size/(1-test_size),
+        if test_size > 0:
+            subsets = train_test_split(self.X.to_numpy(),
+                                       self.y.to_numpy(),
+                                       test_size=test_size,
                                        random_state=seed)
-            self.X_train, self.X_val, self.y_train, self.y_val = subsets
-        # Cross-validation
+            self.X_train, self.X_test, self.y_train, self.y_test = subsets
+            # Split training set into training and validation sets
+            if val_size > 0:
+                subsets = train_test_split(self.X_train,
+                                           self.y_train,
+                                           test_size=val_size/(1-test_size),
+                                           random_state=seed)
+                self.X_train, self.X_val, self.y_train, self.y_val = subsets
+            # Use only training and test sets
+            else:
+                # There is no validation set
+                self.X_val, self.y_val = None, None
         else:
-            self.X_val, self.y_val = None, None
+            # There is no test set
+            self.X_test, self.y_test = None, None
+            # Split data into training and validation sets
+            if val_size > 0:
+                subsets = train_test_split(self.X.to_numpy(),
+                                           self.y.to_numpy(),
+                                           test_size=val_size,
+                                           random_state=seed)
+                self.X_train, self.X_val, self.y_train, self.y_val = subsets
+            # Do not split the data. It can be a cross-validation with all data
+            else:
+                self.X_train, self.y_train = self.X.to_numpy().copy(), self.y.to_numpy().copy()
+                # There is no validation set
+                self.X_val, self.y_val = None, None
