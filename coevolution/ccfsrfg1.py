@@ -72,7 +72,8 @@ class CCFSRFG1(CCEA):
             X=self.data.X_train)
         # Reorder train and test data according to shuffling in feature decomposition
         self.data.X_train = self.data.X_train[:, self.feature_idxs].copy()
-        self.data.X_test = self.data.X_test[:, self.feature_idxs].copy()
+        if self.data.X_test:
+            self.data.X_test = self.data.X_test[:, self.feature_idxs].copy()
 
         # Train-validation
         if self.conf["wrapper"]["eval_mode"] == 'train_val':
