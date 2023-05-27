@@ -1,11 +1,12 @@
 import copy
 import logging
 import numpy as np
+from abc import ABC, abstractmethod
 from utils.datasets import DataLoader
 
 
-class CCEA():
-    """ A template for a Cooperative Co-Evolutionary-Based Feature Selection Algorithm.
+class CCEA(ABC):
+    """ An abstract class for a Cooperative Co-Evolutionary-Based Feature Selection Algorithm.
 
     Attributes
     ----------
@@ -90,34 +91,45 @@ class CCEA():
         handler.setFormatter(logging.Formatter('%(message)s'))
         logging.getLogger().addHandler(handler)
 
+    @abstractmethod
     def _init_decomposer(self):
         """Instantiate feature grouping method."""
-        self.decomposer = None
+        pass
 
+    @abstractmethod
     def _init_evaluator(self):
         """Instantiate evaluation method."""
-        self.evaluator = None
+        pass
 
+    @abstractmethod
     def _init_collaborator(self):
         """Instantiate collaboration method."""
-        self.collaborator = None
+        pass
 
+    @abstractmethod
     def _init_subpop_initializer(self):
         """Instantiate subpopulation initialization method."""
-        self.initializer = None
+        pass
 
+    @abstractmethod
     def _init_optimizers(self):
         """Instantiate evolutionary algorithms to evolve each subpopulation."""
-        self.optimizers = list()
+        pass
 
+    @abstractmethod
     def _problem_decomposition(self):
         """Decompose the problem into smaller subproblems."""
+        pass
 
+    @abstractmethod
     def _evaluate(self, context_vector):
         """Evaluate the given context vector using the evaluator."""
+        pass
 
+    @abstractmethod
     def optimize(self):
         """Solve the feature selection problem through optimization."""
+        pass
 
     def _get_global_best(self):
         """Get the globally best context vector."""

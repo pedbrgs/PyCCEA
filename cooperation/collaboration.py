@@ -1,10 +1,11 @@
 import random
 import numpy as np
+from abc import ABC
 
 
-class Collaboration():
+class Collaboration(ABC):
     """
-    A template for a collaborative approach between individuals from different subpopulations.
+    An abstract class for a collaborative method between individuals from different subpopulations
     """
 
     def __init__(self, seed: int = None):
