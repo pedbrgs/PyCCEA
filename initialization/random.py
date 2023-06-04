@@ -14,9 +14,7 @@ class RandomBinaryInitialization():
         n-dimensional array, where n is the number of features. If there is a 1 in the i-th
         position of the array, it indicates that the i-th feature should be considered and if
         there is a 0, it indicates that the feature should not be considered.
-    local_fitness: list
-        Evaluation of all individuals from all subpopulations.
-    global_fitness: list
+    fitness: list
         Evaluation of all context vectors from all subpopulations.
     context_vectors: list
         Complete problem solutions that were randomly initialized.
@@ -62,10 +60,8 @@ class RandomBinaryInitialization():
         self.best_individuals = list()
         # Individuals of all subpopulations
         self.subpops = list()
-        # List to store the evaluations of the all context vectors
-        self.global_fitness = list()
-        # List to store the evaluations of the individuals of all subpopulations
-        self.local_fitness = list()
+        # List to store the fitness of all context vectors
+        self.fitness = list()
         # Number of subcomponents
         self.n_subcomps = len(subcomp_sizes)
         # Number of features in each subcomponent
@@ -100,26 +96,12 @@ class RandomBinaryInitialization():
         progress_bar = tqdm(total=self.n_subcomps, desc="Evaluating individuals")
         # For each subpopulation
         for i, subpop in enumerate(self.subpops):
-            # List to store the evaluations of the individuals in the current subpopulation
-            subpop_local_fitness = list()
             # List to store the context vectors in the current subpopulation
             subpop_context_vectors = list()
             # List to store the evaluations of these context vectors
-            subpop_global_fitness = list()
+            subpop_fitness = list()
             # Evaluate each individual in the subpopulation
-            for j, individual in enumerate(subpop):
-                # Evaluate the current individual
-                local_metric = self.evaluator.evaluate(solution=individual,
-                                                       X_train=self.data.S_train[i],
-                                                       y_train=self.data.y_train,
-                                                       X_val=self.data.S_val[i],
-                                                       y_val=self.data.y_val)
-                # Penalize large subsets of features
-                if self.penalty:
-                    features_p = individual.sum()/individual.shape[0]
-                    local_metric = self.weights[0] * local_metric - self.weights[1] * features_p
-                # Store evaluation of the current individual
-                subpop_local_fitness.append(local_metric)
+            for j, _ in enumerate(subpop):
                 # Find random collaborator(s) for the current individual
                 collaborators = self.collaborator.get_collaborators(subpop_idx=i,
                                                                     indiv_idx=j,
@@ -127,25 +109,23 @@ class RandomBinaryInitialization():
                 # Build a context vector to evaluate a complete solution
                 context_vector = self.collaborator.build_context_vector(collaborators)
                 # Evaluate the context vector
-                global_metric = self.evaluator.evaluate(solution=context_vector,
-                                                        X_train=self.data.X_train,
-                                                        y_train=self.data.y_train,
-                                                        X_val=self.data.X_val,
-                                                        y_val=self.data.y_val)
+                evaluation = self.evaluator.evaluate(solution=context_vector.copy(),
+                                                     X_train=self.data.X_train,
+                                                     y_train=self.data.y_train,
+                                                     X_val=self.data.X_val,
+                                                     y_val=self.data.y_val)
                 # Penalize large subsets of features
                 if self.penalty:
-                    features_p = context_vector.sum()/context_vector.shape[0]
-                    global_metric = self.weights[0] * global_metric - self.weights[1] * features_p
+                    penalty = context_vector.sum()/context_vector.shape[0]
+                    fitness = self.weights[0] * evaluation - self.weights[1] * penalty
                 # Store the complete problem solution related to the current individual
-                subpop_context_vectors.append(context_vector)
+                subpop_context_vectors.append(context_vector.copy())
                 # Store evaluation of the current context vector
-                subpop_global_fitness.append(global_metric)
+                subpop_fitness.append(fitness)
             # Store all complete problem solutions related to the current subpopulation
             self.context_vectors.append(np.vstack(subpop_context_vectors))
-            # Store evaluation of all individuals of the current subpopulation
-            self.local_fitness.append(subpop_local_fitness)
             # Store evaluation of all context vectors of the current subpopulation
-            self.global_fitness.append(subpop_global_fitness)
+            self.fitness.append(subpop_fitness)
             # Update progress bar
             progress_bar.update(1)
         # Close progress bar

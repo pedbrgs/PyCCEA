@@ -34,16 +34,15 @@ class CCFSRFG1(CCFSRFG):
         # Get the best individual and context vector from each subpopulation
         self.current_best = self.best_collaborator.get_best_individuals(
             subpops=self.subpops,
-            local_fitness=self.local_fitness,
-            global_fitness=self.global_fitness,
+            fitness=self.fitness,
             context_vectors=self.context_vectors
         )
         # Select the globally best context vector
-        self.best_context_vector, self.best_global_fitness = self._get_global_best()
+        self.best_context_vector, self.best_fitness = self._get_global_best()
 
-        # Set the number of generations counter with the first generation
-        n_gen = 1
-        # Number of generations that the best global fitness has not improved
+        # Set the number of generations counter
+        n_gen = 0
+        # Number of generations that the best fitness has not improved
         stagnation_counter = 0
         # Initialize the optimization progress bar
         progress_bar = tqdm(total=self.conf["coevolution"]["max_gen"],
@@ -52,13 +51,13 @@ class CCFSRFG1(CCFSRFG):
 
         # Iterate up to the maximum number of generations
         while n_gen <= self.conf["coevolution"]["max_gen"]:
-            # Append current best global fitness
-            self.convergence_curve.append(self.best_global_fitness)
+            # Append current best fitness
+            self.convergence_curve.append(self.best_fitness)
             # Evolve each subpopulation using a genetic algorithm
             for i in range(self.n_subcomps):
-                self.subpops[i], self.local_fitness[i] = self.optimizers[i].evolve(
-                    self.subpops[i],
-                    self.local_fitness[i]
+                self.subpops[i] = self.optimizers[i].evolve(
+                    subpop=self.subpops[i],
+                    fitness=self.fitness[i]
                 )
             # For each subpopulation
             for i in range(self.n_subcomps):
@@ -74,34 +73,48 @@ class CCFSRFG1(CCFSRFG):
                     context_vector = self.best_collaborator.build_context_vector(collaborators)
                     # Update the context vector
                     # TODO Should I store the best context vector of each subpopulation across generations?
-                    self.context_vectors[i][j] = context_vector
-                    # Update the global evaluation
-                    self.global_fitness[i][j] = self._evaluate(context_vector)
+                    self.context_vectors[i][j] = context_vector.copy()
+                    # Update fitness
+                    self.fitness[i][j] = self._evaluate(context_vector)
             # Get the best individual and context vector from each subpopulation
             self.current_best = self.best_collaborator.get_best_individuals(
                 subpops=self.subpops,
-                local_fitness=self.local_fitness,
-                global_fitness=self.global_fitness,
+                fitness=self.fitness,
                 context_vectors=self.context_vectors
             )
             # Select the globally best context vector
-            best_context_vector, best_global_fitness = self._get_global_best()
+            best_context_vector, best_fitness = self._get_global_best()
             # Update best context vector
-            if self.best_global_fitness < best_global_fitness:
-                # Reset stagnation counter because best global fitness has improved
+            if self.best_fitness < best_fitness:
+                # Reset stagnation counter because best fitness has improved
                 stagnation_counter = 0
                 # Enable logger if specified
                 logging.getLogger().disabled = False if self.verbose else True
+                # Objective weight
+                w1 = self.conf["coevolution"]["weights"][0]
+                # Penalty weight
+                w2 = self.conf["coevolution"]["weights"][1]
+                # Current fitness, performance evaluation and penalty
+                current_best_fitness = round(self.best_fitness, 4)
+                current_penalty = round(self.best_context_vector.sum()/self.n_features, 4)
+                current_eval = round((self.best_fitness + w2*current_penalty)/w1, 4)
+                # New fitness, performance evaluation and penalty
+                new_best_fitness = round(best_fitness, 4)
+                new_penalty = round(best_context_vector.sum()/self.n_features, 4)
+                new_eval = round((best_fitness + w2*new_penalty)/w1, 4)
                 # Show improvement
-                old_best_fitness = round(self.best_global_fitness, 4)
-                new_best_fitness = round(best_global_fitness, 4)
-                logging.info(f"\nUpdate fitness from {old_best_fitness} to {new_best_fitness}.")
+                logging.info(
+                    f"\nUpdate fitness from {current_best_fitness} to {new_best_fitness}.\n"
+                    f"Update {self.evaluator.eval_function} from {current_eval} to {new_eval}.\n"
+                    f"Update penalty from {current_penalty} to {new_penalty}.\n"
+                    f"Update number of features from {self.best_context_vector.sum()} to {best_context_vector.sum()}"
+                )
                 # Update best context vector
-                self.best_context_vector = best_context_vector
-                # Update best global fitness
-                self.best_global_fitness = best_global_fitness
+                self.best_context_vector = best_context_vector.copy()
+                # Update best fitness
+                self.best_fitness = best_fitness
             else:
-                # Increase stagnation counter because best global fitness has not improved
+                # Increase stagnation counter because best fitness has not improved
                 stagnation_counter += 1
                 # Checks whether the optimization has been stagnant for a long time
                 if stagnation_counter >= self.conf["coevolution"]["max_gen_without_improvement"]:

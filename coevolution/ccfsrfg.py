@@ -52,11 +52,7 @@ class CCFSRFG(CCEA):
         # Instantiate an optimizer for each subcomponent
         for i in range(self.n_subcomps):
             optimizer = BinaryGeneticAlgorithm(subpop_size=self.subpop_sizes[i],
-                                               X_train=self.data.S_train[i],
-                                               y_train=self.data.y_train,
-                                               X_val=self.data.S_val[i],
-                                               y_val=self.data.y_val,
-                                               evaluator=self.evaluator,
+                                               n_features=self.subcomp_sizes[i],
                                                conf=self.conf)
             self.optimizers.append(optimizer)
 
@@ -86,16 +82,16 @@ class CCFSRFG(CCEA):
     def _evaluate(self, context_vector):
         """Evaluate the given context vector using the evaluator."""
         # Evaluate the context vector
-        fitness = self.evaluator.evaluate(solution=context_vector,
-                                          X_train=self.data.X_train,
-                                          y_train=self.data.y_train,
-                                          X_val=self.data.X_val,
-                                          y_val=self.data.y_val)
+        evaluation = self.evaluator.evaluate(solution=context_vector.copy(),
+                                             X_train=self.data.X_train,
+                                             y_train=self.data.y_train,
+                                             X_val=self.data.X_val,
+                                             y_val=self.data.y_val)
 
         # Penalize large subsets of features
         if self.conf["coevolution"]["penalty"]:
-            features_p = context_vector.sum()/context_vector.shape[0]
-            global_fitness = self.conf["coevolution"]["weights"][0] * fitness -\
-                self.conf["coevolution"]["weights"][1] * features_p
+            penalty = context_vector.sum()/self.n_features
+            fitness = self.conf["coevolution"]["weights"][0] * evaluation -\
+                self.conf["coevolution"]["weights"][1] * penalty
 
-        return global_fitness
+        return fitness

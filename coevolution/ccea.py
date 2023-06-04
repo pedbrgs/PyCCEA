@@ -27,9 +27,7 @@ class CCEA(ABC):
         n-dimensional array, where n is the number of features. If there is a 1 in the i-th
         position of the array, it indicates that the i-th feature should be considered and if
         there is a 0, it indicates that the feature should not be considered.
-    local_fitness: list
-        Evaluation of all individuals from all subpopulations.
-    global_fitness: list
+    fitness: list
         Evaluation of all context vectors from all subpopulations.
     context_vectors: list
         Complete problem solutions.
@@ -39,7 +37,7 @@ class CCEA(ABC):
         Current best individual of each subpopulation and its respective evaluation.
     best_context_vector: np.ndarray
         Best solution of the complete problem.
-    best_global_fitness: float
+    best_fitness: float
         Evaluation of the best solution of the complete problem.
     """
 
@@ -58,11 +56,13 @@ class CCEA(ABC):
             If True, show the improvements obtained from the optimization process.
         """
         # Seed
-        self.seed = conf["coevolution"]["seed"]
+        self.seed = conf["coevolution"].get("seed")
         # Verbose
         self.verbose = verbose
         # Data
         self.data = data
+        # Number of features
+        self.n_features = self.data.X.shape[1]
         # Number of subcomponents
         self.n_subcomps = conf["coevolution"]["n_subcomps"]
         # Size of each subpopulation
@@ -133,10 +133,10 @@ class CCEA(ABC):
 
     def _get_global_best(self):
         """Get the globally best context vector."""
-        best_idx = np.argmax([best["global_fitness"] for best in self.current_best.values()])
-        best_global_fitness = self.current_best[best_idx]["global_fitness"]
-        best_context_vector = self.current_best[best_idx]["context_vector"]
-        return best_context_vector, best_global_fitness
+        best_idx = np.argmax([best["fitness"] for best in self.current_best.values()])
+        best_fitness = self.current_best[best_idx]["fitness"]
+        best_context_vector = self.current_best[best_idx]["context_vector"].copy()
+        return best_context_vector, best_fitness
 
     def _init_subpopulations(self):
         """Initialize all subpopulations according to their respective sizes."""
@@ -150,9 +150,7 @@ class CCEA(ABC):
         self.initializer.evaluate_individuals()
         # Subpopulations
         self.subpops = copy.deepcopy(self.initializer.subpops)
-        # Evaluations of individuals
-        self.local_fitness = copy.deepcopy(self.initializer.local_fitness)
         # Context vectors
         self.context_vectors = copy.deepcopy(self.initializer.context_vectors)
         # Evaluations of context vectors
-        self.global_fitness = copy.deepcopy(self.initializer.global_fitness)
+        self.fitness = copy.deepcopy(self.initializer.fitness)
