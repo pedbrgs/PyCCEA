@@ -59,8 +59,11 @@ class CCFSRFG(CCEA):
     def _problem_decomposition(self):
         """Decompose the problem into smaller subproblems."""
         # Decompose features in the training set
-        self.data.S_train, self.subcomp_sizes, self.feature_idxs = self.decomposer.decompose(
-            X=self.data.X_train)
+        self.data.S_train, self.feature_idxs = self.decomposer.decompose(X=self.data.X_train)
+        # Update 'n_subcomps' when it starts with NoneType
+        self.n_subcomps = self.decomposer.n_subcomps
+        # Update 'subcomp_sizes' when it starts with an empty list
+        self.subcomp_sizes = self.decomposer.subcomp_sizes.copy()
         # Reorder train and test data according to shuffling in feature decomposition
         self.data.X_train = self.data.X_train[:, self.feature_idxs].copy()
         if self.data.X_test:
@@ -69,8 +72,8 @@ class CCFSRFG(CCEA):
         # Train-validation
         if self.conf["wrapper"]["eval_mode"] == 'train_val':
             # Decompose features in the validation set
-            self.data.S_val, _, _ = self.decomposer.decompose(X=self.data.X_val,
-                                                              feature_idxs=self.feature_idxs)
+            self.data.S_val, _ = self.decomposer.decompose(X=self.data.X_val,
+                                                           feature_idxs=self.feature_idxs)
             # Reorder validation data according to shuffling in feature decomposition
             self.data.X_val = self.data.X_val[:, self.feature_idxs].copy()
         # Cross-validation

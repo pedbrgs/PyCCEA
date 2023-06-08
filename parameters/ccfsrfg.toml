@@ -1,8 +1,8 @@
 # This file specifies the parameters of the Cooperative Co-Evolutionary-Based Feature Selection with Random Feature Grouping (CCFSRFG)
 
 [coevolution]
-n_subcomps = 4
 subpop_sizes = [30, 30, 30, 30]
+subcomp_sizes = [256, 256, 256, 256]
 max_gen = 10000
 max_gen_without_improvement = 100
 penalty = true
@@ -11,7 +11,7 @@ weights = [0.6, 0.4]
 
 [wrapper]
 task = "classification"
-model_type = "gaussian_naive_bayes"
+model_type = "multinomial_naive_bayes"
 eval_function = "accuracy"
 eval_mode = "kfold_cv"
 kfolds = 10

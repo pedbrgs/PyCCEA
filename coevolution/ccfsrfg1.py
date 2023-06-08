@@ -20,7 +20,9 @@ class CCFSRFG1(CCFSRFG):
 
     def _init_decomposer(self):
         """Instantiate feature grouping method."""
-        self.decomposer = RandomFeatureGrouping(n_subcomps=self.n_subcomps, seed=self.seed)
+        self.decomposer = RandomFeatureGrouping(n_subcomps=self.n_subcomps,
+                                                subcomp_sizes=self.subcomp_sizes,
+                                                seed=self.seed)
 
     def optimize(self):
         """Solve the feature selection problem through optimization."""
@@ -107,7 +109,6 @@ class CCFSRFG1(CCFSRFG):
                     f"\nUpdate fitness from {current_best_fitness} to {new_best_fitness}.\n"
                     f"Update {self.evaluator.eval_function} from {current_eval} to {new_eval}.\n"
                     f"Update penalty from {current_penalty} to {new_penalty}.\n"
-                    f"Update number of features from {self.best_context_vector.sum()} to {best_context_vector.sum()}"
                 )
                 # Update best context vector
                 self.best_context_vector = best_context_vector.copy()

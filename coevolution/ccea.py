@@ -63,16 +63,26 @@ class CCEA(ABC):
         self.data = data
         # Number of features
         self.n_features = self.data.X.shape[1]
-        # Number of subcomponents
-        self.n_subcomps = conf["coevolution"]["n_subcomps"]
         # Size of each subpopulation
         self.subpop_sizes = conf["coevolution"]["subpop_sizes"]
-        if self.n_subcomps != len(self.subpop_sizes):
-            raise AssertionError(
-                f"The number of components ({self.n_subcomps}) is not equal to the number of "
-                f"subpopulations ({len(self.subpop_sizes)}). Check parameters 'n_subcomps' and "
-                "'subpop_sizes' in the configuration file."
-            )
+        # Number of subcomponents
+        self.n_subcomps = conf["coevolution"].get("n_subcomps")
+        if self.n_subcomps:
+            if self.n_subcomps != len(self.subpop_sizes):
+                raise AssertionError(
+                    f"The number of components ({self.n_subcomps}) is not equal to the number of "
+                    f"subpopulations ({len(self.subpop_sizes)}). Check parameters 'n_subcomps' "
+                    "and 'subpop_sizes' in the configuration file."
+                )
+        # Number of features in each subcomponent
+        self.subcomp_sizes = conf["coevolution"].get("subcomp_sizes")
+        if self.subcomp_sizes:
+            if len(self.subcomp_sizes) != len(self.subpop_sizes):
+                raise AssertionError(
+                    f"The number of components ({len(self.subcomp_sizes)}) is not equal to the "
+                    f"number of subpopulations ({len(self.subpop_sizes)}). Check parameters "
+                    "'subcomp_sizes' and 'subpop_sizes' in the configuration file."
+                )
         # Configuration parameters
         self.conf = conf
         # Initializes the components of the cooperative co-evolutionary algorithm
