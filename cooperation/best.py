@@ -7,44 +7,6 @@ class SingleBestCollaboration(Collaboration):
     Set the best individual from each subpopulation as a collaborator to any individual.
     """
 
-    def get_best_individuals(self,
-                             subpops: list,
-                             fitness: list,
-                             context_vectors: list):
-        """
-        Get the best individual from each subpopulation.
-
-        Parameters
-        ----------
-        subpops: list
-            Individuals from all subpopulations. Each individual is represented by a binary
-            n-dimensional array, where n is the number of features. If there is a 1 in the i-th
-            position of the array, it indicates that the i-th feature should be considered and if
-            there is a 0, it indicates that the feature should not be considered.
-        fitness: list
-            Evaluation of all context vectors from all subpopulations.
-        context_vectors: list
-            Complete problem solutions.
-
-        Returns
-        -------
-        current_best: dict
-            Current best individual of each subpopulation and its respective evaluation.
-        """
-        # Current best individual of each subpopulation
-        current_best = dict()
-        # Number of subpopulations
-        n_subpops = len(subpops)
-        # For each subpopulation
-        for i in range(n_subpops):
-            best_ind_idx = np.argmax(fitness[i])
-            current_best[i] = dict()
-            current_best[i]["individual"] = subpops[i][best_ind_idx].copy()
-            current_best[i]["context_vector"] = context_vectors[i][best_ind_idx].copy()
-            current_best[i]["fitness"] = fitness[i][best_ind_idx].copy()
-
-        return current_best
-
     def get_collaborators(self,
                           subpop_idx: int,
                           indiv_idx: int,

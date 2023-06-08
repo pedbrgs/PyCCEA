@@ -34,7 +34,7 @@ class CCFSRFG1(CCFSRFG):
         self._init_optimizers()
 
         # Get the best individual and context vector from each subpopulation
-        self.current_best = self.best_collaborator.get_best_individuals(
+        self.current_best = self._get_best_individuals(
             subpops=self.subpops,
             fitness=self.fitness,
             context_vectors=self.context_vectors
@@ -79,7 +79,7 @@ class CCFSRFG1(CCFSRFG):
                     # Update fitness
                     self.fitness[i][j] = self._evaluate(context_vector)
             # Get the best individual and context vector from each subpopulation
-            self.current_best = self.best_collaborator.get_best_individuals(
+            self.current_best = self._get_best_individuals(
                 subpops=self.subpops,
                 fitness=self.fitness,
                 context_vectors=self.context_vectors
