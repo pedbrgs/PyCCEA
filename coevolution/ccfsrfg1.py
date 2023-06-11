@@ -41,6 +41,8 @@ class CCFSRFG1(CCFSRFG):
         )
         # Select the globally best context vector
         self.best_context_vector, self.best_fitness = self._get_global_best()
+        # Save the order of features considered in the random feature grouping
+        self.best_feature_idxs = self.feature_idxs.copy()
 
         # Set the number of generations counter
         n_gen = 0
@@ -57,7 +59,7 @@ class CCFSRFG1(CCFSRFG):
             self.convergence_curve.append(self.best_fitness)
             # Evolve each subpopulation using a genetic algorithm
             for i in range(self.n_subcomps):
-                self.subpops[i] = self.optimizers[i].evolve(
+                self.subpops[i], self.fitness[i] = self.optimizers[i].evolve(
                     subpop=self.subpops[i],
                     fitness=self.fitness[i]
                 )

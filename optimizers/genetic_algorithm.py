@@ -118,17 +118,19 @@ class BinaryGeneticAlgorithm():
 
         Returns
         -------
-        subpop: np.ndarray
-            Individuals of the subpopulation, where each individual is an array of size equal to
-            the number of features.
-        fitness: list
-            Evaluation of all individuals in the subpopulation.
+        next_subpop: np.ndarray
+            Individuals in the subpopulation of the next generation.
+        next_fitness: list
+            Evaluation of all individuals in the subpopulation of the next generation.
         """
 
-        # Elitism: select the elite_size best individuals of the current generation to be in the
-        # next generation
-        n_bests = np.argsort(fitness)[::-1][:self.elite_size]
+        # Maximization problem
+        descending_order = np.argsort(fitness)[::-1]
+        # Select the 'elite_size' best individuals of the current generation to be in the next
+        # generation (elitism)
+        n_bests = descending_order[:self.elite_size]
         next_subpop = subpop[n_bests].copy()
+        next_fitness = np.array(fitness)[descending_order].copy()
 
         # Perform (subpop_size - elite_size) Tournament Selections to build the next generation
         for i in range(self.elite_size, self.subpop_size):
@@ -142,4 +144,4 @@ class BinaryGeneticAlgorithm():
             # Add new individual to the subpopulation
             next_subpop = np.vstack([next_subpop, offspring])
 
-        return next_subpop
+        return next_subpop, next_fitness
