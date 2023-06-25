@@ -52,5 +52,5 @@ class VIP:
         S = np.diag(self.T.T @ self.T @ self.Q.T @ self.Q).reshape(self.c, -1)
         S_cum = np.sum(S)
         for i in range(self.p):
-            weight = np.array([(self.W[i,j] / np.linalg.norm(self.W[:,j]))**2 for j in range(self.c)])
-            self.importances[i] = np.sqrt(self.p*(S.T @ weight)/S_cum)
+            w = np.array([(self.W[i,j] / np.linalg.norm(self.W[:,j]))**2 for j in range(self.c)])
+            self.importances[i] = np.sqrt(self.p*(S.T @ w)/S_cum)
