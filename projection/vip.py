@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class VIP:
     """ Variable Importance in Projection (VIP).
 
