@@ -10,19 +10,17 @@ class VIP:
 
     Attributes
     ----------
-    p: int
+    n_features: int
         Number of variables.
-    c: int
+    n_components: int
         Number of components.
-    n: int
-        Number of observations.
-    W: np.ndarray (p x c)
+    x_weights_: np.ndarray (n_features, n_components)
         Projection matrix.
-    T: np.ndarray (n x c)
+    x_scores_: np.ndarray (n_samples, n_components)
         The transformed training samples (latent components).
-    Q: np.ndarray (k x c)
+    y_loadings_: np.ndarray (n_targets, n_components)
         The loadings of Y.
-    importances: np.ndarray (p x 1)
+    importances: np.ndarray (n_features,)
         Importance of each feature based on its contribution to yield the latent space.
     """
 
@@ -35,23 +33,29 @@ class VIP:
             Covariance-free version (CIPLS).
         """
         # Projection matrix
-        self.W = model.x_weights_.copy()
+        self.x_weights_ = model.x_weights_.copy()
         # Latent components
-        self.T = model.x_scores_.copy()
+        self.x_scores_ = model.x_scores_.copy()
         # Loadings of Y
-        self.Q = model.y_loadings_.copy()
-
+        self.y_loadings_ = model.y_loadings_.copy()
         # Number of features and number of components, respectively
-        self.p, self.c = self.W.shape
-        # Number of observations
-        self.n, _ = self.T.shape
-        # Variable Importance in Projection (VIP)
-        self.importances = np.zeros((self.p,))
+        self.n_features, self.n_components = self.x_weights_.shape
 
     def compute(self):
         """Calculate feature importances."""
-        S = np.diag(self.T.T @ self.T @ self.Q.T @ self.Q).reshape(self.c, -1)
-        S_cum = np.sum(S)
-        for i in range(self.p):
-            w = np.array([(self.W[i,j] / np.linalg.norm(self.W[:,j]))**2 for j in range(self.c)])
-            self.importances[i] = np.sqrt(self.p*(S.T @ w)/S_cum)
+        # Sum of squares explained by each component (n_components,)
+        sum_of_squares = np.diag(self.x_scores_.T @ self.x_scores_ @ self.y_loadings_.T @ self.y_loadings_)
+        # Reshape array (n_components, 1)
+        sum_of_squares = sum_of_squares.reshape(self.n_components, -1)
+        # Cumulative sum of squares
+        cum_sum_of_squares = np.sum(sum_of_squares)
+        # Projection matrix norm
+        weight_norm = np.linalg.norm(self.x_weights_, axis=0)
+        # Normalized weights
+        weights = (self.x_weights_ / np.expand_dims(weight_norm, axis=0)) ** 2
+        # Variable Importances in Projection (VIP)
+        squared_importances = self.n_features * (weights @ sum_of_squares).ravel() / cum_sum_of_squares
+        # To avoid "RuntimeWarning: invalid value encountered in sqrt"
+        squared_importances[squared_importances < 0] = np.nan
+        self.importances = np.sqrt(squared_importances)
+        self.importances[np.where(np.isnan(self.importances))[0]] = -999
