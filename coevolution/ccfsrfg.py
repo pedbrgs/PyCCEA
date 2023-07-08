@@ -1,6 +1,4 @@
-import logging
 import numpy as np
-from tqdm import tqdm
 from coevolution.ccea import CCEA
 from evaluation.wrapper import WrapperEvaluation
 from cooperation.best import SingleBestCollaboration
@@ -10,7 +8,7 @@ from optimizers.genetic_algorithm import BinaryGeneticAlgorithm
 
 
 class CCFSRFG(CCEA):
-    """ Cooperative Co-Evolutionary-Based Feature Selection with Random Feature Grouping.
+    """Cooperative Co-Evolutionary-Based Feature Selection with Random Feature Grouping.
 
     Rashid, A. N. M., et al. "Cooperative co-evolution for feature selection in Big Data with
     random feature grouping." Journal of Big Data 7.1 (2020): 1-42.
