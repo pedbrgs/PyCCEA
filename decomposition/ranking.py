@@ -7,7 +7,7 @@ class RankingFeatureGrouping(FeatureGrouping):
     Decompose the problem (a collection of features) according to a score-based method.
     """
 
-    methods = ['distributed', 'elitist']
+    methods = ["distributed", "elitist"]
 
     def __init__(self,
                  n_subcomps: int = None,
@@ -62,10 +62,10 @@ class RankingFeatureGrouping(FeatureGrouping):
         if not self.ascending:
             ranking = ranking[::-1].copy()
 
-        if self.method == 'elitist':
+        if self.method == "elitist":
             # The order of features for decomposition is the ranking itself
             feature_idxs = ranking.copy()
-        elif self.method == 'distributed':
+        elif self.method == "distributed":
             # Distributes the top-ranked features evenly among the groups
             self.n_subcomps = self.n_subcomps if self.n_subcomps else len(self.subcomp_sizes)
             feature_idxs = [list() for _ in range(self.n_subcomps)]
