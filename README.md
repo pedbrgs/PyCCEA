@@ -1,4 +1,4 @@
-# Cooperative Co-Evolutionary Algorithms (CCEAs)
+# PyCCEA: a python package of Cooperative Co-Evolutionary Algorithms for Feature Selection in Big Data
 
 **Author:** [Pedro Vinícius A. B. Venâncio](https://www.linkedin.com/in/pedbrgs/)<sup>1</sup> <br />
 
@@ -6,6 +6,6 @@
 
 ***
 
-### About
+## About
 
-This repository will contain the source codes of some Cooperative Co-Evolutionary Algorithms (CCEAs) implemented in Python.
+PyCCEA package is **under construction** and will be one of the results of my doctoral research.
