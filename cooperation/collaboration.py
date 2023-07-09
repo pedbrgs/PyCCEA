@@ -1,4 +1,3 @@
-import random
 import numpy as np
 from abc import ABC
 
@@ -8,18 +7,8 @@ class Collaboration(ABC):
     An abstract class for a collaborative method between individuals from different subpopulations
     """
 
-    def __init__(self, seed: int = None):
-        """
-        Parameters
-        ----------
-        seed: int
-            Numerical value that generates a new set or repeats pseudo-random numbers. It is
-            defined in stochastic processes to ensure reproducibility.
-        """
-        # Set the seed value
-        self.seed = seed
-        random.seed(seed)
-        np.random.seed(seed=seed)
+    def __init__(self):
+        pass
 
     def build_context_vector(self, collaborators):
         """
