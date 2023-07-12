@@ -2,6 +2,7 @@ import logging
 import warnings
 import numpy as np
 from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.exceptions import UndefinedMetricWarning
 from sklearn.model_selection import RandomizedSearchCV
@@ -27,7 +28,8 @@ class ClassificationModel():
         'random_forest': RandomForestClassifier,
         'complement_naive_bayes': ComplementNB,
         'gaussian_naive_bayes': GaussianNB,
-        'multinomial_naive_bayes': MultinomialNB
+        'multinomial_naive_bayes': MultinomialNB,
+        'k_nearest_neighbors': KNeighborsClassifier
     }
 
     def __init__(self, model_type: str):
@@ -87,6 +89,10 @@ class ClassificationModel():
         elif self.model_type in ['gaussian_naive_bayes']:
             self.grid = {
                 'var_smoothing': np.logspace(0,-9, num=100)
+            }
+        elif self.model_type == 'k_nearest_neighbors':
+            self.grid = {
+                'n_neighbors': np.arange(1, 31, 1)
             }
 
         # Scoring metric used according to the classification task
