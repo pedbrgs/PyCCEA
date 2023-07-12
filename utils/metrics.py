@@ -3,7 +3,9 @@ import numpy as np
 from sklearn.metrics import make_scorer
 from sklearn.model_selection import cross_validate
 from imblearn.metrics import specificity_score
-from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score
+from sklearn.metrics import (
+    accuracy_score, balanced_accuracy_score, f1_score, precision_score, recall_score
+)
 
 
 class ClassificationMetrics():
@@ -76,6 +78,7 @@ class ClassificationMetrics():
             self.values['recall'] = round(recall_score(y, y_pred, average=avg), 4)
             self.values['f1_score'] = round(f1_score(y, y_pred, average=avg), 4)
             self.values['accuracy'] = round(accuracy_score(y, y_pred), 4)
+            self.values['balanced_accuracy'] = round(balanced_accuracy_score(y, y_pred), 4)
             self.values['specificity'] = round(specificity_score(y, y_pred, average=avg), 4)
         # Cross-validation
         else:
@@ -83,6 +86,7 @@ class ClassificationMetrics():
                        'recall': make_scorer(recall_score, average=avg),
                        'f1_score': make_scorer(f1_score, average=avg),
                        'accuracy': make_scorer(accuracy_score),
+                       'balanced_accuracy': make_scorer(balanced_accuracy_score),
                        'specificity': make_scorer(specificity_score, average=avg)}
             evaluation = cross_validate(estimator, X, y, scoring=scoring, cv=kfolds)
             # Measures
@@ -95,6 +99,7 @@ class ClassificationMetrics():
         if verbose:
             logging.getLogger().disabled = False
             logging.info(f"Precision: {self.values['precision']}")
+            logging.info(f"Balanced accuracy: {self.values['balanced_accuracy']}")
             logging.info(f"Accuracy: {self.values['accuracy']}")
             logging.info(f"Recall/Sensitivity/TPR: {self.values['recall']}")
             logging.info(f"Specificity/TNR: {self.values['specificity']}")
