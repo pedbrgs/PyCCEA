@@ -14,10 +14,10 @@ class CCEA(ABC):
         Subpopulation sizes, that is, the number of individuals in each subpopulation.
     decomposer: object of one of the decomposition classes
         Responsible for decompose the problem into smaller subproblems.
-    evaluator: object of one of the evaluation classes
-        Responsible for evaluating individuals, that is, subsets of features.
     collaborator: object of one of the collaboration classes.
         Responsible for selecting collaborators for individuals.
+    fitness_function: object of one of the fitness classes.
+        Responsible for evaluating individuals, that is, subsets of features.
     initializer: object of one of the subpopulation initializers
         Responsible for initializing all individuals of all subpopulations.
     optimizers: list of objects of optimizer classes
