@@ -26,10 +26,8 @@ class RandomBinaryInitialization():
                  data: DataLoader,
                  subcomp_sizes: list,
                  subpop_sizes: list,
-                 evaluator,
                  collaborator,
-                 penalty: bool = False,
-                 weights: np.ndarray = None):
+                 fitness_function):
         """
         Parameters
         ----------
@@ -39,20 +37,15 @@ class RandomBinaryInitialization():
             Number of features in each subcomponent.
         subpop_sizes: list
             Subpopulation sizes, that is, the number of individuals in each subpopulation.
-        evaluator: object of one of the evaluation classes
-            Responsible for evaluating individuals, that is, subsets of features.
         collaborator: object of one of the collaboration classes.
             Responsible for selecting collaborators for individuals.
-        penalty: bool
-            If True, penalizes a large subset of features in the objective function.
-        weights: list
-            Weights of each objective, where the first element of the list weights the evaluation
-            metric and the second weights the size of the subset of features.
+        fitness_function: object of one of the fitness classes.
+            Responsible for evaluating individuals, that is, subsets of features.
         """
         # Parameters as attributes
         self.data = data
         self.subpop_sizes = subpop_sizes
-        self.evaluator = evaluator
+        self.fitness_function = fitness_function
         self.collaborator = collaborator
         # Complete problem solutions
         self.context_vectors = list()
@@ -66,10 +59,6 @@ class RandomBinaryInitialization():
         self.n_subcomps = len(subcomp_sizes)
         # Number of features in each subcomponent
         self.subcomp_sizes = subcomp_sizes
-        # Apply penalty on the objective function
-        self.penalty = penalty
-        # Weights of objective functions
-        self.weights = weights
 
     def build_subpopulations(self):
         """
@@ -109,15 +98,7 @@ class RandomBinaryInitialization():
                 # Build a context vector to evaluate a complete solution
                 context_vector = self.collaborator.build_context_vector(collaborators)
                 # Evaluate the context vector
-                evaluation = self.evaluator.evaluate(solution=context_vector.copy(),
-                                                     X_train=self.data.X_train,
-                                                     y_train=self.data.y_train,
-                                                     X_val=self.data.X_val,
-                                                     y_val=self.data.y_val)
-                # Penalize large subsets of features
-                if self.penalty:
-                    penalty = context_vector.sum()/context_vector.shape[0]
-                    fitness = self.weights[0] * evaluation - self.weights[1] * penalty
+                fitness = self.fitness_function.evaluate(context_vector, self.data)
                 # Store the complete problem solution related to the current individual
                 subpop_context_vectors.append(context_vector.copy())
                 # Store evaluation of the current context vector
