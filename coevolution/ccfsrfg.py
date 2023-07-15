@@ -1,5 +1,6 @@
 import numpy as np
 from coevolution.ccea import CCEA
+from fitness.penalty import SubsetSizePenalty
 from evaluation.wrapper import WrapperEvaluation
 from cooperation.best import SingleBestCollaboration
 from cooperation.random import SingleRandomCollaboration
@@ -28,21 +29,21 @@ class CCFSRFG(CCEA):
 
     def _init_evaluator(self):
         """Instantiate evaluation method."""
-        self.evaluator = WrapperEvaluation(task=self.conf["wrapper"]["task"],
-                                           model_type=self.conf["wrapper"]["model_type"],
-                                           eval_function=self.conf["wrapper"]["eval_function"],
-                                           eval_mode=self.conf["wrapper"]["eval_mode"],
-                                           kfolds=self.conf["wrapper"].get("kfolds"))
+        evaluator = WrapperEvaluation(task=self.conf["wrapper"]["task"],
+                                      model_type=self.conf["wrapper"]["model_type"],
+                                      eval_function=self.conf["evaluation"]["eval_function"],
+                                      eval_mode=self.conf["evaluation"]["eval_mode"],
+                                      kfolds=self.conf["evaluation"].get("kfolds"))
+        self.fitness_function = SubsetSizePenalty(evaluator=evaluator,
+                                                  weights=self.conf["evaluation"]["weights"])
 
     def _init_subpop_initializer(self):
         """Instantiate subpopulation initialization method."""
         self.initializer = RandomBinaryInitialization(data=self.data,
                                                       subcomp_sizes=self.subcomp_sizes,
                                                       subpop_sizes=self.subpop_sizes,
-                                                      evaluator=self.evaluator,
                                                       collaborator=self.random_collaborator,
-                                                      penalty=self.conf["coevolution"]["penalty"],
-                                                      weights=self.conf["coevolution"]["weights"])
+                                                      fitness_function=self.fitness_function)
 
     def _init_optimizers(self):
         """Instantiate evolutionary algorithms to evolve each subpopulation."""
@@ -68,7 +69,7 @@ class CCFSRFG(CCEA):
             self.data.X_test = self.data.X_test[:, self.feature_idxs].copy()
 
         # Train-validation
-        if self.conf["wrapper"]["eval_mode"] == 'train_val':
+        if self.conf["evaluation"]["eval_mode"] == 'train_val':
             # Decompose features in the validation set
             self.data.S_val, _ = self.decomposer.decompose(X=self.data.X_val,
                                                            feature_idxs=self.feature_idxs)
@@ -79,20 +80,3 @@ class CCFSRFG(CCEA):
             # It is just to avoid crashing when initializing the optimizers.
             # It will not be used in the cross-validation mode.
             self.data.S_val = np.full(shape=(self.n_subcomps), fill_value=None)
-
-    def _evaluate(self, context_vector):
-        """Evaluate the given context vector using the evaluator."""
-        # Evaluate the context vector
-        evaluation = self.evaluator.evaluate(solution=context_vector.copy(),
-                                             X_train=self.data.X_train,
-                                             y_train=self.data.y_train,
-                                             X_val=self.data.X_val,
-                                             y_val=self.data.y_val)
-
-        # Penalize large subsets of features
-        if self.conf["coevolution"]["penalty"]:
-            penalty = context_vector.sum()/self.n_features
-            fitness = self.conf["coevolution"]["weights"][0] * evaluation -\
-                self.conf["coevolution"]["weights"][1] * penalty
-
-        return fitness

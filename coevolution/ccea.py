@@ -137,11 +137,6 @@ class CCEA(ABC):
         pass
 
     @abstractmethod
-    def _evaluate(self, context_vector):
-        """Evaluate the given context vector using the evaluator."""
-        pass
-
-    @abstractmethod
     def optimize(self):
         """Solve the feature selection problem through optimization."""
         pass

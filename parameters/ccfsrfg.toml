@@ -5,16 +5,17 @@ subpop_sizes = [30, 30, 30, 30]
 subcomp_sizes = [256, 256, 256, 256]
 max_gen = 10000
 max_gen_without_improvement = 100
-penalty = true
 seed = 42
-weights = [0.6, 0.4]
 
 [wrapper]
 task = "classification"
-model_type = "multinomial_naive_bayes"
+model_type = "gaussian_naive_bayes"
+
+[evaluation]
 eval_function = "accuracy"
 eval_mode = "kfold_cv"
 kfolds = 10
+weights = [0.6, 0.4]
 
 [optimizer]
 mutation_rate = 0.05

@@ -79,7 +79,7 @@ class CCFSRFG1(CCFSRFG):
                     # TODO Should I store the best context vector of each subpopulation across generations?
                     self.context_vectors[i][j] = context_vector.copy()
                     # Update fitness
-                    self.fitness[i][j] = self._evaluate(context_vector)
+                    self.fitness[i][j] = self.fitness_function.evaluate(context_vector, self.data)
             # Get the best individual and context vector from each subpopulation
             self.current_best = self._get_best_individuals(
                 subpops=self.subpops,
@@ -95,9 +95,9 @@ class CCFSRFG1(CCFSRFG):
                 # Enable logger if specified
                 logging.getLogger().disabled = False if self.verbose else True
                 # Objective weight
-                w1 = self.conf["coevolution"]["weights"][0]
+                w1 = self.conf["evaluation"]["weights"][0]
                 # Penalty weight
-                w2 = self.conf["coevolution"]["weights"][1]
+                w2 = self.conf["evaluation"]["weights"][1]
                 # Current fitness, performance evaluation and penalty
                 current_best_fitness = round(self.best_fitness, 4)
                 current_penalty = round(self.best_context_vector.sum()/self.n_features, 4)
@@ -109,7 +109,7 @@ class CCFSRFG1(CCFSRFG):
                 # Show improvement
                 logging.info(
                     f"\nUpdate fitness from {current_best_fitness} to {new_best_fitness}.\n"
-                    f"Update {self.evaluator.eval_function} from {current_eval} to {new_eval}.\n"
+                    f"Update predictive performance from {current_eval} to {new_eval}.\n"
                     f"Update penalty from {current_penalty} to {new_penalty}.\n"
                 )
                 # Update best context vector
