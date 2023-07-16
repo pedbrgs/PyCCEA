@@ -5,9 +5,9 @@ from tqdm import tqdm
 from projection.vip import VIP
 from coevolution.ccea import CCEA
 from projection.cipls import CIPLS
-from sklearn.model_selection import KFold
 from fitness.penalty import SubsetSizePenalty
 from evaluation.wrapper import WrapperEvaluation
+from sklearn.model_selection import StratifiedKFold
 from cooperation.best import SingleBestCollaboration
 from cooperation.random import SingleRandomCollaboration
 from decomposition.ranking import RankingFeatureGrouping
@@ -33,11 +33,11 @@ class CCPFG(CCEA):
         # Method used to distribute features into subcomponents
         self.method = self.conf["decomposition"]["method"]
         # Perform K-fold cross-validation to compute variable importances
-        kfold = KFold(n_splits=self.conf["evaluation"]["kfolds"],
-                      shuffle=True,
-                      random_state=self.seed)
+        kfold = StratifiedKFold(n_splits=self.conf["evaluation"]["kfolds"],
+                                shuffle=True,
+                                random_state=self.seed)
         vips = list()
-        for train_idx, _ in kfold.split(self.data.X):
+        for train_idx, _ in kfold.split(self.data.X, self.data.y):
             X_train = self.data.X.iloc[train_idx].copy()
             y_train = self.data.y.iloc[train_idx].copy()
             projection_model = CIPLS(n_components=self.n_components, copy=True)
