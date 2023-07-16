@@ -21,7 +21,9 @@ class ClassificationMetrics():
     metrics = [
         # Ratio of number of correct predictions to the total number of input samples, i.e.,
         # (tp+tn)/(tp+fp+tn+fn)
-        'accuracy', 
+        'accuracy',
+        # It is equivalent to accuracy with class-balanced sample weights
+        'balanced_accuracy',
         # Ratio of the correctly identified positive cases to all the predicted positive cases,
         # i.e., tp/(tp+fp).
         'precision',
