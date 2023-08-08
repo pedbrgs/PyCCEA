@@ -90,6 +90,10 @@ class ClassificationMetrics():
                        'accuracy': make_scorer(accuracy_score),
                        'balanced_accuracy': make_scorer(balanced_accuracy_score),
                        'specificity': make_scorer(specificity_score, average=avg)}
+            # Note: For int/None inputs, if the estimator is a classifier and y is either binary
+            # or multiclass, StratifiedKFold is used. In all other cases, KFold is used.
+            # These splitters are instantiated with shuffle=False so the splits will be the same
+            # across calls.
             evaluation = cross_validate(estimator, X, y, scoring=scoring, cv=kfolds)
             # Measures
             self.values = {
