@@ -98,7 +98,7 @@ class CCPFG(CCEA):
         self.subcomp_sizes = self.decomposer.subcomp_sizes.copy()
         # Reorder train and test data according to shuffling in feature decomposition
         self.data.X_train = self.data.X_train[:, self.feature_idxs].copy()
-        if self.data.X_test:
+        if self.data.X_test is not None:
             self.data.X_test = self.data.X_test[:, self.feature_idxs].copy()
 
         # Train-validation
