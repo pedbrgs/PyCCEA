@@ -5,6 +5,7 @@ from tqdm import tqdm
 from projection.vip import VIP
 from coevolution.ccea import CCEA
 from projection.cipls import CIPLS
+from joblib import Parallel, delayed
 from fitness.penalty import SubsetSizePenalty
 from evaluation.wrapper import WrapperEvaluation
 from sklearn.model_selection import StratifiedKFold
@@ -15,7 +16,7 @@ from initialization.random import RandomBinaryInitialization
 from optimizers.genetic_algorithm import BinaryGeneticAlgorithm
 
 
-class CCPFG(CCEA):
+class CCPFGParallel(CCEA):
     """Cooperative Co-Evolutionary Algorithm with Projection-based Feature Grouping (CCPFG).
 
     Attributes
@@ -96,7 +97,7 @@ class CCPFG(CCEA):
         self.n_subcomps = self.decomposer.n_subcomps
         # Update 'subcomp_sizes' when it starts with an empty list
         self.subcomp_sizes = self.decomposer.subcomp_sizes.copy()
-        # Reorder train data according to shuffling in feature decomposition
+        # Reorder train and test data according to shuffling in feature decomposition
         self.data.X_train = self.data.X_train[:, self.feature_idxs].copy()
 
         # Train-validation
@@ -111,6 +112,9 @@ class CCPFG(CCEA):
             # It is just to avoid crashing when initializing the optimizers.
             # It will not be used in the cross-validation mode.
             self.data.S_val = np.full(shape=(self.n_subcomps), fill_value=None)
+
+    def _evolve_subpop(self, optimizer, subpop, fitness):
+        return optimizer.evolve(subpop, fitness)
 
     def optimize(self):
         """Solve the feature selection problem through optimization."""
@@ -146,11 +150,18 @@ class CCPFG(CCEA):
             # Append current best fitness
             self.convergence_curve.append(self.best_fitness)
             # Evolve each subpopulation using a genetic algorithm
-            for i in range(self.n_subcomps):
-                self.subpops[i], self.fitness[i] = self.optimizers[i].evolve(
-                    subpop=self.subpops[i],
-                    fitness=self.fitness[i]
-                )
+            results = Parallel(n_jobs=self.conf["coevolution"].get("n_cores"))(
+                delayed(self._evolve_subpop)(optimizer, subpop, fitness)
+                for optimizer, subpop, fitness in zip(self.optimizers, self.subpops, self.fitness)
+            )
+            for i, (new_subpop, new_fitness) in enumerate(results):
+                self.subpops[i] = new_subpop.copy()
+                self.fitness[i] = new_fitness.copy()
+            # for i in range(self.n_subcomps):
+            #    self.subpops[i], self.fitness[i] = self.optimizers[i].evolve(
+            #        subpop=self.subpops[i],
+            #        fitness=self.fitness[i]
+            #    )
             # For each subpopulation
             for i in range(self.n_subcomps):
                 # Find best individuals from the previous generation as collaborators for each
@@ -222,3 +233,4 @@ class CCPFG(CCEA):
             progress_bar.update(1)
         # Close progress bar after optimization
         progress_bar.close()
+

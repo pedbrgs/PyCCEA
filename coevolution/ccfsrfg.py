@@ -63,10 +63,8 @@ class CCFSRFG(CCEA):
         self.n_subcomps = self.decomposer.n_subcomps
         # Update 'subcomp_sizes' when it starts with an empty list
         self.subcomp_sizes = self.decomposer.subcomp_sizes.copy()
-        # Reorder train and test data according to shuffling in feature decomposition
+        # Reorder train data according to shuffling in feature decomposition
         self.data.X_train = self.data.X_train[:, self.feature_idxs].copy()
-        if self.data.X_test is not None:
-            self.data.X_test = self.data.X_test[:, self.feature_idxs].copy()
 
         # Train-validation
         if self.conf["evaluation"]["eval_mode"] == 'train_val':
