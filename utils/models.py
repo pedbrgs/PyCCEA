@@ -52,6 +52,8 @@ class ClassificationModel():
         logging.basicConfig(encoding='utf-8', level=logging.INFO)
         # Supress divide-by-zero warnings
         warnings.filterwarnings(action='ignore', category=UndefinedMetricWarning)
+        # Supress future warnings
+        warnings.filterwarnings(action='ignore', category=FutureWarning)
 
     def _model_selection(self, 
                          X_train: np.ndarray,
