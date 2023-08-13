@@ -24,6 +24,20 @@ class DataLoader():
         Train output data.
     y_test: np.ndarray
         Test output data.
+    n_examples: int
+        Total number of examples.
+    n_features: int
+        Number of features in the dataset.
+    n_classes: int
+        Number of classes.
+    classes: np.ndarray
+        Class identifiers.
+    train_size: int
+        Number of examples in the training set.
+    val_size: int
+        Number of examples in the validation set.
+    test_size: int
+        Number of examples in the test set.
     """
 
     data_folder = './datasets/'
@@ -33,19 +47,29 @@ class DataLoader():
         '9_tumor': f'{data_folder}9_tumor.csv',
         'brain_tumor_1': f'{data_folder}brain_tumor_1.csv',
         'brain_tumor_2': f'{data_folder}brain_tumor_2.csv',
-        'breast_cancer': f'{data_folder}wdbc.csv',
+        'cbd': f'{data_folder}cbd.csv',
         'dermatology': f'{data_folder}dermatology.csv',
         'divorce': f'{data_folder}divorce.csv',
         'dlbcl': f'{data_folder}dlbcl.csv',
+        'gfe': f'{data_folder}gfe.csv',
+        'hapt': f'{data_folder}hapt.csv',
+        'har': f'{data_folder}har.csv',
+        'isolet5': f'{data_folder}isolet5.csv',
         'leukemia_1': f'{data_folder}leukemia_1.csv',
         'leukemia_2': f'{data_folder}leukemia_2.csv',
         'leukemia_3': f'{data_folder}leukemia_3.csv',
         'lungc': f'{data_folder}lungc.csv',
+        'madelon_valid': f'{data_folder}madelon_valid.csv',
+        'mfd': f'{data_folder}mfd.csv',
+        'orh': f'{data_folder}orh.csv',
         'prostate_tumor_1': f'{data_folder}prostate_tumor_1.csv',
-        'qsar_toxicity': f'{data_folder}qsar_oral_toxicity.csv'
+        'qsar_toxicity': f'{data_folder}qsar_oral_toxicity.csv',
+        'shd': f'{data_folder}shd.csv',
+        'uji_indoor': f'{data_folder}uji_indoor_loc.csv',
+        'wdbc': f'{data_folder}wdbc.csv'
         }
 
-    def __init__(self, dataset: str, encode: bool = False):
+    def __init__(self, dataset: str):
         """
         Parameters
         ----------
@@ -76,12 +100,18 @@ class DataLoader():
         return has_header
 
     def _get_input(self):
-        """Get the input data X from the dataset when the output is the last column."""
-        return self.data.iloc[:,:-1].copy()
+        """
+        Get the input data X from the dataset. By default, the penultimate column of the dataset
+        is the label and the last is the predefined division of train and test set.
+        """
+        return self.data.iloc[:,:-2].copy()
 
     def _get_output(self):
-        """Get the output data y from the dataset when the output is the last column."""
-        return self.data.iloc[:,-1].copy()
+        """
+        Get the output data y from the dataset. By default, the penultimate column of the dataset
+        is the label and the last is the predefined division of train and test set.
+        """
+        return self.data.iloc[:,-2].copy()
 
     def load(self):
         """
@@ -102,86 +132,106 @@ class DataLoader():
         else:
             self.data = pd.read_csv(path)
 
-    def preprocess(self):
+    def preprocess(self, dropna=True):
         """
-        Preprocess dataset according to dataset given as a parameter, i.e., splits the data into
-        input X and output Y, handles categorical variables and normalizes all variables.
+        Preprocess the dataset for use in models.
         """
         # Setting a default representation for NaN values 
         self.data.replace(to_replace = '?', value=np.nan, inplace=True)
-        # Removing rows with at least one NaN value
-        self.data.dropna(inplace=True)
+        # Remove rows with at least one NaN value
+        if dropna:
+            self.data.dropna(inplace=True)
+            self.data.reset_index(drop=True, inplace=True)
 
-        # Standard preprocessing cases
-        special_datasets = ['breast_cancer', 'qsar_toxicity']
-        standard_datasets = list(set(DataLoader.datasets.keys()).difference(special_datasets))
+        # Split into input and output data
+        self.X = self._get_input()
+        self.y = self._get_output()
 
-        if self.dataset in standard_datasets:
-            self.X = self._get_input()
-            self.y = self._get_output()
-
-        elif self.dataset == 'breast_cancer':
-            self.X = self.data.iloc[:,2:].copy()
-            self.y = self.data.iloc[:,1].copy()
-            self.y.loc[self.y == 'M'] = 1
-            self.y.loc[self.y == 'B'] = 0
-
-        elif self.dataset == 'qsar_toxicity':
-            self.X = self._get_input()
-            self.y = self._get_output()
-            self.y.loc[self.y == 'positive'] = 1
-            self.y.loc[self.y == 'negative'] = 0
-        
         # Labels as integer values
         self.y = self.y.astype(int)
-            
-    def split(self, val_size: float = 0.10, test_size: float = 0.10, seed: int = 123456):
+        # Set number of examples
+        self.n_examples = self.X.shape[0]
+        # Set number of features
+        self.n_features = self.X.shape[1]
+        # Set number of classes
+        self.n_classes = self.y.nunique()
+        # Get class identifiers
+        self.classes = sorted(self.y.unique())
+
+    def split(self,
+              preset: bool = False,
+              val_size: float = 0.0,
+              test_size: float = 0.3,
+              seed: int = 42):
         """
         Split dataset into training, validation and test sets.
         
         Parameters
         ----------
-        val_size: float, default 0.10
+        preset: bool, default False
+            In some works, the training and testing sets have already been defined. To use them,
+            just set this boolean variable to True.
+        val_size: float, default 0.0
             Proportion of the dataset to include in the validation set. It should be between 0 and
             1. It can be an integer too, but it refers to the number of observations in the
             validation set, in this case.
-        test_size: float, default 0.10
+        test_size: float, default 0.3
             Proportion of the dataset to include in the test set. It should be between 0 and 1.
             It can be an integer too, but it refers to the number of observations in the test set,
             in this case.
-        seed: int, default 123456
+        seed: int, default 42
             Controls the shuffling applied to the data before applying the split.
         """
-        # Split data into training and test sets
-        if test_size > 0:
-            subsets = train_test_split(self.X.to_numpy(),
-                                       self.y.to_numpy(),
-                                       test_size=test_size,
-                                       random_state=seed)
-            self.X_train, self.X_test, self.y_train, self.y_test = subsets
-            # Split training set into training and validation sets
-            if val_size > 0:
-                subsets = train_test_split(self.X_train,
-                                           self.y_train,
-                                           test_size=val_size/(1-test_size),
-                                           random_state=seed)
-                self.X_train, self.X_val, self.y_train, self.y_val = subsets
-            # Use only training and test sets
-            else:
-                # There is no validation set
-                self.X_val, self.y_val = None, None
+        if preset:
+            logging.info("Using predefined sets...")
+            # Get predefined training set
+            train_idx, = np.where(self.data.iloc[:, -1] == "train")
+            self.X_train = self.X.iloc[train_idx].to_numpy()
+            self.y_train = self.y.iloc[train_idx].to_numpy()
+            # There is no validation set
+            self.X_val, self.y_val = None, None
+            # Get predefined test set
+            test_idx, = np.where(self.data.iloc[:, -1] == "test")
+            self.X_test = self.X.iloc[test_idx].to_numpy()
+            self.y_test = self.y.iloc[test_idx].to_numpy()
         else:
-            # There is no test set
-            self.X_test, self.y_test = None, None
-            # Split data into training and validation sets
-            if val_size > 0:
+            logging.info("Splitting data...")
+            # Split data into training and test sets
+            if test_size > 0:
                 subsets = train_test_split(self.X.to_numpy(),
-                                           self.y.to_numpy(),
-                                           test_size=val_size,
-                                           random_state=seed)
-                self.X_train, self.X_val, self.y_train, self.y_val = subsets
-            # Do not split the data. It can be a cross-validation with all data
+                                        self.y.to_numpy(),
+                                        test_size=test_size,
+                                        random_state=seed)
+                self.X_train, self.X_test, self.y_train, self.y_test = subsets
+                # Split training set into training and validation sets
+                if val_size > 0:
+                    subsets = train_test_split(self.X_train,
+                                            self.y_train,
+                                            test_size=val_size/(1-test_size),
+                                            random_state=seed)
+                    self.X_train, self.X_val, self.y_train, self.y_val = subsets
+                # Use only training and test sets
+                else:
+                    # There is no validation set
+                    self.X_val, self.y_val = None, None
             else:
-                self.X_train, self.y_train = self.X.to_numpy().copy(), self.y.to_numpy().copy()
-                # There is no validation set
-                self.X_val, self.y_val = None, None
+                # There is no test set
+                self.X_test, self.y_test = None, None
+                # Split data into training and validation sets
+                if val_size > 0:
+                    subsets = train_test_split(self.X.to_numpy(),
+                                            self.y.to_numpy(),
+                                            test_size=val_size,
+                                            random_state=seed)
+                    self.X_train, self.X_val, self.y_train, self.y_val = subsets
+                # Do not split the data. It can be a cross-validation with all data
+                else:
+                    self.X_train = self.X.to_numpy().copy()
+                    self.y_train = self.y.to_numpy().copy()
+                    # There is no validation set
+                    self.X_val, self.y_val = None, None
+
+        # Set subset sizes
+        self.train_size = self.X_train.shape[0]
+        self.val_size = self.X_val.shape[0] if self.X_val is not None else None
+        self.test_size = self.X_test.shape[0] if self.X_test is not None else None
