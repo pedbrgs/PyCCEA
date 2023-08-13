@@ -8,4 +8,4 @@
 
 ## About
 
-PyCCEA package is **under construction** and will be one of the results of my doctoral research.
+PyCCEA package is in progress.
