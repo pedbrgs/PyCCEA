@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 
 
@@ -135,6 +136,11 @@ class DataLoader():
     def preprocess(self, dropna=True):
         """
         Preprocess the dataset for use in models.
+
+        Parameters
+        ----------
+        dropna: bool, default False
+            Remove rows that contains NaN values.
         """
         # Setting a default representation for NaN values 
         self.data.replace(to_replace = '?', value=np.nan, inplace=True)
@@ -235,3 +241,19 @@ class DataLoader():
         self.train_size = self.X_train.shape[0]
         self.val_size = self.X_val.shape[0] if self.X_val is not None else None
         self.test_size = self.X_test.shape[0] if self.X_test is not None else None
+
+    def normalize(self):
+        """
+        Transform features by scaling each one between 0 and 1. It is essential for distance-based
+        methods.
+        """
+        logging.info("Normalizing data...")
+        scaler = MinMaxScaler()
+        # Normalization across instances should be done after splitting the data between training
+        # and test set to avoid leakage
+        scaler.fit(X=self.X_train)
+        self.X_train = scaler.transform(X=self.X_train)
+        # When normalizing the validation and test sets, one should apply the normalization
+        # parameters previously obtained from the training set as-is
+        self.X_val = scaler.transform(X=self.X_val) if self.X_val is not None else None
+        self.X_test = scaler.transform(X=self.X_test) if self.X_test is not None else None
