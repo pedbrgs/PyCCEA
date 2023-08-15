@@ -24,12 +24,12 @@ class ClassificationModel():
     """
 
     models = {
-        'support_vector_machine': SVC,
-        'random_forest': RandomForestClassifier,
-        'complement_naive_bayes': ComplementNB,
-        'gaussian_naive_bayes': GaussianNB,
-        'multinomial_naive_bayes': MultinomialNB,
-        'k_nearest_neighbors': KNeighborsClassifier
+        "support_vector_machine": (SVC, {}),
+        "random_forest": (RandomForestClassifier, {}),
+        "complement_naive_bayes": (ComplementNB, {}),
+        "gaussian_naive_bayes": (GaussianNB, {}),
+        "multinomial_naive_bayes": (MultinomialNB, {}),
+        "k_nearest_neighbors": (KNeighborsClassifier, {"n_neighbors": 3})
     }
 
     def __init__(self, model_type: str):
@@ -47,7 +47,8 @@ class ClassificationModel():
             )
         # Initialize classification model
         self.model_type = model_type
-        self.estimator = ClassificationModel.models[self.model_type]()
+        model_class, params = ClassificationModel.models[self.model_type]
+        self.estimator = model_class(**params)
         # Initialize logger with info level
         logging.basicConfig(encoding='utf-8', level=logging.INFO)
         # Supress divide-by-zero warnings
