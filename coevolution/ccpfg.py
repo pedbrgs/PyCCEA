@@ -9,6 +9,7 @@ from fitness.penalty import SubsetSizePenalty
 from evaluation.wrapper import WrapperEvaluation
 from sklearn.model_selection import StratifiedKFold
 from cooperation.best import SingleBestCollaboration
+from sklearn.cross_decomposition import PLSRegression
 from cooperation.random import SingleRandomCollaboration
 from decomposition.ranking import RankingFeatureGrouping
 from initialization.random import RandomBinaryInitialization
@@ -37,10 +38,20 @@ class CCPFG(CCEA):
                                 shuffle=True,
                                 random_state=self.seed)
         vips = list()
-        for train_idx, _ in kfold.split(self.data.X, self.data.y):
+        if self.data.n_features > 1000:
+            high_dim = True
+            logging.info("Projection with Covariance-free Incremental Partial Least Squares (CIPLS).")
+        else:
+            logging.info("Projection with Partial Least Squares (PLS).")
+            high_dim = False
+        for train_idx, _ in kfold.split(self.data.X_train, self.data.y_train):
             X_train = self.data.X.iloc[train_idx].copy()
             y_train = self.data.y.iloc[train_idx].copy()
-            projection_model = CIPLS(n_components=self.n_components, copy=True)
+            projection_model = (
+                CIPLS(n_components=self.n_components, copy=True)
+                if high_dim else
+                PLSRegression(n_components=self.n_components, copy=True)
+            )
             projection_model.fit(X=X_train, Y=y_train)
             vip = VIP(model=projection_model)
             vip.compute()
