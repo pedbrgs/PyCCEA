@@ -2,6 +2,7 @@ import logging
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import train_test_split
 
 
@@ -41,46 +42,52 @@ class DataLoader():
         Number of examples in the test set.
     """
 
-    data_folder = './datasets/'
+    data_folder = "./datasets/"
 
     datasets = {
-        '11_tumor': f'{data_folder}11_tumor.csv',
-        '9_tumor': f'{data_folder}9_tumor.csv',
-        'brain_tumor_1': f'{data_folder}brain_tumor_1.csv',
-        'brain_tumor_2': f'{data_folder}brain_tumor_2.csv',
-        'cbd': f'{data_folder}cbd.csv',
-        'dermatology': f'{data_folder}dermatology.csv',
-        'divorce': f'{data_folder}divorce.csv',
-        'dlbcl': f'{data_folder}dlbcl.csv',
-        'gfe': f'{data_folder}gfe.csv',
-        'hapt': f'{data_folder}hapt.csv',
-        'har': f'{data_folder}har.csv',
-        'isolet5': f'{data_folder}isolet5.csv',
-        'leukemia_1': f'{data_folder}leukemia_1.csv',
-        'leukemia_2': f'{data_folder}leukemia_2.csv',
-        'leukemia_3': f'{data_folder}leukemia_3.csv',
-        'lungc': f'{data_folder}lungc.csv',
-        'madelon_valid': f'{data_folder}madelon_valid.csv',
-        'mfd': f'{data_folder}mfd.csv',
-        'orh': f'{data_folder}orh.csv',
-        'prostate_tumor_1': f'{data_folder}prostate_tumor_1.csv',
-        'qsar_toxicity': f'{data_folder}qsar_oral_toxicity.csv',
-        'shd': f'{data_folder}shd.csv',
-        'uji_indoor': f'{data_folder}uji_indoor_loc.csv',
-        'wdbc': f'{data_folder}wdbc.csv'
+        "11_tumor": f"{data_folder}11_tumor.csv",
+        "9_tumor": f"{data_folder}9_tumor.csv",
+        "brain_tumor_1": f"{data_folder}brain_tumor_1.csv",
+        "brain_tumor_2": f"{data_folder}brain_tumor_2.csv",
+        "cbd": f"{data_folder}cbd.csv",
+        "dermatology": f"{data_folder}dermatology.csv",
+        "divorce": f"{data_folder}divorce.csv",
+        "dlbcl": f"{data_folder}dlbcl.csv",
+        "gfe": f"{data_folder}gfe.csv",
+        "hapt": f"{data_folder}hapt.csv",
+        "har": f"{data_folder}har.csv",
+        "isolet5": f"{data_folder}isolet5.csv",
+        "leukemia_1": f"{data_folder}leukemia_1.csv",
+        "leukemia_2": f"{data_folder}leukemia_2.csv",
+        "leukemia_3": f"{data_folder}leukemia_3.csv",
+        "lungc": f"{data_folder}lungc.csv",
+        "madelon_valid": f"{data_folder}madelon_valid.csv",
+        "mfd": f"{data_folder}mfd.csv",
+        "orh": f"{data_folder}orh.csv",
+        "prostate_tumor_1": f"{data_folder}prostate_tumor_1.csv",
+        "qsar_toxicity": f"{data_folder}qsar_oral_toxicity.csv",
+        "shd": f"{data_folder}shd.csv",
+        "uji_indoor": f"{data_folder}uji_indoor_loc.csv",
+        "wdbc": f"{data_folder}wdbc.csv"
         }
 
-    def __init__(self, dataset: str):
+    def __init__(self, dataset: str, kfolds: int = None, seed: int = 42):
         """
         Parameters
         ----------
         dataset: str
             Name of the dataset that will be loaded and processed.
+        kfolds: int or None, default None
+            Number of folds in the k-fold cross validation.
+        seed: int, default 42
+            It controls the randomness of the data split.
         """
-        
+
         self.dataset = dataset
+        self.kfolds = kfolds
+        self.seed = seed
         # Initialize logger with info level
-        logging.basicConfig(encoding='utf-8', level=logging.INFO)
+        logging.basicConfig(encoding="utf-8", level=logging.INFO)
 
     def _check_header(self, file: str):
         """
@@ -143,7 +150,7 @@ class DataLoader():
             Remove rows that contains NaN values.
         """
         # Setting a default representation for NaN values 
-        self.data.replace(to_replace = '?', value=np.nan, inplace=True)
+        self.data.replace(to_replace = "?", value=np.nan, inplace=True)
         # Remove rows with at least one NaN value
         if dropna:
             self.data.dropna(inplace=True)
@@ -167,8 +174,7 @@ class DataLoader():
     def split(self,
               preset: bool = False,
               val_size: float = 0.0,
-              test_size: float = 0.3,
-              seed: int = 42):
+              test_size: float = 0.3):
         """
         Split dataset into training, validation and test sets.
         
@@ -185,8 +191,6 @@ class DataLoader():
             Proportion of the dataset to include in the test set. It should be between 0 and 1.
             It can be an integer too, but it refers to the number of observations in the test set,
             in this case.
-        seed: int, default 42
-            Controls the shuffling applied to the data before applying the split.
         """
         if preset:
             logging.info("Using predefined sets...")
@@ -207,14 +211,14 @@ class DataLoader():
                 subsets = train_test_split(self.X.to_numpy(),
                                         self.y.to_numpy(),
                                         test_size=test_size,
-                                        random_state=seed)
+                                        random_state=self.seed)
                 self.X_train, self.X_test, self.y_train, self.y_test = subsets
                 # Split training set into training and validation sets
                 if val_size > 0:
                     subsets = train_test_split(self.X_train,
                                             self.y_train,
                                             test_size=val_size/(1-test_size),
-                                            random_state=seed)
+                                            random_state=self.seed)
                     self.X_train, self.X_val, self.y_train, self.y_val = subsets
                 # Use only training and test sets
                 else:
@@ -228,7 +232,7 @@ class DataLoader():
                     subsets = train_test_split(self.X.to_numpy(),
                                             self.y.to_numpy(),
                                             test_size=val_size,
-                                            random_state=seed)
+                                            random_state=self.seed)
                     self.X_train, self.X_val, self.y_train, self.y_val = subsets
                 # Do not split the data. It can be a cross-validation with all data
                 else:
@@ -239,8 +243,12 @@ class DataLoader():
 
         # Set subset sizes
         self.train_size = self.X_train.shape[0]
-        self.val_size = self.X_val.shape[0] if self.X_val is not None else None
-        self.test_size = self.X_test.shape[0] if self.X_test is not None else None
+        self.val_size = self.X_val.shape[0] if self.X_val is not None else 0
+        self.test_size = self.X_test.shape[0] if self.X_test is not None else 0
+        logging.info(f"Training set with {self.train_size} observations.")
+        logging.info(f"Validation set with {self.val_size} observations.")
+        logging.info(f"Test set with {self.test_size} observations.")
+
 
     def normalize(self):
         """
@@ -257,3 +265,24 @@ class DataLoader():
         # parameters previously obtained from the training set as-is
         self.X_val = scaler.transform(X=self.X_val) if self.X_val is not None else None
         self.X_test = scaler.transform(X=self.X_test) if self.X_test is not None else None
+
+    def build_k_folds(self):
+        """
+        Split the training data into k-folds, where the folds are made by preserving the
+        percentage of samples for each class.
+        """
+        if self.kfolds:
+            self.train_folds = list()
+            self.val_folds = list()
+            kfold = StratifiedKFold(n_splits=self.kfolds,
+                                    shuffle=True,
+                                    random_state=self.seed)
+            for train_idx, val_idx in kfold.split(self.X_train, self.y_train):
+                self.train_folds.append(
+                    [self.X_train[train_idx].copy(), 
+                    self.y_train[train_idx].copy()]
+                )
+                self.val_folds.append(
+                    [self.X_train[val_idx].copy(),
+                    self.y_train[val_idx].copy()]
+                )
