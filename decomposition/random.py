@@ -35,7 +35,8 @@ class RandomFeatureGrouping(FeatureGrouping):
         X: np.ndarray
             n-dimensional input data.
         feature_idxs: np.ndarray, default None
-            Shuffled list of feature indexes.
+            Shuffled list of feature indexes. It is passed as a parameter if it has been
+            previously generated.
 
         Returns
         -------
@@ -47,7 +48,7 @@ class RandomFeatureGrouping(FeatureGrouping):
         feature_idxs: np.ndarray
             Shuffled list of feature indexes.
         """
-        if not isinstance(feature_idxs, np.ndarray):
+        if feature_idxs is None:
             # List of feature indexes
             feature_idxs = np.arange(X.shape[1])
             # Shuffle the list of feature indexes

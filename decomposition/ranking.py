@@ -40,7 +40,7 @@ class RankingFeatureGrouping(FeatureGrouping):
         self.method = method
         self.ascending = ascending
 
-    def decompose(self, X: np.ndarray):
+    def decompose(self, X: np.ndarray, feature_idxs: np.ndarray = None):
         """
         Divide an n-dimensional problem into m subproblems.
 
@@ -48,30 +48,34 @@ class RankingFeatureGrouping(FeatureGrouping):
         ----------
         X: np.ndarray
             n-dimensional input data.
+        feature_idxs: np.ndarray, default None
+            Indexes of features sorted according to the score. It is passed as a parameter if it
+            has been previously calculated.
 
         Returns
         -------
         subcomponents: list
             Subcomponents, where each subcomponent is an array that can be accessed by indexing
             the list.
-        subcomp_sizes: list
-            Number of features in each subcomponent.
+        feature_idxs: np.ndarray, default None
+            Indexes of features sorted according to the score.
         """
-        ranking = np.argsort(self.scores, axis=-1)
-        # If lower scores should be ranked better.
-        if not self.ascending:
-            ranking = ranking[::-1].copy()
+        if feature_idxs is None:
+            ranking = np.argsort(self.scores, axis=-1)
+            # If lower scores should be ranked better.
+            if not self.ascending:
+                ranking = ranking[::-1].copy()
 
-        if self.method == "elitist":
-            # The order of features for decomposition is the ranking itself
-            feature_idxs = ranking.copy()
-        elif self.method == "distributed":
-            # Distributes the top-ranked features evenly among the groups
-            self.n_subcomps = self.n_subcomps if self.n_subcomps else len(self.subcomp_sizes)
-            feature_idxs = [list() for _ in range(self.n_subcomps)]
-            for i, value in enumerate(ranking):
-                feature_idxs[i % self.n_subcomps].append(value)
-            feature_idxs = np.concatenate(feature_idxs, axis=0)
+            if self.method == "elitist":
+                # The order of features for decomposition is the ranking itself
+                feature_idxs = ranking.copy()
+            elif self.method == "distributed":
+                # Distributes the top-ranked features evenly among the groups
+                self.n_subcomps = self.n_subcomps if self.n_subcomps else len(self.subcomp_sizes)
+                feature_idxs = [list() for _ in range(self.n_subcomps)]
+                for i, value in enumerate(ranking):
+                    feature_idxs[i % self.n_subcomps].append(value)
+                feature_idxs = np.concatenate(feature_idxs, axis=0)
         # Shuffle the data features according to the indexes
         X = X[:, feature_idxs].copy()
         # Decompose the problem
