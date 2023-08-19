@@ -34,7 +34,7 @@ class CCPFG(CCEA):
         # Method used to distribute features into subcomponents
         self.method = self.conf["decomposition"]["method"]
         # Perform K-fold cross-validation to compute variable importances
-        kfold = StratifiedKFold(n_splits=self.conf["evaluation"]["kfolds"],
+        kfold = StratifiedKFold(n_splits=self.conf["decomposition"]["kfolds"],
                                 shuffle=True,
                                 random_state=self.seed)
         vips = list()
@@ -45,14 +45,13 @@ class CCPFG(CCEA):
             logging.info("Projection with Partial Least Squares (PLS).")
             high_dim = False
         for train_idx, _ in kfold.split(self.data.X_train, self.data.y_train):
-            X_train = self.data.X.iloc[train_idx].copy()
-            y_train = self.data.y.iloc[train_idx].copy()
             projection_model = (
                 CIPLS(n_components=self.n_components, copy=True)
                 if high_dim else
                 PLSRegression(n_components=self.n_components, copy=True)
             )
-            projection_model.fit(X=X_train, Y=y_train)
+            projection_model.fit(X=self.data.X_train[train_idx].copy(),
+                                 Y=self.data.y_train[train_idx].copy())
             vip = VIP(model=projection_model)
             vip.compute()
             vips.append(vip.importances)
@@ -76,8 +75,7 @@ class CCPFG(CCEA):
         evaluator = WrapperEvaluation(task=self.conf["wrapper"]["task"],
                                       model_type=self.conf["wrapper"]["model_type"],
                                       eval_function=self.conf["evaluation"]["eval_function"],
-                                      eval_mode=self.conf["evaluation"]["eval_mode"],
-                                      kfolds=self.conf["evaluation"].get("kfolds"))
+                                      eval_mode=self.conf["evaluation"]["eval_mode"])
         self.fitness_function = SubsetSizePenalty(evaluator=evaluator,
                                                   weights=self.conf["evaluation"]["weights"])
 

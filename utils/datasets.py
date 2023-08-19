@@ -268,7 +268,7 @@ class DataLoader():
 
     def build_k_folds(self):
         """
-        Split the training data into k-folds, where the folds are made by preserving the
+        Split the training and test data into k-folds, where the folds are made by preserving the
         percentage of samples for each class.
         """
         if self.kfolds:
@@ -286,3 +286,15 @@ class DataLoader():
                     [self.X_train[val_idx].copy(),
                     self.y_train[val_idx].copy()]
                 )
+            if self.test_size > 0:
+                self.eval_train_folds = list()
+                self.eval_val_folds = list()
+                for train_idx, val_idx in kfold.split(self.X_test, self.y_test):
+                    self.eval_train_folds.append(
+                        [self.X_test[train_idx].copy(),
+                         self.y_test[train_idx].copy()]
+                    )
+                    self.eval_val_folds.append(
+                        [self.X_test[val_idx].copy(),
+                         self.y_test[val_idx].copy()]
+                    )

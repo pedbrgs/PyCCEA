@@ -1,6 +1,7 @@
 import copy
 import logging
 import numpy as np
+from utils.datasets import DataLoader
 from utils.models import ClassificationModel
 from utils.metrics import ClassificationMetrics
 
@@ -21,16 +22,15 @@ class WrapperEvaluation():
         Model that has been fitted to evaluate the individual.
     """
 
-    models = {'classification': ClassificationModel}
-    metrics = {'classification': ClassificationMetrics}
-    eval_modes = ['train_val', 'kfold_cv']
+    models = {"classification": ClassificationModel}
+    metrics = {"classification": ClassificationMetrics}
+    eval_modes = ["train_val", "kfold_cv"]
 
     def __init__(self,
                  task: str,
                  model_type: str,
                  eval_function: str,
-                 eval_mode: str,
-                 kfolds: int = 10):
+                 eval_mode: str):
         """
         Parameters
         ----------
@@ -43,8 +43,6 @@ class WrapperEvaluation():
             selected subset of features.
         eval_mode: str
             Evaluation mode. It can be 'train_val' or 'kfold_cv'.
-        kfolds: int, default 10
-            Number of folds in the k-fold cross validation.
         """
         # Check if the chosen task is available
         if not task in WrapperEvaluation.metrics.keys():
@@ -72,16 +70,10 @@ class WrapperEvaluation():
                 f"The available evaluation modes are {', '.join(WrapperEvaluation.eval_modes)}."
             )
         self.eval_mode = eval_mode
-        self.kfolds = kfolds
         # Initialize logger with info level
-        logging.basicConfig(encoding='utf-8', level=logging.INFO)
+        logging.basicConfig(encoding="utf-8", level=logging.INFO)
 
-    def evaluate(self,
-                 solution: np.ndarray,
-                 X_train: np.ndarray,
-                 y_train: np.ndarray,
-                 X_val: np.ndarray,
-                 y_val: np.ndarray):
+    def evaluate(self, solution: np.ndarray, data: DataLoader, test_mode=False):
         """
         Evaluate an individual represented by a complete solution through the predictive
         performance of a model and according to an evaluation metric.
@@ -91,47 +83,76 @@ class WrapperEvaluation():
         solution: np.ndarray
             Solution represented by a binary n-dimensional array, where n is the number of
             features.
-        X_train: np.ndarray
-            Train input data.
-        X_val: np.ndarray
-            Validation input data.
-        y_train: np.ndarray
-            Train output data.
-        y_val: np.ndarray
-            Validation output data.
+        data: DataLoader
+            Container with process data and training and test sets.
+        test_mode: bool, default False
+            In test mode, the training will be performed using the training set and the evaluation
+            using the test set (when eval_mode is 'train_val') or the training will be performed
+            using training folds built from the testing set and the evaluation using validation
+            folds built from the testing set (when eval_mode is 'kfold_cv'). Otherwise, the
+            training will be performed using the training set and the evaluation using the 
+            validation set (when eval_mode is 'train_val') or the training will be performed
+            using training folds built from the training set and the evaluation using validation
+            folds built from the training set (when eval_mode is 'kfold_cv').
         """
         # If no feature is selected
+        self.evaluations = {metric: 0 for metric in self.model_evaluator.metrics}
         if solution.sum() == 0:
             return 0
-        # Get model that has not been previously fitted
-        self.model = copy.deepcopy(self.base_model)
         # Boolean array used to filter which features will be used to fit the model
         solution_mask = solution.astype(bool)
-        # Select subset of features in the training set
-        X_train = X_train[:, solution_mask].copy()
         # Train-validation
-        if self.eval_mode == 'train_val':
-            # Select subset of features in the validation set
-            X_val = X_val[:, solution_mask].copy()
+        if self.eval_mode == "train_val":
+            # Get model that has not been previously fitted
+            self.model = copy.deepcopy(self.base_model)
+            # Select subset of features in the training set
+            X_train = data.X_train[:, solution_mask].copy()
+            # Select subset of features in the validation or test set
+            if test_mode:
+                X_val = data.X_test[:, solution_mask].copy()
+                y_val = data.y_test.copy()
+            else:
+                X_val = data.X_val[:, solution_mask].copy()
+                y_val = data.y_val.copy()
             # Train model with the current subset of features
-            self.model.train(X_train=X_train, y_train=y_train, optimize=False, verbose=False)
+            self.model.train(X_train=X_train,
+                             y_train=data.y_train,
+                             optimize=False,
+                             verbose=False)
             # Evaluate the individual
             self.model_evaluator.compute(estimator=self.model.estimator,
-                                         eval_mode=self.eval_mode,
-                                         X=X_val,
-                                         y=y_val,
-                                         kfolds=self.kfolds,
+                                         X_test=X_val,
+                                         y_test=y_val,
                                          verbose=False)
+            # Get evaluation
+            self.evaluations = self.model_evaluator.values
         # Cross-validation
         else:
-            # Evaluate the individual
-            self.model_evaluator.compute(estimator=self.model.estimator,
-                                         eval_mode=self.eval_mode,
-                                         X=X_train,
-                                         y=y_train,
-                                         kfolds=self.kfolds,
-                                         verbose=False)
-        # Get evaluation
-        evaluation = self.model_evaluator.values[self.eval_function]
+            for k in range(data.kfolds):
+                if test_mode:
+                    X_train, y_train = data.eval_train_folds[k]
+                    X_val, y_val = data.eval_val_folds[k]
+                else:
+                    X_train, y_train = data.train_folds[k]
+                    X_val, y_val = data.val_folds[k]
+                # Select subset of features in the training set
+                X_train = X_train[:, solution_mask].copy()
+                # Select subset of features in the validation set
+                X_val = X_val[:, solution_mask].copy()
+                # Get model that has not been previously fitted
+                self.model = copy.deepcopy(self.base_model)
+                # Train model with the current subset of features
+                self.model.train(X_train=X_train, y_train=y_train, optimize=False, verbose=False)
+                # Evaluate the individual
+                self.model_evaluator.compute(estimator=self.model.estimator,
+                                             X_test=X_val,
+                                             y_test=y_val,
+                                             verbose=False)
+                for metric in self.evaluations.keys():
+                    self.evaluations[metric] += self.model_evaluator.values[metric]
+                del self.model
+            # Calculate average performance over k folds
+            for metric in self.evaluations.keys():
+                self.evaluations[metric] = round(self.evaluations[metric]/data.kfolds, 4)
 
-        return evaluation
+        return self.evaluations[self.eval_function]

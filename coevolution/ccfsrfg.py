@@ -32,8 +32,7 @@ class CCFSRFG(CCEA):
         evaluator = WrapperEvaluation(task=self.conf["wrapper"]["task"],
                                       model_type=self.conf["wrapper"]["model_type"],
                                       eval_function=self.conf["evaluation"]["eval_function"],
-                                      eval_mode=self.conf["evaluation"]["eval_mode"],
-                                      kfolds=self.conf["evaluation"].get("kfolds"))
+                                      eval_mode=self.conf["evaluation"]["eval_mode"])
         self.fitness_function = SubsetSizePenalty(evaluator=evaluator,
                                                   weights=self.conf["evaluation"]["weights"])
 

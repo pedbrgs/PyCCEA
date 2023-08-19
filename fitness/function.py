@@ -28,9 +28,5 @@ class WrapperFitnessFunction(ABC):
         the i-th feature should be considered and if there is a 0, it indicates that the feature
         should not be considered.
         """
-        evaluation = self.evaluator.evaluate(solution=context_vector.copy(),
-                                             X_train=data.X_train,
-                                             y_train=data.y_train,
-                                             X_val=data.X_val,
-                                             y_val=data.y_val)
+        evaluation = self.evaluator.evaluate(solution=context_vector.copy(), data=data)
         return evaluation
