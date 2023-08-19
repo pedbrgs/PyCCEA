@@ -1,8 +1,8 @@
 # This file specifies the parameters of the Cooperative Co-Evolutionary Algorithm with Projection-based Feature Grouping (CCPFG)
 
 [coevolution]
-subpop_sizes = [30, 30, 30, 30]
-subcomp_sizes = [256, 256, 256, 256]
+subpop_sizes = [30]
+n_subcomps = 3
 max_gen = 10000
 max_gen_without_improvement = 100
 seed = 42
@@ -10,16 +10,16 @@ seed = 42
 [decomposition]
 n_components = 2
 method = "elitist"
+kfolds = 3
 
 [wrapper]
 task = "classification"
-model_type = "multinomial_naive_bayes"
+model_type = "gaussian_naive_bayes"
 
 [evaluation]
-eval_function = "accuracy"
+eval_function = "balanced_accuracy"
 eval_mode = "kfold_cv"
-kfolds = 10
-weights = [0.6, 0.4]
+weights = [0.7, 0.3]
 
 [optimizer]
 mutation_rate = 0.05
