@@ -17,7 +17,7 @@ class RandomFeatureGrouping(FeatureGrouping):
             Number of subcomponents, where each subcomponent is a subset of features.
         subcomp_sizes: list
             Number of features in each subcomponent.
-        seed: int
+        seed: int, default None
             Numerical value that generates a new set or repeats pseudo-random numbers. It is
             defined in stochastic processes to ensure reproducibility.
         """
