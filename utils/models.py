@@ -60,7 +60,7 @@ class ClassificationModel():
                          X_train: np.ndarray,
                          y_train: np.ndarray,
                          n_iter: int = 100,
-                         seed: int = 123456,
+                         seed: int = None,
                          kfolds: int = 5):
         """
         Optimize the hyperparameters of the model and return the best model found.
@@ -120,7 +120,7 @@ class ClassificationModel():
     def train(self,
               X_train: np.ndarray,
               y_train: np.ndarray,
-              seed: int = 123456,
+              seed: int = None,
               kfolds: int = 10,
               n_iter: int = 100,
               optimize: bool = False,
@@ -134,7 +134,7 @@ class ClassificationModel():
             Train input data.
         y_train: np.ndarray
             Train output data.   
-        seed: int, default 123456
+        seed: int, default None
             Controls the shuffling applied for subsampling the data.
         kfolds: int, default 10
             Number of folds in the k-fold cross validation.
