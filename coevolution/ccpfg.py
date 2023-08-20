@@ -97,30 +97,6 @@ class CCPFG(CCEA):
                                                conf=self.conf)
             self.optimizers.append(optimizer)
 
-    def _problem_decomposition(self):
-        """Decompose the problem into smaller subproblems."""
-        # Decompose features in the training set
-        self.data.S_train, self.feature_idxs = self.decomposer.decompose(X=self.data.X_train)
-        # Update 'n_subcomps' when it starts with NoneType
-        self.n_subcomps = self.decomposer.n_subcomps
-        # Update 'subcomp_sizes' when it starts with an empty list
-        self.subcomp_sizes = self.decomposer.subcomp_sizes.copy()
-        # Reorder train data according to shuffling in feature decomposition
-        self.data.X_train = self.data.X_train[:, self.feature_idxs].copy()
-
-        # Train-validation
-        if self.conf["evaluation"]["eval_mode"] == 'train_val':
-            # Decompose features in the validation set
-            self.data.S_val, _ = self.decomposer.decompose(X=self.data.X_val,
-                                                           feature_idxs=self.feature_idxs)
-            # Reorder validation data according to shuffling in feature decomposition
-            self.data.X_val = self.data.X_val[:, self.feature_idxs].copy()
-        # Cross-validation
-        else:
-            # It is just to avoid crashing when initializing the optimizers.
-            # It will not be used in the cross-validation mode.
-            self.data.S_val = np.full(shape=(self.n_subcomps), fill_value=None)
-
     def optimize(self):
         """Solve the feature selection problem through optimization."""
         # Decompose problem

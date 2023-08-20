@@ -132,11 +132,6 @@ class CCEA(ABC):
         pass
 
     @abstractmethod
-    def _problem_decomposition(self):
-        """Decompose the problem into smaller subproblems."""
-        pass
-
-    @abstractmethod
     def optimize(self):
         """Solve the feature selection problem through optimization."""
         pass
@@ -202,3 +197,38 @@ class CCEA(ABC):
         self.context_vectors = copy.deepcopy(self.initializer.context_vectors)
         # Evaluations of context vectors
         self.fitness = copy.deepcopy(self.initializer.fitness)
+
+    def _problem_decomposition(self):
+        """Decompose the problem into smaller subproblems."""
+        # Train-validation
+        if self.conf["evaluation"]["eval_mode"] == 'train_val':
+            # Decompose features in the training set
+            _, self.feature_idxs = self.decomposer.decompose(X=self.data.X_train)
+            # Reorder training, validation and test sets according to shuffling in the feature
+            # decomposition
+            self.data.X_train = self.data.X_train[:, self.feature_idxs].copy()
+            self.data.X_val = self.data.X_val[:, self.feature_idxs].copy()
+            self.data.X_test = self.data.X_test[:, self.feature_idxs].copy()
+        # K-fold cross-validation
+        else:
+            for k in range(self.data.kfolds):
+                Xk_train = self.data.train_folds[k][0]
+                # Decompose only once to use the same feature indexes on all k-folds
+                if k == 0:
+                    _, self.feature_idxs = self.decomposer.decompose(X=Xk_train.copy())
+                # Reorder training and validation folds built from the training set according to
+                # the shuffling in the feature decomposition
+                self.data.train_folds[k][0] = Xk_train[:, self.feature_idxs].copy()
+                Xk_val = self.data.val_folds[k][0]
+                self.data.val_folds[k][0] = Xk_val[:, self.feature_idxs].copy()
+                # Reorder training and validation folds built from the test set according to the
+                # shuffling in the feature decomposition
+                if self.data.test_size > 0:
+                    Xk_eval_train = self.data.eval_train_folds[k][0]
+                    self.data.eval_train_folds[k][0] = Xk_eval_train[:, self.feature_idxs].copy()
+                    Xk_eval_val = self.data.eval_val_folds[k][0]
+                    self.data.eval_val_folds[k][0] = Xk_eval_val[:, self.feature_idxs].copy()
+        # Update 'n_subcomps' when it starts with NoneType
+        self.n_subcomps = self.decomposer.n_subcomps
+        # Update 'subcomp_sizes' when it starts with an empty list
+        self.subcomp_sizes = self.decomposer.subcomp_sizes.copy()
