@@ -94,6 +94,11 @@ class WrapperEvaluation():
             validation set (when eval_mode is 'train_val') or the training will be performed
             using training folds built from the training set and the evaluation using validation
             folds built from the training set (when eval_mode is 'kfold_cv').
+
+        Returns
+        -------
+        float
+            Evaluation of the chosen predictiv performance function.
         """
         # If no feature is selected
         self.evaluations = {metric: 0 for metric in self.model_evaluator.metrics}
