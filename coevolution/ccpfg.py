@@ -1,5 +1,4 @@
 import logging
-import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from projection.vip import VIP
@@ -7,7 +6,6 @@ from coevolution.ccea import CCEA
 from projection.cipls import CIPLS
 from fitness.penalty import SubsetSizePenalty
 from evaluation.wrapper import WrapperEvaluation
-from sklearn.model_selection import StratifiedKFold
 from cooperation.best import SingleBestCollaboration
 from sklearn.cross_decomposition import PLSRegression
 from cooperation.random import SingleRandomCollaboration
@@ -33,31 +31,42 @@ class CCPFG(CCEA):
         self.n_components = self.conf["decomposition"]["n_components"]
         # Method used to distribute features into subcomponents
         self.method = self.conf["decomposition"]["method"]
-        # Perform K-fold cross-validation to compute variable importances
-        kfold = StratifiedKFold(n_splits=self.conf["decomposition"]["kfolds"],
-                                shuffle=True,
-                                random_state=self.seed)
-        vips = list()
+        logging.info(f"Division approach: {self.method}.")
         if self.data.n_features > 1000:
             high_dim = True
             logging.info("Projection with Covariance-free Incremental Partial Least Squares (CIPLS).")
         else:
             logging.info("Projection with Partial Least Squares (PLS).")
             high_dim = False
-        for train_idx, _ in kfold.split(self.data.X_train, self.data.y_train):
+        # Cross-validation
+        if self.conf["evaluation"]["eval_mode"] == "kfold_cv":
+            vips = list()
+            # Perform K-fold cross-validation to compute variable importances
+            for k in range(self.data.kfolds):
+                projection_model = (
+                    CIPLS(n_components=self.n_components, copy=True)
+                    if high_dim else
+                    PLSRegression(n_components=self.n_components, copy=True)
+                )
+                projection_model.fit(X=self.data.train_folds[k][0], Y=self.data.train_folds[k][1])
+                vip = VIP(model=projection_model)
+                vip.compute()
+                vips.append(vip.importances.copy())
+                del projection_model, vip
+            # The importance of a variable will be the average value of its importances in the k-folds
+            importances = pd.DataFrame(vips).mean(axis=0).values
+        # Train-validation
+        else:
             projection_model = (
                 CIPLS(n_components=self.n_components, copy=True)
                 if high_dim else
                 PLSRegression(n_components=self.n_components, copy=True)
             )
-            projection_model.fit(X=self.data.X_train[train_idx].copy(),
-                                 Y=self.data.y_train[train_idx].copy())
+            projection_model.fit(X=self.data.X_train, Y=self.data.y_train)
             vip = VIP(model=projection_model)
             vip.compute()
-            vips.append(vip.importances)
-            del projection_model, vip
-        # The importance of a variable will be the average value of its importances in the k-folds
-        importances = pd.DataFrame(vips).mean(axis=0).values
+            importances = vip.importances.copy()
+
         # Instantiate ranking feature grouping using variable importances as scores
         self.decomposer = RankingFeatureGrouping(n_subcomps=self.n_subcomps,
                                                  subcomp_sizes=self.subcomp_sizes,
