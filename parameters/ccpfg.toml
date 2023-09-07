@@ -17,7 +17,7 @@ model_type = "k_nearest_neighbors"
 [evaluation]
 eval_function = "balanced_accuracy"
 eval_mode = "kfold_cv"
-weights = [0.6, 0.3]
+weights = [0.6, 0.4]
 
 [optimizer]
 mutation_rate = 0.05
