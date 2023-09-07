@@ -54,7 +54,7 @@ class BinaryGeneticAlgorithm():
         prob = float(np.random.uniform(low=0, high=1))
 
         # If the random probability is less than the crossover probability, then do the crossover
-        if prob < self.crossover_rate:
+        if (prob < self.crossover_rate) and (self.n_features > 1):
             # Crossover point
             point = np.random.randint(low=1, high=self.n_features)
             # Offspring
