@@ -232,3 +232,40 @@ class CCEA(ABC):
         self.n_subcomps = self.decomposer.n_subcomps
         # Update 'subcomp_sizes' when it starts with an empty list
         self.subcomp_sizes = self.decomposer.subcomp_sizes.copy()
+        # Remove empty subcomponents if they exist
+        self._remove_empty_subcomponents()
+
+    def _remove_empty_subcomponents(self):
+        """
+        Remove empty subcomponents.
+
+        Some decomposition methods can by themselves define the best number of subcomponents for
+        a problem. Thus, the number of subcomponents specified by the user will not always be
+        respected. When this happens, some components are empty, that is, without features. This
+        method removes those subcomponents that although specified were not generated.
+        """
+        n_subpops = len(self.subpop_sizes)
+        if n_subpops != self.n_subcomps:
+            logging.info(
+                f"There are {n_subpops} subpopulations and {self.n_subcomps} subcomponents!\n"
+                "Possibly the decomposition method generated a smaller number of subcomponents "
+                "than what was specified.\nSubpopulation sizes have been adjusted."
+            )
+            self.subpop_sizes = self.subpop_sizes[:self.n_subcomps]
+        # Find indices of subcomponents with less than one feature
+        unfeasible_subcomps = [i for i, size in enumerate(self.subcomp_sizes) if size < 1]
+        if not unfeasible_subcomps:
+            return
+        logging.info(
+            f"There are {len(unfeasible_subcomps)} subcomponents with less than one feature! "
+            "These subcomponents have been removed."
+        )
+        # Filter subcomponent sizes and subpopulation sizes to remove unfeasible subcomponents
+        self.subpop_sizes = [
+            size for i, size in enumerate(self.subpop_sizes) if i not in unfeasible_subcomps
+        ]
+        self.subcomp_sizes = [
+            size for i, size in enumerate(self.subcomp_sizes) if i not in unfeasible_subcomps
+        ]
+        # Update the number of subcomponents
+        self.n_subcomps = len(self.subcomp_sizes)
