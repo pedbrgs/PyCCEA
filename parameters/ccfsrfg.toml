@@ -12,7 +12,7 @@ task = "classification"
 model_type = "gaussian_naive_bayes"
 
 [evaluation]
-eval_function = "balanced_accuracy"
+eval_function = "accuracy"
 eval_mode = "kfold_cv"
 weights = [0.6, 0.4]
 
