@@ -7,15 +7,18 @@ class ClusteringFeatureGrouping(FeatureGrouping):
     Decompose the problem (a collection of features) according to a clustering.
     """
 
-    def __init__(self, clusters: np.ndarray = np.empty(0),):
+    def __init__(self, n_subcomps: int = None, clusters: np.ndarray = np.empty(0),):
+        super().__init__(n_subcomps)
         """
         Parameters
         ----------
+        n_subcomps: int
+            Number of subcomponents, where each subcomponent is a subset of features.
         clusters: np.ndarray
             Index of the cluster each feature belongs to.
         """
         self.clusters = clusters.copy()
-        self.n_subcomps = len(np.unique(clusters))
+        self.n_subcomps = n_subcomps
 
     def decompose(self, X: np.ndarray, feature_idxs: np.ndarray = None):
         """

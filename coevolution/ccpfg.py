@@ -146,7 +146,10 @@ class CCPFG(CCEA):
                 projection_model=projection_model,
                 folds=folds
             )
-            self.decomposer = ClusteringFeatureGrouping(clusters=feature_clusters)
+            self.decomposer = ClusteringFeatureGrouping(
+                n_subcomps=self.n_subcomps,
+                clusters=feature_clusters
+            )
         else:
             importances = self._compute_variable_importances(
                 projection_model=projection_model,
