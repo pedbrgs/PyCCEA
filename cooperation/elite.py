@@ -28,7 +28,7 @@ class SingleEliteCollaboration(Collaboration):
                           subpop_idx: int,
                           indiv_idx: int,
                           subpops: list,
-                          ranking: list):
+                          fitness: list):
         """
         Set the collaborator of the individual given as a parameter as a random individual from
         the k best individuals of the subpopulation.
@@ -41,8 +41,8 @@ class SingleEliteCollaboration(Collaboration):
             Index of the individual in its respective subpopulation.
         subpops: list
             Individuals from all subpopulations.
-        ranking: list
-            Ranking of subpopulations.
+        fitness: list
+            Evaluation of the individuals in all subpopulations.
 
         Returns
         -------
@@ -60,7 +60,8 @@ class SingleEliteCollaboration(Collaboration):
             # Otherwise, the collaborator will be a random individual among the 'sample_size' best
             # individuals of the subpopulation
             else:
-                collaborator_pool = subpops[i][ranking[i][:self.sample_size]]
+                ranking = np.argsort(fitness[i])[::-1]
+                collaborator_pool = subpops[i][ranking][:self.sample_size]
                 collaborators[i] = random.choices(collaborator_pool, k=1)[0]
 
         return collaborators
