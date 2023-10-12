@@ -234,15 +234,21 @@ class CCEA(ABC):
         self.subcomp_sizes = self.decomposer.subcomp_sizes.copy()
         # Remove empty subcomponents if they exist
         self._remove_empty_subcomponents()
+        if sum(self.subcomp_sizes) != self.data.n_features:
+            raise AssertionError(
+                f"The sum of the subproblem sizes ({sum(self.subcomp_sizes)}) is not equal to "
+                f"the complete subproblem size ({self.data.n_features})."
+            )
 
     def _remove_empty_subcomponents(self):
         """
         Remove empty subcomponents.
 
-        Some decomposition methods can by themselves define the best number of subcomponents for
-        a problem. Thus, the number of subcomponents specified by the user will not always be
-        respected. When this happens, some components are empty, that is, without features. This
-        method removes those subcomponents that although specified were not generated.
+        Some decomposition methods (learning-based) can by themselves define the best number of
+        subcomponents for a problem. Thus, the number of subcomponents specified by the user will 
+        not always be respected. When this happens, some components are empty, that is, without
+        features. This method removes those subcomponents that although specified were not
+        generated.
         """
         n_subpops = len(self.subpop_sizes)
         if n_subpops != self.n_subcomps:
