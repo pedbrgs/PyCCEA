@@ -51,8 +51,7 @@ class SubsetSizePenalty(WrapperFitnessFunction):
         fitness: float
             Quality of the context vector.
         """
-        n_features = data.X.shape[1]
-        penalty = context_vector.sum()/n_features
+        penalty = context_vector.sum()/data.n_features
         evaluation = self._evaluate_predictive_performance(context_vector, data)
         fitness = self.w1*evaluation - self.w2*penalty
         return fitness
