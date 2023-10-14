@@ -13,7 +13,7 @@ model_type = "k_nearest_neighbors"
 [evaluation]
 eval_function = "accuracy"
 eval_mode = "kfold_cv"
-weights = [0.60, 0.30]
+weights = [0.60, 0.40]
 
 [optimizer]
 selection_method = "generational"
