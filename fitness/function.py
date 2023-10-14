@@ -21,8 +21,7 @@ class WrapperFitnessFunction(ABC):
 
     def _evaluate_predictive_performance(self,
                                          context_vector: np.ndarray,
-                                         data: DataLoader,
-                                         return_gap: bool=False):
+                                         data: DataLoader):
         """""
         Evaluate predictive performance of a machine learning model trained on the selected set.
 
