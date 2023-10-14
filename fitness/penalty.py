@@ -4,48 +4,6 @@ from evaluation.wrapper import WrapperEvaluation
 from fitness.function import WrapperFitnessFunction
 
 
-class OverfittingPenalty(WrapperFitnessFunction):
-    """
-    Objective function that penalizes large generalization gaps.
-
-    Attributes
-    ----------
-    alpha: float
-        Constant that multiplies the generalization gap, controlling the strength of the penalty.
-    """
-
-    def __init__(self, evaluator: WrapperEvaluation, alpha: float):
-        super().__init__(evaluator)
-        # Checks whether the weight of the penalty is greater than zero
-        if alpha <= 0:
-            raise AssertionError(
-                f"Penalty of the generalization gap must be greater than zero (alpha = {alpha}.)"
-            )
-        self.alpha = alpha
-
-    def evaluate(self, context_vector: np.ndarray, data: DataLoader):
-        """
-        Evaluate the given context vector using the fitness function.
-
-        Parameters
-        ----------
-        context_vector: np.ndarray
-            Solution of the complete problem.
-        data: DataLoader
-            Container with process data and training and test sets.
-
-        Returns
-        -------
-        fitness: float
-            Quality of the context vector.
-        """
-        evaluations = self._evaluate_predictive_performance(context_vector, data, return_gap=True)
-        evaluation = evaluations[self.evaluator.eval_function]
-        penalty = evaluations["generalization_gap"]
-        fitness = evaluation - self.alpha*penalty
-        return fitness
-
-
 class SubsetSizePenalty(WrapperFitnessFunction):
     """
     Objective function that penalizes large subsets of features.
