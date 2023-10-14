@@ -5,19 +5,18 @@ subpop_sizes = [30]
 n_subcomps = 3
 max_gen = 10000
 max_gen_without_improvement = 100
-seed = 42
 
 [wrapper]
 task = "classification"
-model_type = "gaussian_naive_bayes"
+model_type = "k_nearest_neighbors"
 
 [evaluation]
 eval_function = "accuracy"
 eval_mode = "kfold_cv"
-weights = [0.6, 0.4]
+weights = [0.60, 0.30]
 
 [optimizer]
-selection_method = "steady-state"
+selection_method = "generational"
 mutation_rate = 0.05
 crossover_rate = 1.00
 tournament_sample_size = 1
