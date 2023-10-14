@@ -17,6 +17,7 @@ eval_mode = "kfold_cv"
 weights = [0.6, 0.4]
 
 [optimizer]
+selection_method = "steady-state"
 mutation_rate = 0.05
 crossover_rate = 1.00
 tournament_sample_size = 1

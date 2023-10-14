@@ -59,7 +59,7 @@ class CCFSRFG1(CCFSRFG):
             self.convergence_curve.append(self.best_fitness)
             # Evolve each subpopulation using a genetic algorithm
             for i in range(self.n_subcomps):
-                self.subpops[i], self.fitness[i] = self.optimizers[i].evolve(
+                self.subpops[i] = self.optimizers[i].evolve(
                     subpop=self.subpops[i],
                     fitness=self.fitness[i]
                 )
