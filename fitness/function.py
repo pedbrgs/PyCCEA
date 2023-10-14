@@ -31,8 +31,4 @@ class WrapperFitnessFunction(ABC):
         the i-th feature should be considered and if there is a 0, it indicates that the feature
         should not be considered.
         """
-        return self.evaluator.evaluate(
-            solution=context_vector.copy(),
-            data=data,
-            return_gap=return_gap
-        )
+        return self.evaluator.evaluate(solution=context_vector.copy(), data=data)
