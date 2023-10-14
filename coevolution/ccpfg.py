@@ -231,7 +231,7 @@ class CCPFG(CCEA):
             self.convergence_curve.append(self.best_fitness)
             # Evolve each subpopulation using a genetic algorithm
             for i in range(self.n_subcomps):
-                self.subpops[i], self.fitness[i] = self.optimizers[i].evolve(
+                self.subpops[i] = self.optimizers[i].evolve(
                     subpop=self.subpops[i],
                     fitness=self.fitness[i]
                 )
@@ -266,23 +266,13 @@ class CCPFG(CCEA):
                 stagnation_counter = 0
                 # Enable logger if specified
                 logging.getLogger().disabled = False if self.verbose else True
-                # Objective weight
-                w1 = self.conf["evaluation"]["weights"][0]
-                # Penalty weight
-                w2 = self.conf["evaluation"]["weights"][1]
-                # Current fitness, performance evaluation and penalty
+                # Current fitness
                 current_best_fitness = round(self.best_fitness, 4)
-                current_penalty = round(self.best_context_vector.sum()/self.n_features, 4)
-                current_eval = round((self.best_fitness + w2*current_penalty)/w1, 4)
-                # New fitness, performance evaluation and penalty
+                # New fitness
                 new_best_fitness = round(best_fitness, 4)
-                new_penalty = round(best_context_vector.sum()/self.n_features, 4)
-                new_eval = round((best_fitness + w2*new_penalty)/w1, 4)
                 # Show improvement
                 logging.info(
                     f"\nUpdate fitness from {current_best_fitness} to {new_best_fitness}.\n"
-                    f"Update predictive performance from {current_eval} to {new_eval}.\n"
-                    f"Update penalty from {current_penalty} to {new_penalty}.\n"
                 )
                 # Update best context vector
                 self.best_context_vector = best_context_vector.copy()
