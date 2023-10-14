@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.exceptions import UndefinedMetricWarning
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.naive_bayes import ComplementNB, GaussianNB, MultinomialNB
@@ -24,12 +25,13 @@ class ClassificationModel():
     """
 
     models = {
-        "support_vector_machine": (SVC, {}),
-        "random_forest": (RandomForestClassifier, {}),
         "complement_naive_bayes": (ComplementNB, {}),
         "gaussian_naive_bayes": (GaussianNB, {}),
+        "k_nearest_neighbors": (KNeighborsClassifier, {"n_neighbors": 3}),
+        "logistic_regression": (LogisticRegression, {}),
         "multinomial_naive_bayes": (MultinomialNB, {}),
-        "k_nearest_neighbors": (KNeighborsClassifier, {"n_neighbors": 3})
+        "random_forest": (RandomForestClassifier, {}),
+        "support_vector_machine": (SVC, {}),
     }
 
     def __init__(self, model_type: str):
