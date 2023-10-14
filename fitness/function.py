@@ -19,7 +19,10 @@ class WrapperFitnessFunction(ABC):
     def __init__(self, evaluator: WrapperEvaluation):
         self.evaluator = evaluator
 
-    def _evaluate_predictive_performance(self, context_vector: np.ndarray, data: DataLoader):
+    def _evaluate_predictive_performance(self,
+                                         context_vector: np.ndarray,
+                                         data: DataLoader,
+                                         return_gap: bool=False):
         """""
         Evaluate predictive performance of a machine learning model trained on the selected set.
 
@@ -28,5 +31,8 @@ class WrapperFitnessFunction(ABC):
         the i-th feature should be considered and if there is a 0, it indicates that the feature
         should not be considered.
         """
-        evaluation = self.evaluator.evaluate(solution=context_vector.copy(), data=data)
-        return evaluation
+        return self.evaluator.evaluate(
+            solution=context_vector.copy(),
+            data=data,
+            return_gap=return_gap
+        )
