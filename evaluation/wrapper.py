@@ -76,8 +76,7 @@ class WrapperEvaluation():
     def _hold_out_validation(self,
                              solution_mask: np.ndarray,
                              data: DataLoader,
-                             test_mode: bool=False,
-                             return_train_eval: bool=False):
+                             test_mode: bool=False):
         """Evaluate an individual using hold-out validation (train/validation/test)."""
 
         # Get model that has not been previously fitted
@@ -104,19 +103,10 @@ class WrapperEvaluation():
         # Get evaluation in the validation or test set
         self.evaluations = self.model_evaluator.values
 
-        # Get evaluation in the training set
-        if return_train_eval:
-            self.model_evaluator.compute(estimator=self.model.estimator,
-                                         X_test=X_train,
-                                         y_test=data.y_train,
-                                         verbose=False)
-            self.train_evaluations = self.model_evaluator.values
-
     def _kfold_cross_validation(self,
                                 solution_mask: np.ndarray,
                                 data: DataLoader,
-                                test_mode: bool=False,
-                                return_train_eval: bool=False):
+                                test_mode: bool=False):
         """Evaluate an individual using k-fold cross-validation."""
 
         for k in range(data.kfolds):
@@ -141,26 +131,15 @@ class WrapperEvaluation():
                                          verbose=False)
             for metric in self.evaluations.keys():
                 self.evaluations[metric] += self.model_evaluator.values[metric]
-            # Get evaluation in the training set
-            if return_train_eval:
-                self.model_evaluator.compute(estimator=self.model.estimator,
-                                             X_test=X_train,
-                                             y_test=y_train,
-                                             verbose=False)
-                for metric in self.evaluations.keys():
-                    self.train_evaluations[metric] += self.model_evaluator.values[metric]
             del self.model
         # Calculate average performance over k folds
         for metric in self.evaluations.keys():
             self.evaluations[metric] = round(self.evaluations[metric]/data.kfolds, 4)
-            if return_train_eval:
-                self.train_evaluations[metric] = round(self.train_evaluations[metric]/data.kfolds, 4)
 
     def evaluate(self,
                  solution: np.ndarray,
                  data: DataLoader,
-                 test_mode: bool=False,
-                 return_gap: bool=False):
+                 test_mode: bool=False):
         """
         Evaluate an individual represented by a complete solution through the predictive
         performance of a model.
@@ -181,10 +160,6 @@ class WrapperEvaluation():
             validation set (when eval_mode is 'train_val') or the training will be performed
             using training folds built from the training set and the evaluation using validation
             folds built from the training set (when eval_mode is 'kfold_cv').
-        return_gap: bool, default False
-            If True, it also calculates evaluation metrics on the training set and computes the
-            generalization gap, which is the difference between the evaluation metrics on the
-            validation/test set (depending on the value of 'test_mode') and the training set.
 
         Returns
         -------
@@ -193,8 +168,6 @@ class WrapperEvaluation():
         """
         # If no feature is selected
         self.evaluations = {metric: 0 for metric in self.model_evaluator.metrics}
-        if return_gap:
-            self.train_evaluations = {metric: 0 for metric in self.model_evaluator.metrics}
         if solution.sum() == 0:
             return 0
         # Boolean array used to filter which features will be used to fit the model
@@ -204,20 +177,14 @@ class WrapperEvaluation():
             self._hold_out_validation(
                 solution_mask=solution_mask,
                 data=data,
-                test_mode=test_mode,
-                return_train_eval=return_gap
+                test_mode=test_mode
             )
         # K-fold cross-validation
         else:
             self._kfold_cross_validation(
                 solution_mask=solution_mask,
                 data=data,
-                test_mode=test_mode,
-                return_train_eval=return_gap
-            )
-        if return_gap:
-            self.evaluations["generalization_gap"] = abs(
-                self.train_evaluations[self.eval_function] - self.evaluations[self.eval_function]
+                test_mode=test_mode
             )
 
         return self.evaluations
