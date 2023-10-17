@@ -29,92 +29,53 @@ class CCPFG(CCEA):
         List of feature indexes.
     """
 
-    def _feature_clustering(self, projection_model, folds):
+    def _feature_clustering(self, projection_model):
         """Cluster the features according to their contribution to the components of the
         low-dimensional latent space.
-
-        Note that when the evaluation mode is "kfold_cv", a clustering is done for each fold and
-        then a clustering is done on the centroids of these clusterings to perform a consensus
-        clustering. Otherwise, only one clustering is done on the training set.
 
         Parameters
         ----------
         projection_model: sklearn model object
             Partial Least Squares regression model. It can be the traditional version (PLS) or the
             Covariance-free version (CIPLS).
-        folds: list, or tuple
-            Data for model fit, where index 0 of each value indicates the input X and index 1 the
-            output y. In case the evaluation mode is "kfold_cv", this list has k values (input and
-            output pairs). Otherwise, it has only one input and output pair.
 
         Returns
         -------
         feature_clusters: np.ndarray
             Index of the cluster each feature belongs to.
         """
-        centroids_folds = list()
-        feature_loadings_folds = list()
-        for Xk_train, yk_train in folds:
-            # For each fold, use an unfitted model and train it
-            projection_model_k = copy.deepcopy(projection_model)
-            projection_model_k.fit(X=Xk_train, Y=yk_train)
-            # Get the loadings of features on PLS components
-            feature_loadings = np.abs(projection_model_k.x_loadings_)
-            feature_loadings_folds.append(feature_loadings)
-            # Cluster features based on loadings.
-            # Loadings indicate how strongly each feature contributes to each component.
-            # Features with similar loadings on the same components are likely to be related.
-            clustering_model_k = KMeans(n_clusters=self.n_subcomps, random_state=self.seed)
-            feature_clusters = clustering_model_k.fit_predict(feature_loadings)
-            centroids_folds.append(clustering_model_k.cluster_centers_)
-            del projection_model_k, clustering_model_k
-        # Combine centroids from all folds to create a consensus set of centroids
-        if len(folds) > 1:
-            clustering_model = KMeans(n_clusters=self.n_subcomps, random_state=self.seed)
-            clustering_model.fit(np.concatenate(centroids_folds))
-            consensus_centroids = clustering_model.cluster_centers_
-            feature_loadings_mean = np.mean(feature_loadings_folds, axis=0)
-            distances = np.linalg.norm(
-                feature_loadings_mean[:, np.newaxis] - consensus_centroids, axis=2
-            )
-            feature_clusters = np.argmin(distances, axis=1)
+        projection_model = copy.deepcopy(projection_model)
+        projection_model.fit(X=self.data.X_train, Y=self.data.y_train)
+        # Get the loadings of features on PLS components
+        feature_loadings = np.abs(projection_model.x_loadings_)
+        # Cluster features based on loadings.
+        # Loadings indicate how strongly each feature contributes to each component.
+        # Features with similar loadings on the same components are likely to be related.
+        clustering_model = KMeans(n_clusters=self.n_subcomps, random_state=self.seed)
+        feature_clusters = clustering_model.fit_predict(feature_loadings)
 
         return feature_clusters
 
-    def _compute_variable_importances(self, projection_model, folds):
+    def _compute_variable_importances(self, projection_model):
         """
         Compute variable importance in projection.
-
-        Note that when the evaluation mode is "kfold_cv", the importances will be averages of the
-        importances in the folds. Otherwise, the importances will be calculated only once in the
-        training set.
 
         Parameters
         ----------
         projection_model: sklearn model object
             Partial Least Squares regression model. It can be the traditional version (PLS) or the
             Covariance-free version (CIPLS).
-        folds: list, or tuple
-            Data for model fit, where index 0 of each value indicates the input X and index 1 the
-            output y. In case the evaluation mode is "kfold_cv", this list has k values (input and
-            output pairs). Otherwise, it has only one input and output pair.
 
         Returns
         -------
         importances: np.ndarray (n_features,)
             Importance of each feature based on its contribution to yield the latent space.
         """
-        vips = list()
-        for Xk_train, yk_train in folds:
-            # For each fold, use an unfitted model and train it
-            projection_model_k = copy.deepcopy(projection_model)
-            projection_model_k.fit(X=Xk_train, Y=yk_train)
-            vip = VIP(model=projection_model_k)
-            vip.compute()
-            vips.append(vip.importances.copy())
-            del projection_model_k, vip
-        # The importance of a variable will be the average value of its importances in the k-folds
-        importances = pd.DataFrame(vips).mean(axis=0).values
+        projection_model = copy.deepcopy(projection_model)
+        projection_model.fit(X=self.data.X_train, Y=self.data.y_train)
+        vip = VIP(model=projection_model)
+        vip.compute()
+        importances = vip.importances.copy()
         return importances
 
     def _init_decomposer(self):
@@ -133,28 +94,15 @@ class CCPFG(CCEA):
             else PLSRegression(n_components=self.n_components, copy=True)
         )
 
-        # Cross-validation
-        if self.conf["evaluation"]["eval_mode"] == "kfold_cv":
-            folds = self.data.train_folds
-        # Train-validation
-        else:
-            folds = [(self.data.X_train, self.data.y_train)]
-
         # Instantiate feature grouping
         if self.method == "clustering":
-            feature_clusters = self._feature_clustering(
-                projection_model=projection_model,
-                folds=folds
-            )
+            feature_clusters = self._feature_clustering(projection_model=projection_model)
             self.decomposer = ClusteringFeatureGrouping(
                 n_subcomps=self.n_subcomps,
                 clusters=feature_clusters
             )
         else:
-            importances = self._compute_variable_importances(
-                projection_model=projection_model,
-                folds=folds
-            )
+            importances = self._compute_variable_importances(projection_model=projection_model)
             # Ranking feature grouping using variable importances as scores
             self.decomposer = RankingFeatureGrouping(
                 n_subcomps=self.n_subcomps,
