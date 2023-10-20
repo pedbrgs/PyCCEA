@@ -1,7 +1,5 @@
 import copy
 import logging
-import numpy as np
-import pandas as pd
 from tqdm import tqdm
 from projection.vip import VIP
 from coevolution.ccea import CCEA
@@ -47,7 +45,7 @@ class CCPFG(CCEA):
         projection_model = copy.deepcopy(projection_model)
         projection_model.fit(X=self.data.X_train, Y=self.data.y_train)
         # Get the loadings of features on PLS components
-        feature_loadings = np.abs(projection_model.x_loadings_)
+        feature_loadings = abs(projection_model.x_loadings_)
         # Cluster features based on loadings.
         # Loadings indicate how strongly each feature contributes to each component.
         # Features with similar loadings on the same components are likely to be related.
