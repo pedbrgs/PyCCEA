@@ -96,6 +96,8 @@ class CCEA(ABC):
         self._init_collaborator()
         # List to store the best global fitness in each generation
         self.convergence_curve = list()
+        # List to store the best context vector in each generation
+        self.best_context_vectors = list()
 
         # Initialize logger with info level
         logging.basicConfig(encoding="utf-8", level=logging.INFO)
@@ -170,7 +172,7 @@ class CCEA(ABC):
             current_best[i] = dict()
             current_best[i]["individual"] = subpops[i][best_ind_idx].copy()
             current_best[i]["context_vector"] = context_vectors[i][best_ind_idx].copy()
-            current_best[i]["fitness"] = fitness[i][best_ind_idx].copy()
+            current_best[i]["fitness"] = fitness[i][best_ind_idx]
 
         return current_best
 
@@ -212,66 +214,23 @@ class CCEA(ABC):
         # K-fold cross-validation
         else:
             for k in range(self.data.kfolds):
-                Xk_train = self.data.train_folds[k][0]
+                Xk_train = self.data.train_folds[k][0].copy()
                 # Decompose only once to use the same feature indexes on all k-folds
                 if k == 0:
                     _, self.feature_idxs = self.decomposer.decompose(X=Xk_train.copy())
                 # Reorder training and validation folds built from the training set according to
                 # the shuffling in the feature decomposition
                 self.data.train_folds[k][0] = Xk_train[:, self.feature_idxs].copy()
-                Xk_val = self.data.val_folds[k][0]
+                Xk_val = self.data.val_folds[k][0].copy()
                 self.data.val_folds[k][0] = Xk_val[:, self.feature_idxs].copy()
                 # Reorder training and validation folds built from the test set according to the
                 # shuffling in the feature decomposition
                 if self.data.test_size > 0:
-                    Xk_eval_train = self.data.eval_train_folds[k][0]
+                    Xk_eval_train = self.data.eval_train_folds[k][0].copy()
                     self.data.eval_train_folds[k][0] = Xk_eval_train[:, self.feature_idxs].copy()
-                    Xk_eval_val = self.data.eval_val_folds[k][0]
+                    Xk_eval_val = self.data.eval_val_folds[k][0].copy()
                     self.data.eval_val_folds[k][0] = Xk_eval_val[:, self.feature_idxs].copy()
         # Update 'n_subcomps' when it starts with NoneType
         self.n_subcomps = self.decomposer.n_subcomps
         # Update 'subcomp_sizes' when it starts with an empty list
         self.subcomp_sizes = self.decomposer.subcomp_sizes.copy()
-        # Remove empty subcomponents if they exist
-        self._remove_empty_subcomponents()
-        if sum(self.subcomp_sizes) != self.data.n_features:
-            raise AssertionError(
-                f"The sum of the subproblem sizes ({sum(self.subcomp_sizes)}) is not equal to "
-                f"the complete subproblem size ({self.data.n_features})."
-            )
-
-    def _remove_empty_subcomponents(self):
-        """
-        Remove empty subcomponents.
-
-        Some decomposition methods (learning-based) can by themselves define the best number of
-        subcomponents for a problem. Thus, the number of subcomponents specified by the user will 
-        not always be respected. When this happens, some components are empty, that is, without
-        features. This method removes those subcomponents that although specified were not
-        generated.
-        """
-        n_subpops = len(self.subpop_sizes)
-        if n_subpops != self.n_subcomps:
-            logging.info(
-                f"There are {n_subpops} subpopulations and {self.n_subcomps} subcomponents!\n"
-                "Possibly the decomposition method generated a smaller number of subcomponents "
-                "than what was specified.\nSubpopulation sizes have been adjusted."
-            )
-            self.subpop_sizes = self.subpop_sizes[:self.n_subcomps]
-        # Find indices of subcomponents with less than one feature
-        unfeasible_subcomps = [i for i, size in enumerate(self.subcomp_sizes) if size < 1]
-        if not unfeasible_subcomps:
-            return
-        logging.info(
-            f"There are {len(unfeasible_subcomps)} subcomponents with less than one feature! "
-            "These subcomponents have been removed."
-        )
-        # Filter subcomponent sizes and subpopulation sizes to remove unfeasible subcomponents
-        self.subpop_sizes = [
-            size for i, size in enumerate(self.subpop_sizes) if i not in unfeasible_subcomps
-        ]
-        self.subcomp_sizes = [
-            size for i, size in enumerate(self.subcomp_sizes) if i not in unfeasible_subcomps
-        ]
-        # Update the number of subcomponents
-        self.n_subcomps = len(self.subcomp_sizes)

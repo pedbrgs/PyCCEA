@@ -40,6 +40,7 @@ class CCFSRFG2(CCFSRFG):
         )
         # Select the globally best context vector
         self.best_context_vector, self.best_fitness = self._get_global_best()
+        self.best_context_vectors.append(self.best_context_vector.copy())
         # Store the shuffled feature list that generated the best context vector
         self.best_feature_idxs = self.feature_idxs.copy()
 
@@ -80,7 +81,6 @@ class CCFSRFG2(CCFSRFG):
                     )
                     context_vector = self.random_collaborator.build_context_vector(collaborators)
                     # Update the context vector
-                    # TODO Should I store the best context vector of each subpopulation across generations?
                     self.context_vectors[i][j] = context_vector.copy()
                     # Update fitness
                     self.fitness[i][j] = self.fitness_function.evaluate(context_vector, self.data)
@@ -118,6 +118,7 @@ class CCFSRFG2(CCFSRFG):
                 )
                 # Update best context vector
                 self.best_context_vector = best_context_vector.copy()
+                self.best_context_vectors.append(self.best_context_vector.copy())
                 # Update best fitness
                 self.best_fitness = best_fitness
                 # Update the shuffled feature list that generated the best context vector

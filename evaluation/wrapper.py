@@ -20,6 +20,9 @@ class WrapperEvaluation():
         is copied and fitted for each individual.
     model: sklearn model object
         Model that has been fitted to evaluate the individual.
+    estimators: list of sklearn model objects
+        Estimators used in the current evaluation. It is one when 'eval_mode' is set to "train_val"
+        and k when 'eval_mode' is set to "kfold_cv".
     """
 
     models = {"classification": ClassificationModel}
@@ -30,7 +33,8 @@ class WrapperEvaluation():
                  task: str,
                  model_type: str,
                  eval_function: str,
-                 eval_mode: str):
+                 eval_mode: str,
+                 n_classes: int = None):
         """
         Parameters
         ----------
@@ -43,6 +47,8 @@ class WrapperEvaluation():
             selected subset of features.
         eval_mode: str
             Evaluation mode. It can be 'train_val' or 'kfold_cv'.
+        n_classes: int, default None
+            Number of classes when task parameter is set to 'classification'.
         """
         # Check if the chosen task is available
         if not task in WrapperEvaluation.metrics.keys():
@@ -51,7 +57,7 @@ class WrapperEvaluation():
                 f"The available tasks are {', '.join(WrapperEvaluation.metrics.keys())}."
             )
         # Initialize the model evaluator
-        self.model_evaluator = WrapperEvaluation.metrics[task]()
+        self.model_evaluator = WrapperEvaluation.metrics[task](n_classes=n_classes)
         # Check if the chosen evaluation function is available
         if not eval_function in self.model_evaluator.metrics:
             raise AssertionError(
@@ -95,6 +101,7 @@ class WrapperEvaluation():
                          y_train=data.y_train,
                          optimize=False,
                          verbose=False)
+        self.estimators.append(copy.deepcopy(self.model.estimator))
         # Evaluate the individual
         self.model_evaluator.compute(estimator=self.model.estimator,
                                      X_test=X_val,
@@ -124,6 +131,7 @@ class WrapperEvaluation():
             self.model = copy.deepcopy(self.base_model)
             # Train model with the current subset of features
             self.model.train(X_train=X_train, y_train=y_train, optimize=False, verbose=False)
+            self.estimators.append(copy.deepcopy(self.model.estimator))
             # Evaluate the individual
             self.model_evaluator.compute(estimator=self.model.estimator,
                                          X_test=X_val,
@@ -166,6 +174,8 @@ class WrapperEvaluation():
         float
             Evaluation metrics.
         """
+        # Estimator(s) used for the current evaluation
+        self.estimators = list()
         # If no feature is selected
         self.evaluations = {metric: 0 for metric in self.model_evaluator.metrics}
         if solution.sum() == 0:
