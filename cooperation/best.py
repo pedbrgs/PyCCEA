@@ -35,6 +35,6 @@ class SingleBestCollaboration(Collaboration):
         # Best individuals from each subpopulation as collaborators
         collaborators = [best["individual"] for best in current_best.values()]
         # Assign the individual itself to the subpopulation to which it belongs
-        collaborators[subpop_idx] = subpops[subpop_idx][indiv_idx]
+        collaborators[subpop_idx] = subpops[subpop_idx][indiv_idx].copy()
 
         return collaborators

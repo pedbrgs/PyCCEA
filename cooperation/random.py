@@ -44,6 +44,6 @@ class SingleRandomCollaboration(Collaboration):
         # For an individual, randomly select a single collaborator from each subpopulation
         collaborators = [random.choices(subpop, k=1)[0] for subpop in subpops]
         # Assign the individual itself to the subpopulation to which it belongs
-        collaborators[subpop_idx] = subpops[subpop_idx][indiv_idx]
+        collaborators[subpop_idx] = subpops[subpop_idx][indiv_idx].copy()
 
         return collaborators
