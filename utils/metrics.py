@@ -37,8 +37,15 @@ class ClassificationMetrics():
         "specificity"
     ]
 
-    def __init__(self):
+    def __init__(self, n_classes):
+        """
+        Parameters
+        ----------
+        n_classes: int
+            Number of classes.
+        """
         self.values = dict()
+        self.n_classes = n_classes
         # Initialize logger with info level
         logging.basicConfig(encoding="utf-8", level=logging.INFO)
 
@@ -61,7 +68,7 @@ class ClassificationMetrics():
         """
 
         # Type of aggregation used in the evaluation metrics according to the classification task
-        avg = "macro" if np.unique(y_test).shape[0] > 2 else "binary"
+        avg = "macro" if self.n_classes > 2 else "binary"
 
         # Predictions
         y_pred = estimator.predict(X_test)
