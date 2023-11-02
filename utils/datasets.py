@@ -2,7 +2,7 @@ import logging
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
 
 
@@ -297,9 +297,9 @@ class DataLoader():
             logging.info(f"Building {self.kfolds}-folds...")
             self.train_folds = list()
             self.val_folds = list()
-            kfold = StratifiedKFold(n_splits=self.kfolds,
-                                    shuffle=True,
-                                    random_state=self.seed)
+            kfold = KFold(n_splits=self.kfolds,
+                          shuffle=True,
+                          random_state=self.seed)
             for train_idx, val_idx in kfold.split(self.X_train, self.y_train):
                 self.train_folds.append(
                     [self.X_train[train_idx].copy(), 
