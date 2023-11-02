@@ -27,7 +27,7 @@ class ClassificationModel():
     models = {
         "complement_naive_bayes": (ComplementNB, {}),
         "gaussian_naive_bayes": (GaussianNB, {}),
-        "k_nearest_neighbors": (KNeighborsClassifier, {"n_neighbors": 3}),
+        "k_nearest_neighbors": (KNeighborsClassifier, {"n_neighbors": 1}),
         "logistic_regression": (LogisticRegression, {}),
         "multinomial_naive_bayes": (MultinomialNB, {}),
         "random_forest": (RandomForestClassifier, {}),
