@@ -179,7 +179,7 @@ class WrapperEvaluation():
         # If no feature is selected
         self.evaluations = {metric: 0 for metric in self.model_evaluator.metrics}
         if solution.sum() == 0:
-            return 0
+            return self.evaluations
         # Boolean array used to filter which features will be used to fit the model
         solution_mask = solution.astype(bool)
         # Train-validation
