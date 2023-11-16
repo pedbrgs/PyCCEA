@@ -173,6 +173,10 @@ class DataLoader():
         self.n_classes = self.y.nunique()
         # Get class identifiers
         self.classes = sorted(self.y.unique())
+        # Compute imbalance ratio
+        minority_class = self.y.value_counts().min()
+        majority_class = self.y.value_counts().max()
+        self.imbalance_ratio = round(majority_class/minority_class, 4)
 
     def split(self,
               preset: bool = False,
