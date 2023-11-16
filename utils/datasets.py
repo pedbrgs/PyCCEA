@@ -2,7 +2,7 @@ import logging
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.model_selection import train_test_split
 
 
@@ -292,18 +292,28 @@ class DataLoader():
             self.X_val = scaler.transform(X=self.X_val) if self.X_val is not None else None
             self.X_test = scaler.transform(X=self.X_test) if self.X_test is not None else None
 
-    def build_k_folds(self):
+    def build_k_folds(self, stratified=False):
         """
         Split the training and test data into k-folds, where the folds are made by preserving the
         percentage of samples for each class.
+
+        Parameters
+        ----------
+        stratified: bool, default False
+            If True, the folds are made by preserving the percentage of samples for each class.
         """
         if self.kfolds is not None:
             logging.info(f"Building {self.kfolds}-folds...")
             self.train_folds = list()
             self.val_folds = list()
-            kfold = KFold(n_splits=self.kfolds,
-                          shuffle=True,
-                          random_state=self.seed)
+            if stratified:
+                kfold = StratifiedKFold(n_splits=self.kfolds,
+                                        shuffle=True,
+                                        random_state=self.seed)
+            else:
+                kfold = KFold(n_splits=self.kfolds,
+                              shuffle=True,
+                              random_state=self.seed)
             for train_idx, val_idx in kfold.split(self.X_train, self.y_train):
                 self.train_folds.append(
                     [self.X_train[train_idx].copy(), 
