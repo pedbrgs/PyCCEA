@@ -1,9 +1,8 @@
 import numpy as np
-from tqdm import tqdm
 
 
 class BinaryGeneticAlgorithm():
-    """ Binary genetic algorithm.
+    """Binary genetic algorithm.
 
     Attributes
     ----------
@@ -64,8 +63,8 @@ class BinaryGeneticAlgorithm():
         # Sample size for Tournament Selection
         self.tournament_sample_size = self.conf["optimizer"]["tournament_sample_size"]
 
-    def _single_point_crossover(self, parent_a, parent_b):
-        """ Single point crossover. """
+    def _single_point_crossover(self, parent_a: np.ndarray, parent_b: np.ndarray):
+        """Single point crossover. """
         # Random probability
         prob = float(np.random.uniform(low=0, high=1))
 
@@ -82,8 +81,8 @@ class BinaryGeneticAlgorithm():
 
         return offspring
 
-    def _mutation(self, parent):
-        """ Bit-flip mutation. """
+    def _mutation(self, parent: np.ndarray):
+        """Bit-flip mutation. """
         # Offspring
         offspring = parent.copy()
         # Random probabilities
@@ -95,8 +94,8 @@ class BinaryGeneticAlgorithm():
 
         return offspring
 
-    def _tournament_selection(self, subpop, fitness):
-        """ Tournament selection. """
+    def _tournament_selection(self, subpop: np.ndarray, fitness: list):
+        """Tournament selection. """
         # Indexes of selected parents
         selected_idxs = np.zeros((2,))
 
@@ -121,8 +120,8 @@ class BinaryGeneticAlgorithm():
 
         return parent_a, parent_b
 
-    def _survivor_selection(self, subpop, fitness):
-        """ Selection of individuals who will remain in the subpopulation. """
+    def _survivor_selection(self, subpop: np.ndarray, fitness: list):
+        """Selection of individuals who will remain in the subpopulation. """
         # Select the two worst individuals (lower fitness) in the subpopulation
         worst_idxs = np.argsort(fitness)[:2]
         # Eliminate the two worst individuals in the subpopulation
@@ -130,8 +129,8 @@ class BinaryGeneticAlgorithm():
 
         return subpop
 
-    def evolve(self, subpop, fitness):
-        """ Evolve a subpopulation for a single generation.
+    def evolve(self, subpop: np.ndarray, fitness: list):
+        """Evolve a subpopulation for a single generation.
 
         Parameters
         ----------
