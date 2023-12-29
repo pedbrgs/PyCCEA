@@ -28,19 +28,29 @@ class SingleEliteCollaboration(Collaboration):
                           subpop_idx: int,
                           indiv_idx: int,
                           subpops: list,
+                          next_subpops: list,
                           fitness: list):
         """
-        Set the collaborator of the individual given as a parameter as a random individual from
-        the k best individuals of the subpopulation.
+        Set the collaborators of the individual given as a parameter as random individuals among
+        the k best individuals in each subpopulation.
+
+        In the scenario of n subpopulations, the elite collaboration method involves choosing n
+        collaborators, with one selected from each subpopulation. Notably, the individual
+        becomes their own collaborator within their specific subpopulation, while the remaining
+        collaborators are chosen from the top k individuals in each respective subpopulation.
 
         Parameters
         ----------
         subpop_idx: int
             Index of the subpopulation to which the individual belongs.
         indiv_idx: int
-            Index of the individual in its respective subpopulation.
+            Index of the individual in its respective subpopulation. The vector that represents
+            the individual is obtained from the `next_subpops`, where the individuals were evolved
+            and not evaluated.
         subpops: list
             Individuals from all subpopulations.
+        next_subpops: list
+            Individuals from all subpopulations of the next generation.
         fitness: list
             Evaluation of the individuals in all subpopulations.
 
@@ -53,15 +63,15 @@ class SingleEliteCollaboration(Collaboration):
         collaborators = [None] * len(subpops)
         # Find a collaborator per subpopulation
         for i in range(len(subpops)):
-            # If the current subpopulation is the same as the individual's subpopulation, the
-            # individual's collaborator is himself
+            # If the i-th subpopulation is the same as the individual's subpopulation, the
+            # individual's collaborator is itself, since we want to evaluate it
             if i == subpop_idx:
-                collaborators[i] = subpops[subpop_idx][indiv_idx]
+                collaborators[i] = next_subpops[subpop_idx][indiv_idx].copy()
             # Otherwise, the collaborator will be a random individual among the 'sample_size' best
-            # individuals of the subpopulation
+            # individuals of the subpopulation in the previous generation
             else:
                 ranking = np.argsort(fitness[i])[::-1]
-                collaborator_pool = subpops[i][ranking][:self.sample_size]
-                collaborators[i] = random.choices(collaborator_pool, k=1)[0]
+                collaborator_pool = subpops[i][ranking][:self.sample_size].copy()
+                collaborators[i] = random.choices(collaborator_pool, k=1)[0].copy()
 
         return collaborators
