@@ -1,14 +1,12 @@
 import numpy as np
 
 
-class AngleModulatedDifferentialEvolution():
-    """Angle Modulated Differential Evolution (AMDE) algorithm (rand/1/exp).
+class DifferentialEvolution():
+    """Differential Evolution (AMDE) algorithm (rand/1/exp).
 
-    Perform a homomorphous mapping to abstract a problem (defined in binary-valued space) into a
-    simpler problem (defined in continuos-valued space).
-
-    Engelbrecht, Andries P., and Gary Pampara. "Binary differential evolution strategies."
-    2007 IEEE congress on evolutionary computation. IEEE, (2007).
+    Storn, Rainer, and Kenneth Price. "Differential Evolution - A Simple and Efficient Heuristic
+    for Global Optimization over Continuous Spaces" Journal of global optimization 11 (1997):
+    341-359.
 
     Attributes
     ----------
@@ -20,14 +18,8 @@ class AngleModulatedDifferentialEvolution():
         also known as the crossover probability. Increasing this value allows a larger number
         of mutants to progress into the next generation, but at the risk of population
         stability.
-    bounds: tuple[float, float], default (-1, 1)
-        Bounds for coefficients (min, max).
-    n_coeffs: int, default 4
-        Number of coefficients in the angle modulation function. The AMDE evolves values for
-        the four coefficients, a, b, c, and d. The first coefficient represents the horizontal
-        shift of the function, the second coefficient represents the maximum frequency of the
-        sine function, the third coefficient represents the frequency of the cosine function,
-        and the fourth coefficient represents the vertical shift of the function.
+    bounds: tuple[float, float]
+        Bounds for continuous variables (min, max).
     """
 
     def __init__(self,
@@ -40,7 +32,7 @@ class AngleModulatedDifferentialEvolution():
         subpop_size: int
             Number of individuals in the subpopulation.
         n_features: int
-            Number of features, that is, decision variables.
+            Number of features in the subcomponent, that is, number of decision variables.
         conf: dict
             Configuration parameters of the cooperative coevolutionary algorithm.
         """
@@ -64,10 +56,8 @@ class AngleModulatedDifferentialEvolution():
             raise ValueError("Crossover probability should be in the range [0, 1].")
         # Number of features
         self.n_features = n_features
-        # Number of coefficients in the angle modulation function
-        self.n_coeffs = 4
-        # Bounds for coefficients
-        self.bounds = (-1, 1)
+        # Bounds for continuous variables
+        self.bounds = (0, 1)
 
     def _select_solutions(self, pop: np.ndarray, target_vector_idx: float):
         """Select 3 solutions randomly from the population.
@@ -87,10 +77,10 @@ class AngleModulatedDifferentialEvolution():
 
     def _exponential_crossover(self, target_vector: np.ndarray, donor_vector: np.ndarray):
         """Perform exponential crossover."""
-        n = np.random.choice(range(self.n_coeffs))
-        trial_vector = np.zeros(self.n_coeffs)
+        n = np.random.choice(range(self.n_features))
+        trial_vector = np.zeros(self.n_features)
         trial_vector[n] = donor_vector[n].copy()
-        indices = [i if i < self.n_coeffs else i-self.n_coeffs for i in range(n+1, n+self.n_coeffs)]
+        indices = [i if i < self.n_features else i-self.n_features for i in range(n+1, n+self.n_features)]
         remaining_idxs = indices.copy()
         for i in indices:
             r = np.random.uniform()
