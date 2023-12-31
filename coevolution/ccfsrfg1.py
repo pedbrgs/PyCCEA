@@ -1,3 +1,5 @@
+import gc
+import copy
 import logging
 from tqdm import tqdm
 from coevolution.ccfsrfg import CCFSRFG
@@ -58,34 +60,51 @@ class CCFSRFG1(CCFSRFG):
         while n_gen <= self.conf["coevolution"]["max_gen"]:
             # Append current best fitness
             self.convergence_curve.append(self.best_fitness)
+
             # Evolve each subpopulation using a genetic algorithm
+            next_subpops = list()
             for i in range(self.n_subcomps):
-                self.subpops[i] = self.optimizers[i].evolve(
+                next_subpop = self.optimizers[i].evolve(
                     subpop=self.subpops[i],
                     fitness=self.fitness[i]
                 )
-            # For each subpopulation
+                next_subpops.append(next_subpop)
+
+            # Evaluate each individual of the evolved subpopulations
+            next_fitness = list()
+            next_context_vectors = list()
             for i in range(self.n_subcomps):
-                # Find best individuals from the previous generation as collaborators for each
-                # individual in the current generation
+                next_fitness.append(list())
+                next_context_vectors.append(list())
+                # Use best individuals from the previous generation (`self.current_best`) as
+                # collaborators for each individual in the current generation after evolve
+                # (`next_subpop`)
                 for j in range(self.subpop_sizes[i]):
                     collaborators = self.best_collaborator.get_collaborators(
                         subpop_idx=i,
                         indiv_idx=j,
-                        subpops=self.subpops,
+                        next_subpops=next_subpops,
                         current_best=self.current_best
                     )
                     context_vector = self.best_collaborator.build_context_vector(collaborators)
                     # Update the context vector
-                    self.context_vectors[i][j] = context_vector.copy()
+                    next_context_vectors[i].append(context_vector.copy())
                     # Update fitness
-                    self.fitness[i][j] = self.fitness_function.evaluate(context_vector, self.data)
+                    next_fitness[i].append(self.fitness_function.evaluate(context_vector, self.data))
+            # Update subpopulations, context vectors and evaluations
+            self.subpops = copy.deepcopy(next_subpops)
+            self.fitness = copy.deepcopy(next_fitness)
+            self.context_vectors = copy.deepcopy(next_context_vectors)
+            del next_subpops, next_fitness, next_context_vectors
+            gc.collect()
+
             # Get the best individual and context vector from each subpopulation
             self.current_best = self._get_best_individuals(
                 subpops=self.subpops,
                 fitness=self.fitness,
                 context_vectors=self.context_vectors
             )
+
             # Select the globally best context vector
             best_context_vector, best_fitness = self._get_global_best()
             # Update best context vector
