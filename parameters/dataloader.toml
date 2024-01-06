@@ -1,0 +1,14 @@
+# This file specifies the parameters of the DataLoader
+
+[general]
+splitter_type = "k_fold"
+verbose = true
+
+[splitter]
+preset = true
+kfolds = 10
+stratified = true
+
+[normalization]
+normalize = true
+method = "min_max"
