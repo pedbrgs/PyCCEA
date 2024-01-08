@@ -1,5 +1,7 @@
+import gc
 import copy
 import logging
+import numpy as np
 from tqdm import tqdm
 from projection.vip import VIP
 from coevolution.ccea import CCEA
@@ -21,25 +23,29 @@ class CCPFG(CCEA):
 
     Attributes
     ----------
-    subcomp_sizes: list
+    subcomp_sizes : list
         Number of features in each subcomponent.
-    feature_idxs: np.ndarray
+    feature_idxs : np.ndarray
         List of feature indexes.
+    n_components : int
+        Number of components to keep after dimensionality reduction.
+    method : str
+        Projection-based decomposition method. It can be 'clustering', 'elitist' and 'distributed'.
     """
 
-    def _feature_clustering(self, projection_model):
+    def _feature_clustering(self, projection_model) -> np.ndarray:
         """Cluster the features according to their contribution to the components of the
         low-dimensional latent space.
 
         Parameters
         ----------
-        projection_model: sklearn model object
+        projection_model : sklearn model object
             Partial Least Squares regression model. It can be the traditional version (PLS) or the
             Covariance-free version (CIPLS).
 
         Returns
         -------
-        feature_clusters: np.ndarray
+        feature_clusters : np.ndarray
             Index of the cluster each feature belongs to.
         """
         projection_model = copy.deepcopy(projection_model)
@@ -54,19 +60,18 @@ class CCPFG(CCEA):
 
         return feature_clusters
 
-    def _compute_variable_importances(self, projection_model):
-        """
-        Compute variable importance in projection.
+    def _compute_variable_importances(self, projection_model) -> np.ndarray:
+        """Compute variable importance in projection (VIP).
 
         Parameters
         ----------
-        projection_model: sklearn model object
+        projection_model : sklearn model object
             Partial Least Squares regression model. It can be the traditional version (PLS) or the
             Covariance-free version (CIPLS).
 
         Returns
         -------
-        importances: np.ndarray (n_features,)
+        importances : np.ndarray (n_features,)
             Importance of each feature based on its contribution to yield the latent space.
         """
         projection_model = copy.deepcopy(projection_model)
@@ -76,7 +81,7 @@ class CCPFG(CCEA):
         importances = vip.importances.copy()
         return importances
 
-    def _init_decomposer(self):
+    def _init_decomposer(self) -> None:
         """Instantiate feature grouping method."""
         # Number of components to keep after projection
         self.n_components = self.conf["decomposition"]["n_components"]
@@ -92,6 +97,9 @@ class CCPFG(CCEA):
             else PLSRegression(n_components=self.n_components, copy=True)
         )
 
+        # Compute feature importances
+        importances = self._compute_variable_importances(projection_model=projection_model)
+
         # Instantiate feature grouping
         if self.method == "clustering":
             feature_clusters = self._feature_clustering(projection_model=projection_model)
@@ -100,7 +108,6 @@ class CCPFG(CCEA):
                 clusters=feature_clusters
             )
         else:
-            importances = self._compute_variable_importances(projection_model=projection_model)
             # Ranking feature grouping using variable importances as scores
             self.decomposer = RankingFeatureGrouping(
                 n_subcomps=self.n_subcomps,
@@ -110,22 +117,22 @@ class CCPFG(CCEA):
                 ascending=False
             )
 
-    def _init_collaborator(self):
+    def _init_collaborator(self) -> None:
         """Instantiate collaboration method."""
         self.best_collaborator = SingleBestCollaboration()
         self.random_collaborator = SingleRandomCollaboration(seed=self.seed)
 
-    def _init_evaluator(self):
+    def _init_evaluator(self) -> None:
         """Instantiate evaluation method."""
         evaluator = WrapperEvaluation(task=self.conf["wrapper"]["task"],
                                       model_type=self.conf["wrapper"]["model_type"],
                                       eval_function=self.conf["evaluation"]["eval_function"],
-                                      eval_mode=self.conf["evaluation"]["eval_mode"],
+                                      eval_mode=self.eval_mode,
                                       n_classes=self.data.n_classes)
         self.fitness_function = SubsetSizePenalty(evaluator=evaluator,
                                                   weights=self.conf["evaluation"]["weights"])
 
-    def _init_subpop_initializer(self):
+    def _init_subpop_initializer(self) -> None:
         """Instantiate subpopulation initialization method."""
         self.initializer = RandomBinaryInitialization(data=self.data,
                                                       subcomp_sizes=self.subcomp_sizes,
@@ -133,7 +140,7 @@ class CCPFG(CCEA):
                                                       collaborator=self.random_collaborator,
                                                       fitness_function=self.fitness_function)
 
-    def _init_optimizers(self):
+    def _init_optimizers(self) -> None:
         """Instantiate evolutionary algorithms to evolve each subpopulation."""
         self.optimizers = list()
         # Instantiate an optimizer for each subcomponent
@@ -143,7 +150,7 @@ class CCPFG(CCEA):
                                                conf=self.conf)
             self.optimizers.append(optimizer)
 
-    def optimize(self):
+    def optimize(self) -> None:
         """Solve the feature selection problem through optimization."""
         # Decompose problem
         self._problem_decomposition()
@@ -177,28 +184,44 @@ class CCPFG(CCEA):
         while n_gen <= self.conf["coevolution"]["max_gen"]:
             # Append current best fitness
             self.convergence_curve.append(self.best_fitness)
+
             # Evolve each subpopulation using a genetic algorithm
+            next_subpops = list()
             for i in range(self.n_subcomps):
-                self.subpops[i] = self.optimizers[i].evolve(
+                next_subpop = self.optimizers[i].evolve(
                     subpop=self.subpops[i],
                     fitness=self.fitness[i]
                 )
-            # For each subpopulation
+                next_subpops.append(next_subpop)
+
+            # Evaluate each individual of the evolved subpopulations
+            next_fitness = list()
+            next_context_vectors = list()
             for i in range(self.n_subcomps):
-                # Find best individuals from the previous generation as collaborators for each
-                # individual in the current generation
+                next_fitness.append(list())
+                next_context_vectors.append(list())
+                # Use best individuals from the previous generation (`self.current_best`) as
+                # collaborators for each individual in the current generation after evolve
+                # (`next_subpop`)
                 for j in range(self.subpop_sizes[i]):
                     collaborators = self.best_collaborator.get_collaborators(
                         subpop_idx=i,
                         indiv_idx=j,
-                        subpops=self.subpops,
+                        next_subpops=next_subpops,
                         current_best=self.current_best
                     )
                     context_vector = self.best_collaborator.build_context_vector(collaborators)
                     # Update the context vector
-                    self.context_vectors[i][j] = context_vector.copy()
+                    next_context_vectors[i].append(context_vector.copy())
                     # Update fitness
-                    self.fitness[i][j] = self.fitness_function.evaluate(context_vector, self.data)
+                    next_fitness[i].append(self.fitness_function.evaluate(context_vector, self.data))
+            # Update subpopulations, context vectors and evaluations
+            self.subpops = copy.deepcopy(next_subpops)
+            self.fitness = copy.deepcopy(next_fitness)
+            self.context_vectors = copy.deepcopy(next_context_vectors)
+            del next_subpops, next_fitness, next_context_vectors
+            gc.collect()
+
             # Get the best individual and context vector from each subpopulation
             self.current_best = self._get_best_individuals(
                 subpops=self.subpops,
