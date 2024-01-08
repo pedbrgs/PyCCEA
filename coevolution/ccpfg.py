@@ -31,6 +31,13 @@ class CCPFG(CCEA):
         Number of components to keep after dimensionality reduction.
     method : str
         Projection-based decomposition method. It can be 'clustering', 'elitist' and 'distributed'.
+    quantile : float
+        Quantile of the feature importance distribution that will be considered to remove the
+        least relevant ones.
+    removal_threshold : float
+        All features whose importance is below this threshold will be removed.
+    removed_features : np.ndarray
+        Indexes of features that were removed due to their low importance.
     """
 
     def _feature_clustering(self, projection_model) -> np.ndarray:
@@ -59,6 +66,38 @@ class CCPFG(CCEA):
         feature_clusters = clustering_model.fit_predict(feature_loadings)
 
         return feature_clusters
+
+    def _remove_unimportant_features(self, importances: np.ndarray) -> np.ndarray:
+        """Remove irrelevant or weaken features from folds and subsets.
+
+        Parameters
+        ----------
+        importances : np.ndarray
+            Importance of each feature based on its contribution to yield the latent space.
+
+        Returns
+        -------
+        importances : np.ndarray
+            Importance of the remaining features.
+        """
+        self.removal_threshold = np.quantile(importances, self.quantile)
+        logging.info(f"Removing features with VIP less than {self.removal_threshold}...")
+        features_to_keep = importances >= self.removal_threshold
+        self.removed_features = np.where(features_to_keep == False)[0]
+
+        # Removing features from subsets and folds
+        self.data.X_train = self.data.X_train[:, features_to_keep].copy()
+        self.data.X_test = self.data.X_test[:, features_to_keep].copy()
+        for k in range(self.data.kfolds):
+            self.data.train_folds[k][0] = self.data.train_folds[k][0][:, features_to_keep].copy()
+            self.data.val_folds[k][0] = self.data.val_folds[k][0][:, features_to_keep].copy()
+
+        # Number of remaining features
+        self.data.n_features = sum(features_to_keep)
+        # Importance of the remaining features
+        importances = importances[features_to_keep].copy()
+
+        return importances
 
     def _compute_variable_importances(self, projection_model) -> np.ndarray:
         """Compute variable importance in projection (VIP).
@@ -99,6 +138,11 @@ class CCPFG(CCEA):
 
         # Compute feature importances
         importances = self._compute_variable_importances(projection_model=projection_model)
+
+        self.quantile = self.conf["decomposition"].get("quantile", 0)
+        if self.quantile > 0:
+            # Remove irrelevant or weaken relevant features
+            importances = self._remove_unimportant_features(importances)
 
         # Instantiate feature grouping
         if self.method == "clustering":
