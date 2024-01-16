@@ -14,7 +14,7 @@ from sklearn.cross_decomposition import PLSRegression
 from cooperation.random import SingleRandomCollaboration
 from decomposition.ranking import RankingFeatureGrouping
 from decomposition.clustering import ClusteringFeatureGrouping
-from initialization.random import RandomBinaryInitialization
+from initialization.binary import RandomBinaryInitialization
 from optimizers.genetic_algorithm import BinaryGeneticAlgorithm
 
 
@@ -23,10 +23,6 @@ class CCPFG(CCEA):
 
     Attributes
     ----------
-    subcomp_sizes : list
-        Number of features in each subcomponent.
-    feature_idxs : np.ndarray
-        List of feature indexes.
     n_components : int
         Number of components to keep after dimensionality reduction.
     method : str
