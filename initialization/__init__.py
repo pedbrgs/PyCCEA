@@ -1,4 +1,2 @@
-from .random import (
-    RandomBinaryInitialization,
-    RandomContinuousInitialization
-)
+from .binary import RandomBinaryInitialization
+from .continuous import RandomContinuousInitialization
