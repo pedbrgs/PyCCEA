@@ -39,6 +39,8 @@ class CCEA(ABC):
         Best solution of the complete problem.
     best_fitness: float
         Evaluation of the best solution of the complete problem.
+    feature_idxs : np.ndarray
+        List of feature indexes.
     """
 
     def __init__(self,
