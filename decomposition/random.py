@@ -1,12 +1,10 @@
 import random
-import  numpy as np
+import numpy as np
 from decomposition.grouping import FeatureGrouping
 
 
 class RandomFeatureGrouping(FeatureGrouping):
-    """
-    Decompose the problem (a collection of features) randomly.
-    """
+    """Decompose the problem (a collection of features) randomly."""
 
     def __init__(self, n_subcomps: int = None, subcomp_sizes: list = list(), seed: int = None):
         super().__init__(n_subcomps, subcomp_sizes)
@@ -26,9 +24,8 @@ class RandomFeatureGrouping(FeatureGrouping):
         random.seed(seed)
         np.random.seed(seed=seed)
 
-    def decompose(self, X: np.ndarray, feature_idxs: np.ndarray = None):
-        """
-        Divide an n-dimensional problem into m subproblems.
+    def decompose(self, X: np.ndarray, feature_idxs: np.ndarray = None) -> tuple[list, np.ndarray]:
+        """Divide an n-dimensional problem into m subproblems.
 
         Parameters
         ----------
@@ -43,8 +40,6 @@ class RandomFeatureGrouping(FeatureGrouping):
         subcomponents: list
             Subcomponents, where each subcomponent is an array that can be accessed by indexing
             the list.
-        subcomp_sizes: list
-            Number of features in each subcomponent.
         feature_idxs: np.ndarray
             Shuffled list of feature indexes.
         """
