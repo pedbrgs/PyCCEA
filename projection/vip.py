@@ -10,17 +10,17 @@ class VIP:
 
     Attributes
     ----------
-    n_features: int
+    n_features : int
         Number of variables.
-    n_components: int
+    n_components : int
         Number of components.
-    x_weights_: np.ndarray (n_features, n_components)
-        Projection matrix.
-    x_scores_: np.ndarray (n_samples, n_components)
+    x_rotations_ : np.ndarray (n_features, n_components)
+        Projection matrix used to transform X.
+    x_scores_ : np.ndarray (n_samples, n_components)
         The transformed training samples (latent components).
-    y_loadings_: np.ndarray (n_targets, n_components)
+    y_loadings_ : np.ndarray (n_targets, n_components)
         The loadings of Y.
-    importances: np.ndarray (n_features,)
+    importances : np.ndarray (n_features,)
         Importance of each feature based on its contribution to yield the latent space.
     """
 
@@ -28,18 +28,18 @@ class VIP:
         """
         Parameters
         ----------
-        model: sklearn model object
+        model : sklearn model object
             Partial Least Squares regression model. It can be the traditional version (PLS) or the
             Covariance-free version (CIPLS).
         """
         # Projection matrix
-        self.x_weights_ = model.x_weights_.copy()
+        self.x_rotations_ = model.x_rotations_.copy()
         # Latent components
         self.x_scores_ = model.x_scores_.copy()
         # Loadings of Y
         self.y_loadings_ = model.y_loadings_.copy()
         # Number of features and number of components, respectively
-        self.n_features, self.n_components = self.x_weights_.shape
+        self.n_features, self.n_components = self.x_rotations_.shape
 
     def compute(self):
         """Calculate feature importances."""
@@ -50,9 +50,9 @@ class VIP:
         # Cumulative sum of squares
         cum_sum_of_squares = np.sum(sum_of_squares)
         # Projection matrix norm
-        weight_norm = np.linalg.norm(self.x_weights_, axis=0)
+        weight_norm = np.linalg.norm(self.x_rotations_, axis=0)
         # Normalized weights
-        weights = (self.x_weights_ / np.expand_dims(weight_norm, axis=0)) ** 2
+        weights = (self.x_rotations_ / np.expand_dims(weight_norm, axis=0)) ** 2
         # Variable Importances in Projection (VIP)
         squared_importances = self.n_features * (weights @ sum_of_squares).ravel() / cum_sum_of_squares
         # To avoid "RuntimeWarning: invalid value encountered in sqrt"
