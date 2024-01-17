@@ -104,11 +104,11 @@ class CCFSRFG2(CCFSRFG):
                 w2 = self.conf["evaluation"]["weights"][1]
                 # Current fitness, performance evaluation and penalty
                 current_best_fitness = round(self.best_fitness, 4)
-                current_penalty = round(self.best_context_vector.sum()/self.n_features, 4)
+                current_penalty = round(self.best_context_vector.sum()/self.data.n_features, 4)
                 current_eval = round((self.best_fitness + w2*current_penalty)/w1, 4)
                 # New fitness, performance evaluation and penalty
                 new_best_fitness = round(best_fitness, 4)
-                new_penalty = round(best_context_vector.sum()/self.n_features, 4)
+                new_penalty = round(best_context_vector.sum()/self.data.n_features, 4)
                 new_eval = round((best_fitness + w2*new_penalty)/w1, 4)
                 # Show improvement
                 logging.info(

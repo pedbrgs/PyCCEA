@@ -63,8 +63,6 @@ class CCEA(ABC):
         self.verbose = verbose
         # Data
         self.data = data
-        # Number of features
-        self.n_features = self.data.n_features
         # Size of each subpopulation
         self.subpop_sizes = conf["coevolution"]["subpop_sizes"]
         # Number of subcomponents
