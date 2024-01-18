@@ -52,7 +52,12 @@ class RandomContinuousInitialization(SubpopulationInitialization):
         )
         return subpop
 
-    def _build_context_vector(self, subpop_idx: int, indiv_idx: int, subpops: np.ndarray) -> np.ndarray:
+    def _build_context_vector(
+            self,
+            subpop_idx: int,
+            indiv_idx: int,
+            subpops: list
+        ) -> np.ndarray:
         """Build a complete solution from an individual and their collaborators.
 
         Parameters
@@ -61,8 +66,8 @@ class RandomContinuousInitialization(SubpopulationInitialization):
             Index of the subpopulation to which the individual belongs.
         indiv_idx : int
             Index of the individual in its respective subpopulation.
-        subpops : np.ndarray
-            Subpopulations.
+        subpops : list
+            Individuals from all subpopulations of the first generation (will be evaluated).
 
         Returns
         -------
@@ -73,7 +78,10 @@ class RandomContinuousInitialization(SubpopulationInitialization):
         encoded_collaborators = self.collaborator.get_collaborators(
             subpop_idx=subpop_idx,
             indiv_idx=indiv_idx,
-            subpops=self.subpops
+            # As it is the first generation, individuals will be used as collaborators with each
+            # other for evaluation
+            previous_subpops=subpops,
+            current_subpops=subpops,
         )
         # Collaborators in the continuous space is transformed into the binary space
         collaborators = [

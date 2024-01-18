@@ -26,7 +26,12 @@ class RandomBinaryInitialization(SubpopulationInitialization):
         subpop = np.random.randint(2, size=(subpop_size, subcomp_size))
         return subpop
 
-    def _build_context_vector(self, subpop_idx: int, indiv_idx: int, subpops: np.ndarray) -> np.ndarray:
+    def _build_context_vector(
+            self,
+            subpop_idx: int,
+            indiv_idx: int,
+            subpops: list,
+        ) -> np.ndarray:
         """Build a complete solution from an individual and their collaborators.
 
         Parameters
@@ -35,8 +40,8 @@ class RandomBinaryInitialization(SubpopulationInitialization):
             Index of the subpopulation to which the individual belongs.
         indiv_idx : int
             Index of the individual in its respective subpopulation.
-        subpops : np.ndarray
-            Subpopulations.
+        subpops : list
+            Individuals from all subpopulations of the first generation (will be evaluated).
 
         Returns
         -------
@@ -47,7 +52,10 @@ class RandomBinaryInitialization(SubpopulationInitialization):
         collaborators = self.collaborator.get_collaborators(
             subpop_idx=subpop_idx,
             indiv_idx=indiv_idx,
-            subpops=self.subpops
+            # As it is the first generation, individuals will be used as collaborators with each
+            # other for evaluation
+            previous_subpops=subpops,
+            current_subpops=subpops,
         )
         # Build a context vector to evaluate a complete solution
         context_vector = self.collaborator.build_context_vector(collaborators)

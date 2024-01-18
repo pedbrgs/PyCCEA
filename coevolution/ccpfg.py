@@ -27,11 +27,8 @@ class CCPFG(CCEA):
         Number of components to keep after dimensionality reduction.
     method : str
         Projection-based decomposition method. It can be 'clustering', 'elitist' and 'distributed'.
-    quantile : float
-        Quantile of the feature importance distribution that will be considered to remove the
-        least relevant ones.
-    removal_threshold : float
-        All features whose importance is below this threshold will be removed.
+    vip_threshold : float
+        All features whose importance is less than or equal to this threshold will be removed.
     removed_features : np.ndarray
         Indexes of features that were removed due to their low importance.
     """
@@ -76,10 +73,10 @@ class CCPFG(CCEA):
         importances : np.ndarray
             Importance of the remaining features.
         """
-        self.removal_threshold = np.quantile(importances, self.quantile)
-        logging.info(f"Removing features with VIP less than {self.removal_threshold}...")
-        features_to_keep = importances >= self.removal_threshold
+        logging.info(f"Removing features with VIP less than or equal to {self.vip_threshold}...")
+        features_to_keep = importances > self.vip_threshold
         self.removed_features = np.where(features_to_keep == False)[0]
+        logging.info(f"{len(self.removed_features)} features were removed.")
 
         # Removing features from subsets and folds
         self.data.X_train = self.data.X_train[:, features_to_keep].copy()
@@ -88,8 +85,6 @@ class CCPFG(CCEA):
             self.data.train_folds[k][0] = self.data.train_folds[k][0][:, features_to_keep].copy()
             self.data.val_folds[k][0] = self.data.val_folds[k][0][:, features_to_keep].copy()
 
-        # Number of remaining features
-        self.data.n_features = sum(features_to_keep)
         # Importance of the remaining features
         importances = importances[features_to_keep].copy()
 
@@ -135,8 +130,8 @@ class CCPFG(CCEA):
         # Compute feature importances
         importances = self._compute_variable_importances(projection_model=projection_model)
 
-        self.quantile = self.conf["decomposition"].get("quantile", 0)
-        if self.quantile > 0:
+        self.vip_threshold = self.conf["decomposition"].get("vip_threshold", 0)
+        if self.vip_threshold > 0:
             # Remove irrelevant or weaken relevant features
             importances = self._remove_unimportant_features(importances)
 
@@ -226,40 +221,40 @@ class CCPFG(CCEA):
             self.convergence_curve.append(self.best_fitness)
 
             # Evolve each subpopulation using a genetic algorithm
-            next_subpops = list()
+            current_subpops = list()
             for i in range(self.n_subcomps):
-                next_subpop = self.optimizers[i].evolve(
+                current_subpop = self.optimizers[i].evolve(
                     subpop=self.subpops[i],
                     fitness=self.fitness[i]
                 )
-                next_subpops.append(next_subpop)
+                current_subpops.append(current_subpop)
 
             # Evaluate each individual of the evolved subpopulations
-            next_fitness = list()
-            next_context_vectors = list()
+            current_fitness = list()
+            current_context_vectors = list()
             for i in range(self.n_subcomps):
-                next_fitness.append(list())
-                next_context_vectors.append(list())
+                current_fitness.append(list())
+                current_context_vectors.append(list())
                 # Use best individuals from the previous generation (`self.current_best`) as
                 # collaborators for each individual in the current generation after evolve
-                # (`next_subpop`)
+                # (`current_subpops`)
                 for j in range(self.subpop_sizes[i]):
                     collaborators = self.best_collaborator.get_collaborators(
                         subpop_idx=i,
                         indiv_idx=j,
-                        next_subpops=next_subpops,
+                        current_subpops=current_subpops,
                         current_best=self.current_best
                     )
                     context_vector = self.best_collaborator.build_context_vector(collaborators)
                     # Update the context vector
-                    next_context_vectors[i].append(context_vector.copy())
+                    current_context_vectors[i].append(context_vector.copy())
                     # Update fitness
-                    next_fitness[i].append(self.fitness_function.evaluate(context_vector, self.data))
+                    current_fitness[i].append(self.fitness_function.evaluate(context_vector, self.data))
             # Update subpopulations, context vectors and evaluations
-            self.subpops = copy.deepcopy(next_subpops)
-            self.fitness = copy.deepcopy(next_fitness)
-            self.context_vectors = copy.deepcopy(next_context_vectors)
-            del next_subpops, next_fitness, next_context_vectors
+            self.subpops = copy.deepcopy(current_subpops)
+            self.fitness = copy.deepcopy(current_fitness)
+            self.context_vectors = copy.deepcopy(current_context_vectors)
+            del current_subpops, current_fitness, current_context_vectors
             gc.collect()
 
             # Get the best individual and context vector from each subpopulation
