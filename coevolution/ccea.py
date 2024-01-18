@@ -214,6 +214,10 @@ class CCEA(ABC):
             self.data.train_folds[k][0] = Xk_train[:, self.feature_idxs].copy()
             Xk_val = self.data.val_folds[k][0].copy()
             self.data.val_folds[k][0] = Xk_val[:, self.feature_idxs].copy()
+        # Reorder training set according to the shuffling in the feature decomposition
+        self.data.X_train = self.data.X_train[:, self.feature_idxs].copy()
+        # Reorder test set according to the shuffling in the feature decomposition
+        self.data.X_test = self.data.X_test[:, self.feature_idxs].copy()
         # Update 'n_subcomps' when it starts with NoneType
         self.n_subcomps = self.decomposer.n_subcomps
         # Update 'subcomp_sizes' when it starts with an empty list
