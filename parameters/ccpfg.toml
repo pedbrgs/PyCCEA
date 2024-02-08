@@ -2,24 +2,29 @@
 
 [coevolution]
 subpop_sizes = [30]
-n_subcomps = 4
 max_gen = 10000
 max_gen_without_improvement = 100
 
 [decomposition]
-n_components = 3
 method = "clustering"
+quantile_to_remove = 0.20
+
+[collaboration]
+method = "best"
 
 [wrapper]
 task = "classification"
 model_type = "k_nearest_neighbors"
 
 [evaluation]
-eval_function = "balanced_accuracy"
-eval_mode = "kfold_cv"
-weights = [0.6, 0.4]
+fitness_function = "penalty"
+eval_function = "accuracy"
+eval_mode = "k_fold"
+weights = [1.00, 0.00]
 
 [optimizer]
+method = "GA"
+selection_method = "generational"
 mutation_rate = 0.05
 crossover_rate = 1.00
 tournament_sample_size = 1
