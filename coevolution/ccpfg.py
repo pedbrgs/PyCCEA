@@ -2,11 +2,14 @@ import gc
 import copy
 import logging
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
+from kneed import KneeLocator
 from projection.vip import VIP
 from coevolution.ccea import CCEA
 from projection.cipls import CIPLS
 from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 from fitness.penalty import SubsetSizePenalty
 from evaluation.wrapper import WrapperEvaluation
 from cooperation.best import SingleBestCollaboration
@@ -52,6 +55,12 @@ class CCPFG(CCEA):
         projection_model.fit(X=self.data.X_train, Y=self.data.y_train)
         # Get the loadings of features on PLS components
         feature_loadings = abs(projection_model.x_loadings_)
+
+        # Automatically define the number of subcomponents
+        self.n_subcomps = self._get_best_number_of_subcomponents(feature_loadings)
+        # Update the subpopulation sizes after update the number of subcomponents
+        self.subpop_sizes = [self.subpop_sizes[0]] * self.n_subcomps
+
         # Cluster features based on loadings.
         # Loadings indicate how strongly each feature contributes to each component.
         # Features with similar loadings on the same components are likely to be related.
@@ -60,19 +69,110 @@ class CCPFG(CCEA):
 
         return feature_clusters
 
-    def _remove_unimportant_features(self, importances: np.ndarray) -> np.ndarray:
+    def _get_best_number_of_components(
+            self,
+            projection_class,
+            X_train: np.ndarray,
+            y_train: np.ndarray
+        ):
+        """Get the best number of components to keep by PLS decomposition.
+
+        The number of components will occur at the elbow point where the coefficient of
+        determination (r2-score) starts to level off.
+
+        Parameters
+        ----------
+        projection_class : sklearn model class
+            Partial Least Squares regression class. It can be the traditional version (PLS) or the
+            Covariance-free version (CIPLS).
+        X_train : np.ndarray
+            Train input data.
+        y_train : np.ndarray
+            Train output data.
+
+        Returns
+        -------
+        n_components : int
+            Best number of components to keep after the decomposition into a latent space.
+        """
+        n_components_range = range(2, min(30, X_train.shape[1]))
+        r_squared_values = list()
+
+        for n_components in n_components_range:
+            projection_model = projection_class(n_components=n_components, copy=True)
+            projection_model.fit(X_train, y_train)
+            # Sum the coefficient of determination of the prediction
+            r_squared_values.append(np.sum(projection_model.score(X_train, y_train)))
+            del projection_model
+            gc.collect()
+
+        # Use kneed to find the knee/elbow point
+        kneedle = KneeLocator(
+            n_components_range, r_squared_values, curve="concave", direction="increasing"
+        )
+        n_components = kneedle.knee
+        logging.info(f"Best number of components: {n_components}.")
+
+        return n_components
+
+    def _get_best_number_of_subcomponents(self, feature_loadings: np.ndarray) -> int:
+        """Get the best number of subcomponents.
+
+        The number of subcomponents (clusters) will be the one that maximizes the silhouette
+        coefficient of the clustering of X loadings.
+
+        Parameters
+        ----------
+        feature_loadings : np.ndarray
+            The absolute importance of terms to components.
+
+        Returns
+        -------
+        n_subcomps : int
+            Best number of subcomponents to decompose the original problem.
+        """
+        n_clusters_range = range(2, min(30, feature_loadings.shape[0]))
+        silhouette_scores = list()
+
+        for n_clusters in n_clusters_range:
+            kmeans = KMeans(n_clusters=n_clusters)
+            cluster_labels = kmeans.fit_predict(feature_loadings)
+            silhouette_avg = silhouette_score(feature_loadings, cluster_labels)
+            silhouette_scores.append(silhouette_avg)
+
+        silhouette_scores = pd.DataFrame(
+            list(zip(n_clusters_range, silhouette_scores)),
+            columns=["n_clusters", "silhouette_score"]
+        )
+
+        n_subcomps = silhouette_scores.loc[
+            silhouette_scores["silhouette_score"].idxmax(), "n_clusters"
+        ]
+        logging.info(f"Best number of subcomponents: {n_subcomps}.")
+
+        return n_subcomps
+
+    def _remove_unimportant_features(
+            self,
+            importances: np.ndarray,
+            quantile_to_remove: float
+        ) -> np.ndarray:
         """Remove irrelevant or weaken features from folds and subsets.
 
         Parameters
         ----------
         importances : np.ndarray
             Importance of each feature based on its contribution to yield the latent space.
+        quantile_to_remove: float
+            Quantile of the feature importance distribution that will be considered to remove the
+            least relevant ones.
 
         Returns
         -------
         importances : np.ndarray
             Importance of the remaining features.
         """
+        self.vip_threshold = round(np.quantile(importances, quantile_to_remove), 4)
         logging.info(f"Removing features with VIP less than or equal to {self.vip_threshold}...")
         features_to_keep = importances > self.vip_threshold
         self.removed_features = np.where(features_to_keep == False)[0]
@@ -113,27 +213,32 @@ class CCPFG(CCEA):
 
     def _init_decomposer(self) -> None:
         """Instantiate feature grouping method."""
-        # Number of components to keep after projection
-        self.n_components = self.conf["decomposition"]["n_components"]
         # Method used to distribute features into subcomponents
         self.method = self.conf["decomposition"]["method"]
         logging.info(f"Decomposition approach: {self.method}.")
 
         # Define projection model according to the number of features
-        high_dim = self.data.n_features > 1000
-        projection_model = (
-            CIPLS(n_components=self.n_components, copy=True)
-            if high_dim
-            else PLSRegression(n_components=self.n_components, copy=True)
-        )
+        high_dim = self.data.n_features/self.data.n_examples > 10
+        projection_class = CIPLS if high_dim else PLSRegression
+
+        if self.conf["decomposition"].get("n_components"):
+            self.n_components = self.conf["decomposition"]["n_components"]
+        else:
+            logging.info("Automatically choosing the number of PLS components...")
+            # Get the best number of components to keep after projection using the Elbow method
+            self.n_components = self._get_best_number_of_components(
+                projection_class, self.data.X_train, self.data.y_train
+            )
+        # Instantiate projection model object
+        projection_model = projection_class(n_components=self.n_components, copy=True)
 
         # Compute feature importances
         importances = self._compute_variable_importances(projection_model=projection_model)
 
-        self.vip_threshold = self.conf["decomposition"].get("vip_threshold", 0)
-        if self.vip_threshold > 0:
-            # Remove irrelevant or weaken relevant features
-            importances = self._remove_unimportant_features(importances)
+        # Remove irrelevant or weaken relevant features
+        quantile_to_remove = self.conf["decomposition"].get("quantile_to_remove", 0)
+        if quantile_to_remove > 0:
+            importances = self._remove_unimportant_features(importances, quantile_to_remove)
 
         # Instantiate feature grouping
         if self.method == "clustering":
