@@ -52,7 +52,9 @@ class CCPFG(CCEA):
             Index of the cluster each feature belongs to.
         """
         projection_model = copy.deepcopy(projection_model)
-        projection_model.fit(X=self.data.X_train, Y=self.data.y_train)
+        X_train_normalized = self.data.X_train - self.data.X_train.mean(axis=0)
+        y_train_encoded = pd.get_dummies(self.data.y_train).astype(int)
+        projection_model.fit(X=X_train_normalized, Y=y_train_encoded)
         # Get the loadings of features on PLS components
         feature_loadings = abs(projection_model.x_loadings_)
 
@@ -100,9 +102,11 @@ class CCPFG(CCEA):
 
         for n_components in n_components_range:
             projection_model = projection_class(n_components=n_components, copy=True)
-            projection_model.fit(X_train, y_train)
+            X_train_normalized = X_train - X_train.mean(axis=0)
+            y_train_encoded = pd.get_dummies(y_train).astype(int)
+            projection_model.fit(X_train_normalized, y_train_encoded)
             # Sum the coefficient of determination of the prediction
-            r_squared_values.append(np.sum(projection_model.score(X_train, y_train)))
+            r_squared_values.append(np.sum(projection_model.score(X_train_normalized, y_train_encoded)))
             del projection_model
             gc.collect()
 
@@ -131,7 +135,7 @@ class CCPFG(CCEA):
         n_subcomps : int
             Best number of subcomponents to decompose the original problem.
         """
-        n_clusters_range = range(2, min(30, feature_loadings.shape[0]))
+        n_clusters_range = range(2, min(10, feature_loadings.shape[0]))
         silhouette_scores = list()
 
         for n_clusters in n_clusters_range:
@@ -205,7 +209,9 @@ class CCPFG(CCEA):
             Importance of each feature based on its contribution to yield the latent space.
         """
         projection_model = copy.deepcopy(projection_model)
-        projection_model.fit(X=self.data.X_train, Y=self.data.y_train)
+        X_train_normalized = self.data.X_train - self.data.X_train.mean(axis=0)
+        y_train_encoded = pd.get_dummies(self.data.y_train).astype(int)
+        projection_model.fit(X=X_train_normalized, Y=y_train_encoded)
         vip = VIP(model=projection_model)
         vip.compute()
         importances = vip.importances.copy()
