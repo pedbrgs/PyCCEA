@@ -135,7 +135,7 @@ class WrapperEvaluation():
         for metric in self.evaluations.keys():
             self.evaluations[metric] = round(self.evaluations[metric]/data.kfolds, 4)
 
-    def evaluate(self, solution: np.ndarray, data: DataLoader) -> dict[str, float]:
+    def evaluate(self, solution: np.ndarray, data: DataLoader) -> dict:
         """
         Evaluate an individual represented by a complete solution through the predictive
         performance of a machine learning model.
@@ -150,7 +150,7 @@ class WrapperEvaluation():
 
         Returns
         -------
-        dict[str, float]
+        : dict
             Evaluation metrics.
         """
         # Estimator(s) used for the current evaluation

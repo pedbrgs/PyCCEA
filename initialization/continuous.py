@@ -18,7 +18,7 @@ class RandomContinuousInitialization(SubpopulationInitialization):
             subpop_sizes: list,
             collaborator,
             fitness_function,
-            bounds: tuple[int, int] = (0, 1)
+            bounds: tuple = (0, 1)
     ):
         super().__init__(data, subcomp_sizes, subpop_sizes, collaborator, fitness_function)
         """

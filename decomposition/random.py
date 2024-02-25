@@ -24,7 +24,7 @@ class RandomFeatureGrouping(FeatureGrouping):
         random.seed(seed)
         np.random.seed(seed=seed)
 
-    def decompose(self, X: np.ndarray, feature_idxs: np.ndarray = None) -> tuple[list, np.ndarray]:
+    def decompose(self, X: np.ndarray, feature_idxs: np.ndarray = None) -> tuple:
         """Divide an n-dimensional problem into m subproblems.
 
         Parameters
