@@ -8,16 +8,16 @@ from kneed import KneeLocator
 from projection.vip import VIP
 from coevolution.ccea import CCEA
 from projection.cipls import CIPLS
-from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from fitness.penalty import SubsetSizePenalty
 from evaluation.wrapper import WrapperEvaluation
 from cooperation.best import SingleBestCollaboration
 from sklearn.cross_decomposition import PLSRegression
-from cooperation.random import SingleRandomCollaboration
 from decomposition.ranking import RankingFeatureGrouping
-from decomposition.clustering import ClusteringFeatureGrouping
+from cooperation.random import SingleRandomCollaboration
+from sklearn.cluster import KMeans, AgglomerativeClustering
 from initialization.binary import RandomBinaryInitialization
+from decomposition.clustering import ClusteringFeatureGrouping
 from optimizers.genetic_algorithm import BinaryGeneticAlgorithm
 
 
@@ -35,6 +35,11 @@ class CCPFG(CCEA):
     removed_features : np.ndarray
         Indexes of features that were removed due to their low importance.
     """
+
+    CLUSTERING_METHODS = {
+        "k_means": (KMeans, {}),
+        "agglomerative_clustering": (AgglomerativeClustering, {"linkage": "ward", "affinity": "euclidean"})
+    }
 
     def _feature_clustering(self, projection_model) -> np.ndarray:
         """Cluster the features according to their contribution to the components of the
@@ -66,7 +71,8 @@ class CCPFG(CCEA):
         # Cluster features based on loadings.
         # Loadings indicate how strongly each feature contributes to each component.
         # Features with similar loadings on the same components are likely to be related.
-        clustering_model = KMeans(n_clusters=self.n_subcomps, random_state=self.seed)
+        clustering_model_class, clustering_params = CCPFG.CLUSTERING_METHODS[self.clustering_model_type]
+        clustering_model = clustering_model_class(n_clusters=self.n_subcomps, **clustering_params)
         feature_clusters = clustering_model.fit_predict(feature_loadings)
 
         return feature_clusters
@@ -139,8 +145,9 @@ class CCPFG(CCEA):
         silhouette_scores = list()
 
         for n_clusters in n_clusters_range:
-            kmeans = KMeans(n_clusters=n_clusters)
-            cluster_labels = kmeans.fit_predict(feature_loadings)
+            clustering_model_class, clustering_params = CCPFG.CLUSTERING_METHODS[self.clustering_model_type]
+            clustering_model = clustering_model_class(n_clusters=n_clusters, **clustering_params)
+            cluster_labels = clustering_model.fit_predict(feature_loadings)
             silhouette_avg = silhouette_score(feature_loadings, cluster_labels)
             silhouette_scores.append(silhouette_avg)
 
@@ -156,10 +163,49 @@ class CCPFG(CCEA):
 
         return n_subcomps
 
+    def _get_best_quantile_to_remove(self, importances: np.ndarray) -> float:
+        """
+        Gets the best quantile of the feature importance distribution to remove weak features.
+
+        The best quantile will be the one that, when its features are removed from a context
+        vector filled with 1's (selecting all remaining features), gives the best fitness value.
+
+        Parameters
+        ----------
+        importances : np.ndarray (n_features,)
+            Importance of each feature based on its contribution to yield the latent space.
+
+        Returns
+        -------
+        best_quantile : float
+            Best quantile. All features that have their importance in this quantile of the
+            feature importance distribution will be removed.
+        """
+        metrics = dict()
+        quantiles = np.arange(0, 0.55, 0.05).round(2)
+        for quantile in quantiles:
+            data_q = copy.deepcopy(self.data)
+            vip_threshold = round(np.quantile(importances, quantile), 4)
+            features_to_keep = importances > vip_threshold
+            # Removing features from subsets and folds
+            data_q.X_train = data_q.X_train[:, features_to_keep].copy()
+            data_q.X_test = data_q.X_test[:, features_to_keep].copy()
+            for k in range(data_q.kfolds):
+                data_q.train_folds[k][0] = data_q.train_folds[k][0][:, features_to_keep].copy()
+                data_q.val_folds[k][0] = data_q.val_folds[k][0][:, features_to_keep].copy()
+            # Build context vector with all remaining features
+            context_vector = np.ones((data_q.X_train.shape[1],)).astype(bool)
+            metrics[quantile] = self.fitness_function.evaluate(context_vector, data_q)
+            logging.getLogger().disabled = False
+        # Get the quantile that gives the best fitness value
+        metrics = pd.DataFrame(list(metrics.items()), columns=["quantile", "fitness"])
+        best_quantile = metrics.loc[metrics["fitness"].idxmax(), "quantile"]
+        logging.info(f"Best quantile: {best_quantile}.")
+        return best_quantile
+
     def _remove_unimportant_features(
             self,
             importances: np.ndarray,
-            quantile_to_remove: float
         ) -> np.ndarray:
         """Remove irrelevant or weaken features from folds and subsets.
 
@@ -167,16 +213,14 @@ class CCPFG(CCEA):
         ----------
         importances : np.ndarray
             Importance of each feature based on its contribution to yield the latent space.
-        quantile_to_remove: float
-            Quantile of the feature importance distribution that will be considered to remove the
-            least relevant ones.
 
         Returns
         -------
         importances : np.ndarray
             Importance of the remaining features.
         """
-        self.vip_threshold = round(np.quantile(importances, quantile_to_remove), 4)
+        self.quantile_to_remove = self._get_best_quantile_to_remove(importances)
+        self.vip_threshold = round(np.quantile(importances, self.quantile_to_remove), 4)
         logging.info(f"Removing features with VIP less than or equal to {self.vip_threshold}...")
         features_to_keep = importances > self.vip_threshold
         self.removed_features = np.where(features_to_keep == False)[0]
@@ -242,12 +286,13 @@ class CCPFG(CCEA):
         importances = self._compute_variable_importances(projection_model=projection_model)
 
         # Remove irrelevant or weaken relevant features
-        quantile_to_remove = self.conf["decomposition"].get("quantile_to_remove", 0)
-        if quantile_to_remove > 0:
-            importances = self._remove_unimportant_features(importances, quantile_to_remove)
+        if self.conf["decomposition"].get("drop", False) > 0:
+            importances = self._remove_unimportant_features(importances)
 
         # Instantiate feature grouping
         if self.method == "clustering":
+            self.clustering_model_type = self.conf["decomposition"]["clustering_model_type"]
+            logging.info(f"Clustering model type: {self.clustering_model_type}")
             feature_clusters = self._feature_clustering(projection_model=projection_model)
             self.decomposer = ClusteringFeatureGrouping(
                 n_subcomps=self.n_subcomps,
