@@ -43,10 +43,7 @@ class CCEA(ABC):
         List of feature indexes.
     """
 
-    def __init__(self,
-                 data: DataLoader,
-                 conf: dict,
-                 verbose: bool = True):
+    def __init__(self, data: DataLoader, conf: dict, verbose: bool = True):
         """
         Parameters
         ----------
@@ -93,8 +90,8 @@ class CCEA(ABC):
         # Configuration parameters
         self.conf = conf
         # Initializes the components of the cooperative co-evolutionary algorithm
-        self._init_decomposer()
         self._init_evaluator()
+        self._init_decomposer()
         self._init_collaborator()
         # List to store the best global fitness in each generation
         self.convergence_curve = list()
