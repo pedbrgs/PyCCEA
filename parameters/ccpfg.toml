@@ -7,7 +7,8 @@ max_gen_without_improvement = 100
 
 [decomposition]
 method = "clustering"
-quantile_to_remove = 0.20
+drop = true
+clustering_model_type = "agglomerative_clustering"
 
 [collaboration]
 method = "best"
