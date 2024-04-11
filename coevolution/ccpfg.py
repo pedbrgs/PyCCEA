@@ -268,7 +268,8 @@ class CCPFG(CCEA):
         logging.info(f"Decomposition approach: {self.method}.")
 
         # Define projection model according to the number of features
-        high_dim = self.data.n_features/self.data.n_examples > 10
+        high_dim = self.data.n_features > 100000
+        # TODO CIPLS breaks when running for too many dimensions
         projection_class = CIPLS if high_dim else PLSRegression
 
         if self.conf["decomposition"].get("n_components"):
