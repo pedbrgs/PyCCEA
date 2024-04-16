@@ -1,4 +1,4 @@
-# This file specifies the parameters of the Cooperative Co-Evolutionary-Based Feature Selection with Symmetric Uncertainty Feature Grouping (CCFSRFG)
+# This file specifies the parameters of the Cooperative Co-Evolutionary-Based Feature Selection with Symmetric Uncertainty Feature Grouping (CCSUFG)
 
 [coevolution]
 subpop_sizes = [30]
