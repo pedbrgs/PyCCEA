@@ -225,7 +225,13 @@ class CCSUFG(CCBCGA):
         return importances
 
     def _compute_variable_importances(self) -> list:
-        """Compute symmetric uncertainty between each feature and class labels."""
+        """Compute symmetric uncertainty between each feature and class labels.
+
+        Returns
+        -------
+        importances : np.ndarray
+            Importance of each feature based on symmetric uncertainty.
+        """
         importances = list()
 
         for i in range(self.data.n_features):
