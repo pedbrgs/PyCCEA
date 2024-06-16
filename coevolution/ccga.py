@@ -8,13 +8,8 @@ from initialization.binary import RandomBinaryInitialization
 from optimizers.genetic_algorithm import BinaryGeneticAlgorithm
 
 
-class CCFSRFG(CCEA):
-    """Cooperative Co-Evolutionary-Based Feature Selection with Random Feature Grouping.
-
-    These methods are common to both the CCFSRFG1 and CCFSRFG2 versions.
-
-    Rashid, A. N. M., et al. "Cooperative co-evolution for feature selection in Big Data with
-    random feature grouping." Journal of Big Data 7.1 (2020): 1-42.
+class CCGA(CCEA):
+    """Cooperative Co-Evolutionary Genetic Algorithm.
 
     Attributes
     ----------

@@ -1,4 +1,4 @@
-# This file specifies the parameters of the Cooperative Co-Evolutionary Algorithm with Projection-based Feature Grouping (CCPFG)
+# This file specifies the parameters of the Cooperative Co-Evolutionary Algorithm with Projection-based Self-Tuning Feature Grouping (CCPSTFG)
 
 [coevolution]
 subpop_sizes = [30]

@@ -2,62 +2,25 @@ import gc
 import copy
 import logging
 from tqdm import tqdm
-from abc import abstractmethod
-from coevolution.ccea import CCEA
-from fitness.penalty import SubsetSizePenalty
-from evaluation.wrapper import WrapperEvaluation
-from cooperation.best import SingleBestCollaboration
-from cooperation.random import SingleRandomCollaboration
-from initialization.binary import RandomBinaryInitialization
-from optimizers.genetic_algorithm import BinaryGeneticAlgorithm
+from coevolution.ccga import CCGA
+from decomposition.static import SequentialFeatureGrouping
 
 
-class CCBCGA(CCEA):
-    """Simple Cooperative Co-Evolutionary Algorithm with Best Collaboration and Genetic Algorithm.
+class CCEAFS(CCGA):
+    """Cooperative Co-Evolutionary-Based Feature Selection (CCEAFS).
 
-    The components of this algorithm will remain unchanged to assess different decomposition
-    strategies.
+    Rashid, A. N. M., et al. "A novel penalty-based wrapper objective function for feature
+    selection in Big Data using cooperative co-evolution." IEEE Access 8 (2020): 150113-150129.
     """
 
-    @abstractmethod
-    def _init_decomposer(self) -> None:
+    def _init_decomposer(self):
         """Instantiate feature grouping method."""
-        pass
+        self.decomposer = SequentialFeatureGrouping(
+            n_subcomps=self.n_subcomps,
+            subcomp_sizes=self.subcomp_sizes
+        )
 
-    def _init_collaborator(self) -> None:
-        """Instantiate collaboration method."""
-        self.best_collaborator = SingleBestCollaboration()
-        self.random_collaborator = SingleRandomCollaboration(seed=self.seed)
-
-    def _init_evaluator(self) -> None:
-        """Instantiate evaluation method."""
-        evaluator = WrapperEvaluation(task=self.conf["wrapper"]["task"],
-                                      model_type=self.conf["wrapper"]["model_type"],
-                                      eval_function=self.conf["evaluation"]["eval_function"],
-                                      eval_mode=self.eval_mode,
-                                      n_classes=self.data.n_classes)
-        self.fitness_function = SubsetSizePenalty(evaluator=evaluator,
-                                                  weights=self.conf["evaluation"]["weights"])
-
-    def _init_subpop_initializer(self) -> None:
-        """Instantiate subpopulation initialization method."""
-        self.initializer = RandomBinaryInitialization(data=self.data,
-                                                      subcomp_sizes=self.subcomp_sizes,
-                                                      subpop_sizes=self.subpop_sizes,
-                                                      collaborator=self.random_collaborator,
-                                                      fitness_function=self.fitness_function)
-
-    def _init_optimizers(self) -> None:
-        """Instantiate evolutionary algorithms to evolve each subpopulation."""
-        self.optimizers = list()
-        # Instantiate an optimizer for each subcomponent
-        for i in range(self.n_subcomps):
-            optimizer = BinaryGeneticAlgorithm(subpop_size=self.subpop_sizes[i],
-                                               n_features=self.subcomp_sizes[i],
-                                               conf=self.conf)
-            self.optimizers.append(optimizer)
-
-    def optimize(self) -> None:
+    def optimize(self):
         """Solve the feature selection problem through optimization."""
         # Decompose problem
         self._problem_decomposition()
@@ -135,6 +98,7 @@ class CCBCGA(CCEA):
                 fitness=self.fitness,
                 context_vectors=self.context_vectors
             )
+
             # Select the globally best context vector
             best_context_vector, best_fitness = self._get_global_best()
             # Update best context vector
@@ -143,13 +107,23 @@ class CCBCGA(CCEA):
                 stagnation_counter = 0
                 # Enable logger if specified
                 logging.getLogger().disabled = False if self.verbose else True
-                # Current fitness
+                # Objective weight
+                w1 = self.conf["evaluation"]["weights"][0]
+                # Penalty weight
+                w2 = self.conf["evaluation"]["weights"][1]
+                # Current fitness, performance evaluation and penalty
                 current_best_fitness = round(self.best_fitness, 4)
-                # New fitness
+                current_penalty = round(self.best_context_vector.sum()/self.data.n_features, 4)
+                current_eval = round((self.best_fitness + w2*current_penalty)/w1, 4)
+                # New fitness, performance evaluation and penalty
                 new_best_fitness = round(best_fitness, 4)
+                new_penalty = round(best_context_vector.sum()/self.data.n_features, 4)
+                new_eval = round((best_fitness + w2*new_penalty)/w1, 4)
                 # Show improvement
                 logging.info(
                     f"\nUpdate fitness from {current_best_fitness} to {new_best_fitness}.\n"
+                    f"Update predictive performance from {current_eval} to {new_eval}.\n"
+                    f"Update penalty from {current_penalty} to {new_penalty}.\n"
                 )
                 # Update best context vector
                 self.best_context_vector = best_context_vector.copy()

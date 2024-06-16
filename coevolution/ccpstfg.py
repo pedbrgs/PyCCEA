@@ -6,23 +6,17 @@ import pandas as pd
 from tqdm import tqdm
 from kneed import KneeLocator
 from projection.vip import VIP
-from coevolution.ccea import CCEA
+from coevolution.ccga import CCGA
 from projection.cipls import CIPLS
 from sklearn.metrics import silhouette_score
-from fitness.penalty import SubsetSizePenalty
-from evaluation.wrapper import WrapperEvaluation
-from cooperation.best import SingleBestCollaboration
 from sklearn.cross_decomposition import PLSRegression
 from decomposition.ranking import RankingFeatureGrouping
-from cooperation.random import SingleRandomCollaboration
 from sklearn.cluster import KMeans, AgglomerativeClustering
-from initialization.binary import RandomBinaryInitialization
 from decomposition.clustering import ClusteringFeatureGrouping
-from optimizers.genetic_algorithm import BinaryGeneticAlgorithm
 
 
-class CCPFG(CCEA):
-    """Cooperative Co-Evolutionary Algorithm with Projection-based Feature Grouping (CCPFG).
+class CCPSTFG(CCGA):
+    """Cooperative Co-Evolutionary Algorithm with Projection-based Self-Tuning Feature Grouping (CCPSTFG).
 
     Attributes
     ----------
@@ -71,7 +65,7 @@ class CCPFG(CCEA):
         # Cluster features based on loadings.
         # Loadings indicate how strongly each feature contributes to each component.
         # Features with similar loadings on the same components are likely to be related.
-        clustering_model_class, clustering_params = CCPFG.CLUSTERING_METHODS[self.clustering_model_type]
+        clustering_model_class, clustering_params = CCPSTFG.CLUSTERING_METHODS[self.clustering_model_type]
         clustering_model = clustering_model_class(n_clusters=self.n_subcomps, **clustering_params)
         feature_clusters = clustering_model.fit_predict(feature_loadings)
 
@@ -145,7 +139,7 @@ class CCPFG(CCEA):
         silhouette_scores = list()
 
         for n_clusters in n_clusters_range:
-            clustering_model_class, clustering_params = CCPFG.CLUSTERING_METHODS[self.clustering_model_type]
+            clustering_model_class, clustering_params = CCPSTFG.CLUSTERING_METHODS[self.clustering_model_type]
             clustering_model = clustering_model_class(n_clusters=n_clusters, **clustering_params)
             cluster_labels = clustering_model.fit_predict(feature_loadings)
             silhouette_avg = silhouette_score(feature_loadings, cluster_labels)
@@ -308,39 +302,6 @@ class CCPFG(CCEA):
                 method=self.method,
                 ascending=False
             )
-
-    def _init_collaborator(self) -> None:
-        """Instantiate collaboration method."""
-        self.best_collaborator = SingleBestCollaboration()
-        self.random_collaborator = SingleRandomCollaboration(seed=self.seed)
-
-    def _init_evaluator(self) -> None:
-        """Instantiate evaluation method."""
-        evaluator = WrapperEvaluation(task=self.conf["wrapper"]["task"],
-                                      model_type=self.conf["wrapper"]["model_type"],
-                                      eval_function=self.conf["evaluation"]["eval_function"],
-                                      eval_mode=self.eval_mode,
-                                      n_classes=self.data.n_classes)
-        self.fitness_function = SubsetSizePenalty(evaluator=evaluator,
-                                                  weights=self.conf["evaluation"]["weights"])
-
-    def _init_subpop_initializer(self) -> None:
-        """Instantiate subpopulation initialization method."""
-        self.initializer = RandomBinaryInitialization(data=self.data,
-                                                      subcomp_sizes=self.subcomp_sizes,
-                                                      subpop_sizes=self.subpop_sizes,
-                                                      collaborator=self.random_collaborator,
-                                                      fitness_function=self.fitness_function)
-
-    def _init_optimizers(self) -> None:
-        """Instantiate evolutionary algorithms to evolve each subpopulation."""
-        self.optimizers = list()
-        # Instantiate an optimizer for each subcomponent
-        for i in range(self.n_subcomps):
-            optimizer = BinaryGeneticAlgorithm(subpop_size=self.subpop_sizes[i],
-                                               n_features=self.subcomp_sizes[i],
-                                               conf=self.conf)
-            self.optimizers.append(optimizer)
 
     def optimize(self) -> None:
         """Solve the feature selection problem through optimization."""

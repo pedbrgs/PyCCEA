@@ -2,29 +2,24 @@ import gc
 import copy
 import logging
 from tqdm import tqdm
-from coevolution.ccfsrfg import CCFSRFG
+from coevolution.ccga import CCGA
 from decomposition.random import RandomFeatureGrouping
 
 
-class CCFSRFG1(CCFSRFG):
-    """ Cooperative Co-Evolutionary-Based Feature Selection with Random Feature Grouping 1.
+class CCFSRFG1(CCGA):
+    """Cooperative Co-Evolutionary-Based Feature Selection with Random Feature Grouping 1.
 
     Rashid, A. N. M., et al. "Cooperative co-evolution for feature selection in Big Data with
     random feature grouping." Journal of Big Data 7.1 (2020): 1-42.
-
-    Attributes
-    ----------
-    subcomp_sizes: list
-        Number of features in each subcomponent.
-    feature_idxs: np.ndarray
-        Shuffled list of feature indexes.
     """
 
     def _init_decomposer(self):
         """Instantiate feature grouping method."""
-        self.decomposer = RandomFeatureGrouping(n_subcomps=self.n_subcomps,
-                                                subcomp_sizes=self.subcomp_sizes,
-                                                seed=self.seed)
+        self.decomposer = RandomFeatureGrouping(
+            n_subcomps=self.n_subcomps,
+            subcomp_sizes=self.subcomp_sizes,
+            seed=self.seed
+        )
 
     def optimize(self):
         """Solve the feature selection problem through optimization."""
