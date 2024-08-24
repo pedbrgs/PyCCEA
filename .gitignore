@@ -1,2 +1,7 @@
 **/.ipynb_checkpoints
 **/__pycache__/
+**/phd/
+**/results/
+*.ipynb
+*.out
+*.code-workspace
