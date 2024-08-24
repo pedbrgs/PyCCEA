@@ -281,7 +281,7 @@ class CCPSTFG(CCGA):
         importances = self._compute_variable_importances(projection_model=projection_model)
 
         # Remove irrelevant or weaken relevant features
-        if self.conf["decomposition"].get("drop", False) > 0:
+        if self.conf["decomposition"].get("drop", False):
             importances = self._remove_unimportant_features(importances)
 
         # Instantiate feature grouping
