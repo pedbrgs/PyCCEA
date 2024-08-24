@@ -1,3 +1,4 @@
+import os
 import logging
 import numpy as np
 import pandas as pd
@@ -236,7 +237,8 @@ class DataLoader():
     def _load(self) -> None:
         """Load dataset according to dataset given as a parameter."""
         try:
-            path = f"./datasets/{DataLoader.DATASETS[self.dataset]}"
+            current_dir = os.path.dirname(__file__)
+            path = os.path.join(current_dir, "..", "datasets", DataLoader.DATASETS[self.dataset])
         except:
             # Check if the chosen dataset is available
             raise AssertionError(
