@@ -57,8 +57,12 @@ class CCPSTFG(CCGA):
         # Get the loadings of features on PLS components
         feature_loadings = abs(projection_model.x_loadings_)
 
-        # Automatically define the number of subcomponents
-        self.n_subcomps = self._get_best_number_of_subcomponents(feature_loadings)
+        if self.conf["coevolution"].get("n_subcomps"):
+            self.n_subcomps = self.conf["coevolution"]["n_subcomps"]
+            logging.info(f"User-defined number of subcomponents: {self.n_subcomps}")
+        else:
+            logging.info("Automatically choosing the number of subcomponents...")
+            self.n_subcomps = self._get_best_number_of_subcomponents(feature_loadings)
         # Update the subpopulation sizes after update the number of subcomponents
         self.subpop_sizes = [self.subpop_sizes[0]] * self.n_subcomps
 
@@ -115,7 +119,7 @@ class CCPSTFG(CCGA):
             n_components_range, r_squared_values, curve="concave", direction="increasing"
         )
         n_components = kneedle.knee
-        logging.info(f"Best number of components: {n_components}.")
+        logging.info(f"Optimized number of PLS components: {n_components}.")
 
         return n_components
 
@@ -153,7 +157,7 @@ class CCPSTFG(CCGA):
         n_subcomps = silhouette_scores.loc[
             silhouette_scores["silhouette_score"].idxmax(), "n_clusters"
         ]
-        logging.info(f"Best number of subcomponents: {n_subcomps}.")
+        logging.info(f"Optimized number of subcomponents: {n_subcomps}.")
 
         return n_subcomps
 
@@ -268,6 +272,7 @@ class CCPSTFG(CCGA):
 
         if self.conf["decomposition"].get("n_components"):
             self.n_components = self.conf["decomposition"]["n_components"]
+            logging.info(f"User-defined number of PLS components: {self.n_components}")
         else:
             logging.info("Automatically choosing the number of PLS components...")
             # Get the best number of components to keep after projection using the Elbow method
