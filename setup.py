@@ -18,6 +18,9 @@ setup(
     author_email="pedbrgs@gmail.com",
     url="https://github.com/pedbrgs/PyCCEA",
     packages=find_packages(include=["pyccea*"]),
+    package_data={
+        "pyccea": ["parameters/*.toml"],
+    },
     install_requires=requirements,
     classifiers=[
         "Programming Language :: Python :: 3",
