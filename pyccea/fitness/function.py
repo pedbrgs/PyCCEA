@@ -1,7 +1,7 @@
 import numpy as np
 from abc import ABC
-from utils.datasets import DataLoader
-from evaluation.wrapper import WrapperEvaluation
+from ..utils.datasets import DataLoader
+from ..evaluation.wrapper import WrapperEvaluation
 
 
 class WrapperFitnessFunction(ABC):

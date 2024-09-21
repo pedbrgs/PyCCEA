@@ -1,7 +1,7 @@
 import numpy as np
-from utils.datasets import DataLoader
-from utils.mapping import shifted_heaviside_function
-from initialization.build import SubpopulationInitialization
+from ..utils.datasets import DataLoader
+from ..utils.mapping import shifted_heaviside_function
+from ..initialization.build import SubpopulationInitialization
 
 
 class RandomContinuousInitialization(SubpopulationInitialization):

@@ -1,11 +1,11 @@
 import numpy as np
-from coevolution.ccea import CCEA
-from fitness.penalty import SubsetSizePenalty
-from evaluation.wrapper import WrapperEvaluation
-from cooperation.best import SingleBestCollaboration
-from cooperation.random import SingleRandomCollaboration
-from initialization.binary import RandomBinaryInitialization
-from optimizers.genetic_algorithm import BinaryGeneticAlgorithm
+from ..coevolution.ccea import CCEA
+from ..fitness.penalty import SubsetSizePenalty
+from ..evaluation.wrapper import WrapperEvaluation
+from ..cooperation.best import SingleBestCollaboration
+from ..cooperation.random import SingleRandomCollaboration
+from ..initialization.binary import RandomBinaryInitialization
+from ..optimizers.genetic_algorithm import BinaryGeneticAlgorithm
 
 
 class CCGA(CCEA):

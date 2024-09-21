@@ -4,8 +4,8 @@ import logging
 import numpy as np
 from math import log
 from tqdm import tqdm
-from coevolution.ccga import CCGA
-from decomposition.ranking import RankingFeatureGrouping
+from ..coevolution.ccga import CCGA
+from ..decomposition.ranking import RankingFeatureGrouping
 
 
 class CCSUFG(CCGA):

@@ -1,6 +1,6 @@
 import random
 import numpy as np
-from decomposition.grouping import FeatureGrouping
+from ..decomposition.grouping import FeatureGrouping
 
 
 class RandomFeatureGrouping(FeatureGrouping):

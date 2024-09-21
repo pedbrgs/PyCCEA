@@ -3,8 +3,8 @@ import copy
 import logging
 import numpy as np
 from tqdm import tqdm
-from coevolution.ccga import CCGA
-from decomposition.random import RandomFeatureGrouping
+from ..coevolution.ccga import CCGA
+from ..decomposition.random import RandomFeatureGrouping
 
 
 class CCFSRFG2(CCGA):

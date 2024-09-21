@@ -2,8 +2,8 @@ import gc
 import copy
 import logging
 from tqdm import tqdm
-from coevolution.ccga import CCGA
-from decomposition.static import SequentialFeatureGrouping
+from ..coevolution.ccga import CCGA
+from ..decomposition.static import SequentialFeatureGrouping
 
 
 class CCEAFS(CCGA):

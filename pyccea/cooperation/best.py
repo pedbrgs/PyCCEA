@@ -1,4 +1,4 @@
-from cooperation.collaboration import Collaboration
+from ..cooperation.collaboration import Collaboration
 
 
 class SingleBestCollaboration(Collaboration):

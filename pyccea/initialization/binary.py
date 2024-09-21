@@ -1,5 +1,5 @@
 import numpy as np
-from initialization.build import SubpopulationInitialization
+from ..initialization.build import SubpopulationInitialization
 
 
 class RandomBinaryInitialization(SubpopulationInitialization):

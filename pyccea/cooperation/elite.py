@@ -1,6 +1,6 @@
 import random
 import numpy as np
-from cooperation.collaboration import Collaboration
+from ..cooperation.collaboration import Collaboration
 
 
 class SingleEliteCollaboration(Collaboration):

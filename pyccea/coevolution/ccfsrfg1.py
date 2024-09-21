@@ -2,8 +2,8 @@ import gc
 import copy
 import logging
 from tqdm import tqdm
-from coevolution.ccga import CCGA
-from decomposition.random import RandomFeatureGrouping
+from ..coevolution.ccga import CCGA
+from ..decomposition.random import RandomFeatureGrouping
 
 
 class CCFSRFG1(CCGA):

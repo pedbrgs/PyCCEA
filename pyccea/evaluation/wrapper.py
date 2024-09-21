@@ -2,9 +2,9 @@ import copy
 import logging
 import warnings
 import numpy as np
-from utils.datasets import DataLoader
-from utils.models import ClassificationModel
-from utils.metrics import ClassificationMetrics
+from ..utils.datasets import DataLoader
+from ..utils.models import ClassificationModel
+from ..utils.metrics import ClassificationMetrics
 
 warnings.filterwarnings(action="ignore", category=UserWarning, message="y_pred contains classes")
 

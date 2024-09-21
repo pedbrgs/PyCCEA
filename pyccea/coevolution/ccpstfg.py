@@ -5,14 +5,14 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from kneed import KneeLocator
-from projection.vip import VIP
-from coevolution.ccga import CCGA
-from projection.cipls import CIPLS
+from ..projection.vip import VIP
+from ..coevolution.ccga import CCGA
+from ..projection.cipls import CIPLS
 from sklearn.metrics import silhouette_score
 from sklearn.cross_decomposition import PLSRegression
-from decomposition.ranking import RankingFeatureGrouping
+from ..decomposition.ranking import RankingFeatureGrouping
 from sklearn.cluster import KMeans, AgglomerativeClustering
-from decomposition.clustering import ClusteringFeatureGrouping
+from ..decomposition.clustering import ClusteringFeatureGrouping
 
 
 class CCPSTFG(CCGA):

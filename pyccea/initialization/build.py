@@ -1,7 +1,7 @@
 import numpy as np
 from tqdm import tqdm
 from abc import ABC, abstractmethod
-from utils.datasets import DataLoader
+from ..utils.datasets import DataLoader
 
 
 class SubpopulationInitialization(ABC):

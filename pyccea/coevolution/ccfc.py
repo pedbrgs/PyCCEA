@@ -2,9 +2,9 @@ import gc
 import copy
 import logging
 from tqdm import tqdm
-from coevolution.ccga import CCGA
+from ..coevolution.ccga import CCGA
 from sklearn.cluster import KMeans
-from decomposition.clustering import ClusteringFeatureGrouping
+from ..decomposition.clustering import ClusteringFeatureGrouping
 
 
 class CCFC(CCGA):

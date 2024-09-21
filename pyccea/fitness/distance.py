@@ -1,7 +1,7 @@
 import numpy as np
-from utils.datasets import DataLoader
-from evaluation.wrapper import WrapperEvaluation
-from fitness.function import WrapperFitnessFunction
+from ..utils.datasets import DataLoader
+from ..evaluation.wrapper import WrapperEvaluation
+from ..fitness.function import WrapperFitnessFunction
 
 
 class DistanceBasedFitness(WrapperFitnessFunction):
