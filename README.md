@@ -18,6 +18,17 @@ PyCCEA package is **in progress** and will be one of the results of my doctoral 
 |  CCFSRFG1    |  [Rashid, A. N. M., et al. "Cooperative co-evolution for feature selection in Big Data with random feature grouping." Journal of Big Data 7.1 (2020): 1-42.](https://journalofbigdata.springeropen.com/articles/10.1186/s40537-020-00381-y)      |
 |  CCFSRFG2    |  [Rashid, A. N. M., et al. "Cooperative co-evolution for feature selection in Big Data with random feature grouping." Journal of Big Data 7.1 (2020): 1-42.](https://journalofbigdata.springeropen.com/articles/10.1186/s40537-020-00381-y)      |
 
+## Installation
+
+To install the package directly from the GitHub repository, run the following command:
+
+```
+pip install git+https://github.com/pedbrgs/pyccea.git
+```
+
+Make sure you have `pip` installed and an active internet connection to fetch the package.
+
+
 ## Citation info
 
 If you are using these codes in any way, please let them know your source:
