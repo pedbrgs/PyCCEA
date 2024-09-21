@@ -14,7 +14,7 @@ The dataset and algorithm parameters are defined in separate `.toml` configurati
 
 ## Example
 
-By following this example, you will see how easy it is to use pyccea to solve feature selection problems with just a few lines of code. Let’s walk through the process of loading data, configuring the algorithm, and running the optimization:
+By following this example, you will see how easy it is to use PyCCEA to solve feature selection problems with just a few lines of code. Let’s walk through the process of loading data, configuring the algorithm, and running the optimization:
 
 ```python
 import toml
