@@ -2,7 +2,7 @@
 
 [coevolution]
 subpop_sizes = [30]
-n_subcomps = 2
+n_subcomps = 6
 max_gen = 10000
 max_gen_without_improvement = 100
 

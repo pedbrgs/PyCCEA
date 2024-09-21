@@ -1,10 +1,15 @@
-# This file specifies the parameters of the Cooperative Co-Evolutionary-Based Feature Selection with Symmetric Uncertainty Feature Grouping (CCSUFG)
+# This file specifies the parameters of the Cooperative Co-Evolutionary Algorithm with Projection-based Self-Tuning Feature Grouping (CCPSTFG)
 
 [coevolution]
-subpop_sizes = [30]
-n_subcomps = 4
+subpop_sizes = [100]
 max_gen = 10000
 max_gen_without_improvement = 100
+optimized_resource_allocation = true
+
+[decomposition]
+method = "clustering"
+drop = true
+clustering_model_type = "agglomerative_clustering"
 
 [collaboration]
 method = "best"
