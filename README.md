@@ -8,7 +8,7 @@
 
 ## About
 
-PyCCEA is an evolving Python package aimed at solving feature selection problems using cooperative co-evolutionary strategies. The package is designed to assist in high-dimensional by leveraging a flexible, decomposition-based approach. Currently, **PyCCEA is a work in progress** and is being developed as part of my doctoral research. Once complete, it will offer a robust solution for researchers and practitioners working with large-scale feature selection problems. Stay tuned for updates!
+PyCCEA is an evolving Python package aimed at solving feature selection problems using cooperative co-evolutionary strategies. The package is designed to assist in high-dimensional problems by leveraging a flexible, decomposition-based approach. Currently, **PyCCEA is a work in progress** and is being developed as part of my doctoral research. Once complete, it will offer a robust solution for researchers and practitioners working with large-scale feature selection problems. Stay tuned for updates!
 
 ## Installation
 
@@ -19,7 +19,6 @@ pip install git+https://github.com/pedbrgs/pyccea.git
 ```
 
 Make sure you have `pip` installed and an active internet connection to fetch the package.
-
 
 ## Citation info
 
