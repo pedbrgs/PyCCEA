@@ -19,7 +19,7 @@ setup(
     url="https://github.com/pedbrgs/PyCCEA",
     packages=find_packages(include=["pyccea*"]),
     package_data={
-        "pyccea": ["parameters/*.toml"],
+        "pyccea": ["datasets/*.csv", "parameters/*.toml"],
     },
     install_requires=requirements,
     classifiers=[
