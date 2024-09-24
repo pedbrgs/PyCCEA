@@ -1,4 +1,4 @@
-![pyccea-logo](https://github.com/pedbrgs/PyCCEA/blob/main/docs/figures/logo.png "pyccea-logo")
+<img src="https://github.com/pedbrgs/PyCCEA/blob/main/docs/figures/logo.png" alt="pyccea-logo" width="100" height="auto">
 
 A python package of Cooperative Co-Evolutionary Algorithms for Feature Selection in Big Data.
 
