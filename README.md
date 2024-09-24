@@ -1,4 +1,6 @@
-# PyCCEA: a python package of Cooperative Co-Evolutionary Algorithms for Feature Selection in Big Data
+![pyccea-logo](https://github.com/pedbrgs/PyCCEA/blob/main/docs/figures/logo.png "pyccea-logo")
+
+A python package of Cooperative Co-Evolutionary Algorithms for Feature Selection in Big Data.
 
 **Author:** [Pedro Vinícius A. B. Venâncio](https://www.linkedin.com/in/pedbrgs/)<sup>1</sup> <br />
 
