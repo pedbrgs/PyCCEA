@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 from ..decomposition.grouping import FeatureGrouping
 
@@ -61,9 +62,11 @@ class RankingFeatureGrouping(FeatureGrouping):
             Indexes of features sorted according to the score.
         """
         if feature_idxs is None:
+            logging.info("Generating feature indexes according to the scores.")
             ranking = np.argsort(self.scores, axis=-1)
             # If lower scores should be ranked better.
             if not self.ascending:
+                logging.info("Descending order of scores was chosen.")
                 ranking = ranking[::-1].copy()
 
             if self.method == "elitist":
