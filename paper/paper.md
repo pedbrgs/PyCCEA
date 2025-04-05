@@ -27,7 +27,7 @@ bibliography: paper.bib
 
 # Summary
 
-Feature selection is a critical preprocessing step in many machine learning pipelines, particularly when dealing with high-dimensional datasets commonly found in domains such as genomics, text mining, and image analysis. However, many feature selection techniques, such as heuristic search methods and evolutionary algorithms, struggle to maintain predictive performance and interpretability as the dimensionality of data increases [@Then:2024].
+Feature selection is a critical preprocessing step in many machine learning pipelines, particularly when dealing with high-dimensional datasets commonly found in domains such as genomics, text mining, and image analysis. However, many feature selection techniques, such as heuristic search methods and evolutionary algorithms, struggle to maintain predictive performance and interpretability as the dimensionality of data increases [@Theng:2024].
 
 Cooperative co-evolutionary algorithms (CCEAs) offer a promising approach for tackling this challenge by dividing the high-dimensional space into multiple tractable low-dimensional subcomponents. Each subcomponent is evolved independently using a subpopulation, and candidate solutions are evaluated based on their collaboration with representatives from other subpopulations [@Ma:2018].
 
@@ -37,7 +37,7 @@ All machine learning and data processing components are built on top of well-est
 
 # Statement of need
 
-Despite the growing interest in cooperative co-evolutionary algorithms for feature selection and their promising results [@Song:2020], there is currently no publicly available software package that consolidates these techniques into a reusable and extensible tool. Existing research typically relies on custom [@Rashid:2020a; @Rashid2020b; Firouznia:2023] or unpublished implementations [@Song:2020; @Zhou2024], which makes it difficult to reproduce results, compare methods, or build upon previous work.
+Despite the growing interest in cooperative co-evolutionary algorithms for feature selection and their promising results [@Song:2020], there is currently no publicly available software package that consolidates these techniques into a reusable and extensible tool. Existing research typically relies on custom [@Rashid:2020a; @Rashid:2020b; @Firouznia:2023] or unpublished implementations [@Song:2020; @Zhou2024], which makes it difficult to reproduce results, compare methods, or build upon previous work.
 
 `PyCCEA` addresses this gap by providing a well-organized, research-focused implementation of cooperative co-evolutionary algorithms tailored to feature selection. It incorporates widely used strategies from the literature and encourages standardization in experimental design and evaluation. By enabling consistent benchmarking and facilitating the development of new strategies, `PyCCEA` supports both methodological innovation and practical application in high-dimensional machine learning problems. Its release lowers the barrier to entry for researchers and practitioners, accelerating progress in the field of feature selection using evolutionary computation.
 
