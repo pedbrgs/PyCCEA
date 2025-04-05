@@ -1,14 +1,14 @@
 <img src="https://github.com/pedbrgs/PyCCEA/blob/main/docs/figures/logo.png" alt="pyccea-logo" width="150" height="auto">
 
-**PyCCEA** is a python package of Cooperative Co-Evolutionary Algorithms (CCEAs) for feature selection in Big Data.
-
 ***
 
-## Overview
+## :bulb: Overview
 
-PyCCEA is an evolving open-source Python package aimed at solving feature selection problems using cooperative co-evolutionary strategies. The package is designed to assist in high-dimensional problems by leveraging a flexible, decomposition-based approach. Currently, **PyCCEA is a work in progress** and is being developed as part of my doctoral research. Once complete, it will offer a robust solution for researchers and practitioners working with large-scale feature selection problems. Stay tuned for updates!
+PyCCEA is an open-source package developed as part of ongoing doctoral research. It provides cooperative co-evolutionary strategies tailored for feature selection in large-scale and high-dimensional problems. The framework adopts a modular, decomposition-based approach and is intended for researchers and practitioners tackling complex feature selection tasks.
 
-## Installation
+> **Note:** PyCCEA is a work in progress. Stay tuned for improvements and new algorithm implementations.
+
+## :computer: Installation
 
 To install the package directly from PyPI, use the following command:
 
@@ -16,16 +16,59 @@ To install the package directly from PyPI, use the following command:
 pip install pyccea
 ```
 
-Alternatively, if you want to install the package directly from the GitHub repository, run:
+Alternatively, if you want to install the latest version directly from the GitHub:
 
 
 ```
 pip install git+https://github.com/pedbrgs/pyccea.git
 ```
 
-Make sure you have `pip` installed and an active internet connection to fetch the package.
+Ensure you have `pip` and an active internet connection to download dependencies.
 
-## Citation info
+## :high_brightness: Quickstart
+
+This quickstart demonstrates how to use the CCFSRFG1 algorithm — a CCEA variant with random feature grouping — to perform feature selection on the Wisconsin Diagnostic Breast Cancer (WDBC) dataset.
+
+In this example, you will:
+
+- Load the dataset using the `DataLoader` utility.
+- Configure the dataset and algorithm from `.toml` files.
+- Run the optimization process.
+
+
+```python
+import toml
+import importlib.resources
+from pyccea.coevolution import CCFSRFG1
+from pyccea.utils.datasets import DataLoader
+
+# Load dataset parameters
+with importlib.resources.open_text("pyccea.parameters", "dataloader.toml") as toml_file:
+    data_conf = toml.load(toml_file)
+
+# Initialize the DataLoader with the specified dataset and configuration
+data = DataLoader(
+    dataset="wdbc",
+    conf=data_conf
+)
+
+# Prepare the dataset for the algorithm (e.g., preprocessing, splitting)
+data.get_ready()
+
+# Load algorithm-specific parameters
+with importlib.resources.open_text("pyccea.parameters", "ccfsrfg.toml") as toml_file:
+    ccea_conf = toml.load(toml_file)
+
+# Initialize the cooperative co-evolutionary algorithm
+ccea = CCFSRFG1(data=data, conf=ccea_conf, verbose=False)
+
+# Start the optimization process
+ccea.optimize()
+```
+
+The best feature subset found is stored in the attribute `best_context_vector`, a binary array where 1 indicates a selected feature and 0 indicates an unselected one.
+
+## :scroll: Citation info
 
 If you are using these codes in any way, please let them know your source:
 
@@ -40,5 +83,5 @@ If you are using these codes in any way, please let them know your source:
 
 ***
 
-## Contact
+## :mailbox: Contact
 Please send any bug reports, questions or suggestions directly in the repository.
