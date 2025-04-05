@@ -316,26 +316,29 @@ class CCPSTFG(CCGA):
         indices = np.cumsum(self.subcomp_sizes)[:-1]
         # Split the feature importances array into subcomponents based on the indices
         importances = np.split(self.feature_importances, indices)
-        # Calculate the average importance for each subcomponent
+        # Calculate the average importance of each subcomponent
         subcomp_importances = np.array([np.mean(subcomp) for subcomp in importances])
-        # Calculate the percentage of features each subcomponent contributes relative to the total
-        subcomp_features_percentage = np.array([len(subcomp)/sum(self.subcomp_sizes) for subcomp in importances])
-        # Determine the total population size across all subproblems
-        total_pop_size = sum(self.subpop_sizes)
-        # Combine subcomponent importances and feature percentages to determine subpopulation size factors
-        subpop_size_factors = subcomp_importances + subcomp_features_percentage
-        # Normalize the subpopulation size factors so they sum to 1
-        subpop_size_factors /= sum(subpop_size_factors)
-        # Calculate the size of each subpopulation by distributing the total population size according to the factors
-        subpop_sizes = [subpop_size_factor * total_pop_size for subpop_size_factor in subpop_size_factors]
-        # Update the subpopulation sizes with the calculated values, rounding to the nearest integer
-        self.subpop_sizes = np.round(subpop_sizes).astype(int)
+        # Normalize the subcomponent importances
+        normalized_subcomp_importances = subcomp_importances / np.sum(subcomp_importances)
+        logging.info(f"Subcomponent importances: {normalized_subcomp_importances}")
+        # Calculate the normalized subcomponent sizes
+        normalized_subcomp_sizes = np.array(self.subcomp_sizes) / np.sum(self.subcomp_sizes)
+        logging.info(f"Normalized subcomponent sizes: {normalized_subcomp_sizes}")
+        # Calculate the allocation factor
+        allocation_factor = normalized_subcomp_importances * normalized_subcomp_sizes
+        # Normalize the allocation factor
+        normalized_allocation_factor = allocation_factor / np.sum(allocation_factor)
+        # Update the subpopulation sizes based on the normalized allocation factor
+        logging.info(f"Subpopulation sizes in Round-Robin strategy: {self.subpop_sizes}")
+        self.subpop_sizes = np.round(normalized_allocation_factor * sum(self.subpop_sizes)).astype(int)
+        logging.info(f"Subpopulation sizes after resource allocation: {self.subpop_sizes}")
 
     def optimize(self) -> None:
         """Solve the feature selection problem through optimization."""
         # Decompose problem
         self._problem_decomposition()
         if self.conf["coevolution"].get("optimized_resource_allocation", False):
+            logging.info("Optimizing resource allocation...")
             self._allocate_subproblem_resources()
         # Initialize subpopulations
         self._init_subpopulations()
