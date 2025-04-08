@@ -74,7 +74,7 @@ If you are using these codes in any way, please let them know your source:
 
 ```
 @Misc{PyCCEA,
-    title = {PyCCEA: a python package of Cooperative Co-Evolutionary Algorithms for Feature Selection in Big Data},
+    title = {PyCCEA: A Python package of cooperative co-evolutionary algorithms for feature selection in high-dimensional data},
     author = {Pedro Vinicius A. B. Venancio},
     howPublished = {\url{https://github.com/pedbrgs/PyCCEA}},
     year = {2024}
