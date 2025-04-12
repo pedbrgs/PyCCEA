@@ -1,4 +1,6 @@
-<img src="https://github.com/pedbrgs/PyCCEA/blob/main/docs/figures/logo.png" alt="pyccea-logo" width="150" height="auto">
+<div style="text-align: center;">
+  <img src="https://github.com/pedbrgs/PyCCEA/blob/main/docs/figures/logo.png" alt="pyccea-logo" width="150" height="auto">
+</div>
 
 <br>
 
