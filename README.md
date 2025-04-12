@@ -1,8 +1,6 @@
-<div style="text-align: center;">
-  <img src="https://github.com/pedbrgs/PyCCEA/blob/main/docs/figures/logo.png" alt="pyccea-logo" width="150" height="auto">
-</div>
-
-<br>
+<p align="center">
+    <img width="150" src="./docs/figures/logo.png" alt="PyCCEA logo">
+<p>
 
 [![codecov](https://codecov.io/gh/pedbrgs/PyCCEA/branch/main/graph/badge.svg?token=4X58GY16J4)](https://codecov.io/gh/pedbrgs/PyCCEA)
 ***
