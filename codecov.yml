@@ -4,12 +4,13 @@ coverage:
       default:
         target: 80%
 
-  # Include specific files or directories
   include:
     - "pyccea/utils/datasets.py"
     - "pyccea/coevolution/*"
 
-  # Define thresholds and precision
+  exclude:
+    - "*/tests/*"
+
   coverage:
     precision: 2
     round: down
