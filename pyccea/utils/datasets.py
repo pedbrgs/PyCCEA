@@ -241,7 +241,7 @@ class DataLoader():
             path = os.path.join(current_dir, "..", "datasets", DataLoader.DATASETS[self.dataset])
         except:
             # Check if the chosen dataset is available
-            raise AssertionError(
+            raise ValueError(
                 f"The '{self.dataset}' dataset is not available. "
                 f"The available datasets are {', '.join(DataLoader.DATASETS.keys())}."
             )
