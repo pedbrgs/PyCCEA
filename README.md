@@ -3,6 +3,8 @@
 <p>
 
 [![codecov](https://codecov.io/gh/pedbrgs/PyCCEA/branch/main/graph/badge.svg?token=4X58GY16J4)](https://codecov.io/gh/pedbrgs/PyCCEA)
+[![status](https://joss.theoj.org/papers/dd1af373a617c14953d289c085c38d8f/status.svg)](https://joss.theoj.org/papers/dd1af373a617c14953d289c085c38d8f)
+
 ***
 
 ## :bulb: Overview
