@@ -11,10 +11,10 @@ with open("requirements.txt") as f:
 setup(
     name="pyccea",
     version="0.1.0",
-    description="Cooperative co-evolutionary algorithms for feature selection in big data",
+    description="Cooperative co-evolutionary algorithms for feature selection in high-dimensional data",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    author="Pedro Vinícius Almeida Borges de Venâncio",
+    author="Pedro Vinícius A. B. Venâncio",
     author_email="pedbrgs@gmail.com",
     url="https://github.com/pedbrgs/PyCCEA",
     packages=find_packages(include=["pyccea*"]),
