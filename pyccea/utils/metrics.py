@@ -1,20 +1,92 @@
 import logging
 import numpy as np
-from sklearn.metrics import make_scorer
-from sklearn.model_selection import cross_validate
 from imblearn.metrics import specificity_score
+from sklearn.base import BaseEstimator
 from sklearn.metrics import (
-    accuracy_score, balanced_accuracy_score, f1_score, precision_score, recall_score
+    accuracy_score,
+    balanced_accuracy_score,
+    f1_score,
+    mean_absolute_error,
+    mean_absolute_percentage_error,
+    mean_squared_error,
+    precision_score,
+    r2_score,
+    recall_score
 )
 
 
-class ClassificationMetrics():
-    """
-    Evaluate machine learning model trained for a classification problem.
+class RegressionMetrics():
+    """Evaluate machine learning model trained for a regression problem.
 
     Attributes
     ----------
-    values: dict()
+    values : dict()
+        Values of regression metrics.
+    """
+
+    metrics = [
+        # Mean absolute error
+        "mae",
+        # Mean squared error
+        "mse",
+        # Root mean squared error
+        "rmse",
+        # R-squared score
+        "r2",
+        # Mean absolute percentage error
+        "mape",
+    ]
+
+    def __init__(self):
+        """Initialize the regression metrics class."""
+        self.values = dict()
+        # Initialize logger with info level
+        logging.basicConfig(encoding="utf-8", level=logging.INFO)
+
+    def compute(self,
+                estimator: BaseEstimator,
+                X_test: np.ndarray,
+                y_test: np.ndarray,
+                verbose: bool=False):
+        """Compute regression metrics.
+
+        Parameters
+        ----------
+        estimator : BaseEstimator
+            Model that will be evaluated.
+        X_test : np.ndarray
+            Input test data.
+        y_test : np.ndarray
+            Output test data.
+        verbose : bool, default False
+            If True, show evaluation metrics.
+        """
+
+        # Predictions
+        y_pred = estimator.predict(X_test)
+        # Measures
+        self.values["mae"] = round(mean_absolute_error(y_test, y_pred), 4)
+        self.values["mse"] = round(mean_squared_error(y_test, y_pred), 4)
+        self.values["rmse"] = round(mean_squared_error(y_test, y_pred, squared=False), 4)
+        self.values["r2"] = round(r2_score(y_test, y_pred), 4)
+        self.values["mape"] = round(mean_absolute_percentage_error(y_test, y_pred) * 100, 4)
+
+        # Show evaluation metrics
+        if verbose:
+            logging.getLogger().disabled = False
+            logging.info(f"MAE: {self.values['mae']}")
+            logging.info(f"MSE: {self.values['mse']}")
+            logging.info(f"RMSE: {self.values['rmse']}")
+            logging.info(f"R2: {self.values['r2']}")
+            logging.info(f"MAPE: {self.values['mape']}%")
+
+
+class ClassificationMetrics():
+    """Evaluate machine learning model trained for a classification problem.
+
+    Attributes
+    ----------
+    values : dict()
         Values of classification metrics.
     """
 
@@ -37,11 +109,12 @@ class ClassificationMetrics():
         "specificity"
     ]
 
-    def __init__(self, n_classes):
-        """
+    def __init__(self, n_classes: int):
+        """Initialize the classification metrics class.
+
         Parameters
         ----------
-        n_classes: int
+        n_classes : int
             Number of classes.
         """
         self.values = dict()
@@ -50,20 +123,21 @@ class ClassificationMetrics():
         logging.basicConfig(encoding="utf-8", level=logging.INFO)
 
     def compute(self,
-                estimator,
+                estimator: BaseEstimator,
                 X_test: np.ndarray,
                 y_test: np.ndarray,
                 verbose: bool=False):
-        """
+        """Compute classification metrics.
+
         Parameters
         ----------
-        estimator: sklearn model object
+        estimator : BaseEstimator
             Model that will be evaluated.
-        X_test: np.ndarray
+        X_test : np.ndarray
             Input test data.
-        y_test: np.ndarray
+        y_test : np.ndarray
             Output test data.
-        verbose: bool, default False
+        verbose : bool, default False
             If True, show evaluation metrics.
         """
 
