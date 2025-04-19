@@ -1,0 +1,109 @@
+# This file specifies the datasets
+
+[11_tumor]
+file = "11_tumor.csv"
+task = "classification"
+
+[9_tumor]
+file = "9_tumor.csv"
+task = "classification"
+
+[brain_tumor_1]
+file = "brain_tumor_1.csv"
+task = "classification"
+
+[brain_tumor_2]
+file = "brain_tumor_2.csv"
+task = "classification"
+
+[cbd]
+file = "cbd.csv"
+task = "classification"
+
+[dermatology]
+file = "dermatology.csv"
+task = "classification"
+
+[divorce]
+file = "divorce.csv"
+task = "classification"
+
+[dlbcl]
+file = "dlbcl.csv"
+task = "classification"
+
+[gfe]
+file = "gfe.csv"
+task = "classification"
+
+[hapt]
+file = "hapt.csv"
+task = "classification"
+
+[har]
+file = "har.csv"
+task = "classification"
+
+[isolet5]
+file = "isolet5.csv"
+task = "classification"
+
+[leukemia_1]
+file = "leukemia_1.csv"
+task = "classification"
+
+[leukemia_2]
+file = "leukemia_2.csv"
+task = "classification"
+
+[leukemia_3]
+file = "leukemia_3.csv"
+task = "classification"
+
+[libras]
+file = "libras.csv"
+task = "classification"
+
+[lsvt]
+file = "lsvt.csv"
+task = "classification"
+
+[lungc]
+file = "lungc.csv"
+task = "classification"
+
+[madelon_valid]
+file = "madelon_valid.csv"
+task = "classification"
+
+[mfd]
+file = "mfd.csv"
+task = "classification"
+
+[orh]
+file = "orh.csv"
+task = "classification"
+
+[prostate_tumor_1]
+file = "prostate_tumor_1.csv"
+task = "classification"
+
+[qsar_toxicity]
+file = "qsar_oral_toxicity.csv"
+task = "classification"
+
+[scadi]
+file = "scadi.csv"
+task = "classification"
+
+[shd]
+file = "shd.csv"
+task = "classification"
+
+[uji_indoor]
+file = "uji_indoor_loc.csv"
+task = "classification"
+
+[wdbc]
+file = "wdbc.csv"
+task = "classification"

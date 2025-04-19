@@ -1,7 +1,9 @@
 import os
+import toml
 import logging
 import numpy as np
 import pandas as pd
+import importlib.resources
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.model_selection import KFold, LeaveOneOut, StratifiedKFold
@@ -60,35 +62,8 @@ class DataLoader():
     SPLITTER_TYPES = ["k_fold", "leave_one_out"]
     PRIMARY_CONF_KEYS = ["general", "splitter", "normalization"]
     NORMALIZATION_METHODS = {"min_max": MinMaxScaler, "standard": StandardScaler}
-    DATASETS = {
-        "11_tumor": "11_tumor.csv",
-        "9_tumor": "9_tumor.csv",
-        "brain_tumor_1": "brain_tumor_1.csv",
-        "brain_tumor_2": "brain_tumor_2.csv",
-        "cbd": "cbd.csv",
-        "dermatology": "dermatology.csv",
-        "divorce": "divorce.csv",
-        "dlbcl": "dlbcl.csv",
-        "gfe": "gfe.csv",
-        "hapt": "hapt.csv",
-        "har": "har.csv",
-        "isolet5": "isolet5.csv",
-        "leukemia_1": "leukemia_1.csv",
-        "leukemia_2": "leukemia_2.csv",
-        "leukemia_3": "leukemia_3.csv",
-        "libras": "libras.csv",
-        "lsvt": "lsvt.csv",
-        "lungc": "lungc.csv",
-        "madelon_valid": "madelon_valid.csv",
-        "mfd": "mfd.csv",
-        "orh": "orh.csv",
-        "prostate_tumor_1": "prostate_tumor_1.csv",
-        "qsar_toxicity": "qsar_oral_toxicity.csv",
-        "scadi": "scadi.csv",
-        "shd": "shd.csv",
-        "uji_indoor": "uji_indoor_loc.csv",
-        "wdbc": "wdbc.csv"
-        }
+    with importlib.resources.open_text("pyccea.parameters", "datasets.toml") as toml_file:
+        DATASETS = toml.load(toml_file)
 
     def __init__(self, dataset: str, conf: dict):
         """
@@ -140,18 +115,18 @@ class DataLoader():
             self.kfolds = self.conf["splitter"]["kfolds"]
             self.stratified = self.conf["splitter"].get("stratified", False)
         if self.splitter_type == "leave_one_out":
-            logging.info(
+            logging.warn(
                 "Careful! It is not recommended to use Leave-One-Out when your problem has large "
                 "datasets or costly machine learning models to fit."
             )
             if "kfolds" in self.conf["splitter"]:
-                logging.info(
+                logging.warn(
                     "You specified the number of folds using Leave-One-Out (LOO). However, LOO is"
                     " equivalent to K-Fold when K is equal to the number of examples. Therefore, "
                     "the value of 'kfolds' parameter will be ignored in this case."
                 )
             if "stratified" in self.conf["splitter"]:
-                logging.info(
+                logging.warn(
                     "You specified the 'stratified' parameter using Leave-One-Out (LOO). However," 
                     " the validation folds made by the LOO have only one sample. Therefore, the "
                     "value of 'stratified' parameter will be ignored in this case."
@@ -238,7 +213,7 @@ class DataLoader():
         """Load dataset according to dataset given as a parameter."""
         try:
             current_dir = os.path.dirname(__file__)
-            path = os.path.join(current_dir, "..", "datasets", DataLoader.DATASETS[self.dataset])
+            path = os.path.join(current_dir, "..", "datasets", DataLoader.DATASETS[self.dataset]["file"])
         except:
             # Check if the chosen dataset is available
             raise ValueError(
@@ -299,20 +274,22 @@ class DataLoader():
         self.X = self._get_input()
         self.y = self._get_output()
 
-        # Labels as integer values
-        self.y = self.y.astype(int)
         # Set number of examples
         self.n_examples = self.X.shape[0]
         # Set number of features
         self.n_features = self.X.shape[1]
-        # Set number of classes
-        self.n_classes = self.y.nunique()
-        # Get class identifiers
-        self.classes = sorted(self.y.unique())
-        # Compute imbalance ratio
-        minority_class = self.y.value_counts().min()
-        majority_class = self.y.value_counts().max()
-        self.imbalance_ratio = round(majority_class/minority_class, 4)
+        # For classification tasks
+        if DataLoader.DATASETS[self.dataset]["task"] == "classification":
+            # Set number of classes
+            self.n_classes = self.y.nunique()
+            # Get class identifiers
+            self.classes = sorted(self.y.unique())
+            # Compute imbalance ratio
+            minority_class = self.y.value_counts().min()
+            majority_class = self.y.value_counts().max()
+            self.imbalance_ratio = round(majority_class/minority_class, 4)
+            # Ensure labels are integer-encoded
+            self.y = self.y.astype(int)
 
     def _split(self) -> None:
         """Split dataset into training and test sets."""
@@ -360,7 +337,7 @@ class DataLoader():
         logging.info(f"Splitter type: {self.splitter_type}.")
 
         if self.splitter_type == "k_fold":
-            if self.stratified:
+            if self.stratified and DataLoader.DATASETS[self.dataset]["task"] == "classification":
                 self.splitter = StratifiedKFold(
                     n_splits=self.kfolds,
                     shuffle=True,
