@@ -1,7 +1,9 @@
 **/.ipynb_checkpoints
 **/__pycache__/
 **/phd/
+**.research/
 **/results/
+**/scripts/
 *.ipynb
 *.out
 *.code-workspace
