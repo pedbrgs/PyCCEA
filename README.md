@@ -52,11 +52,7 @@ with importlib.resources.open_text("pyccea.parameters", "dataloader.toml") as to
     data_conf = toml.load(toml_file)
 
 # Initialize the DataLoader with the specified dataset and configuration
-data = DataLoader(
-    dataset="wdbc",
-    conf=data_conf
-)
-
+data = DataLoader(dataset="wdbc", conf=data_conf)
 # Prepare the dataset for the algorithm (e.g., preprocessing, splitting)
 data.get_ready()
 
@@ -66,7 +62,6 @@ with importlib.resources.open_text("pyccea.parameters", "ccfsrfg.toml") as toml_
 
 # Initialize the cooperative co-evolutionary algorithm
 ccea = CCFSRFG1(data=data, conf=ccea_conf, verbose=False)
-
 # Start the optimization process
 ccea.optimize()
 ```
