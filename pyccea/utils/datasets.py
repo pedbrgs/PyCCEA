@@ -267,8 +267,13 @@ class DataLoader():
         self.data.replace(to_replace = "?", value=np.nan, inplace=True)
         # Remove rows with at least one NaN value
         if dropna:
+            # Store the number of rows before dropping NaNs
+            initial_row_count = self.data.shape[0]
             self.data.dropna(inplace=True)
             self.data.reset_index(drop=True, inplace=True)
+            # Calculate the number of removed rows
+            removed_rows = initial_row_count - self.data.shape[0]
+            logging.info(f"Number of rows removed due to NaN values: {removed_rows}")
 
         # Split into input and output data
         self.X = self._get_input()
