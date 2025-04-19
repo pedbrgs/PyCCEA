@@ -115,18 +115,18 @@ class DataLoader():
             self.kfolds = self.conf["splitter"]["kfolds"]
             self.stratified = self.conf["splitter"].get("stratified", False)
         if self.splitter_type == "leave_one_out":
-            logging.warn(
+            logging.warning(
                 "Careful! It is not recommended to use Leave-One-Out when your problem has large "
                 "datasets or costly machine learning models to fit."
             )
             if "kfolds" in self.conf["splitter"]:
-                logging.warn(
+                logging.warning(
                     "You specified the number of folds using Leave-One-Out (LOO). However, LOO is"
                     " equivalent to K-Fold when K is equal to the number of examples. Therefore, "
                     "the value of 'kfolds' parameter will be ignored in this case."
                 )
             if "stratified" in self.conf["splitter"]:
-                logging.warn(
+                logging.warning(
                     "You specified the 'stratified' parameter using Leave-One-Out (LOO). However," 
                     " the validation folds made by the LOO have only one sample. Therefore, the "
                     "value of 'stratified' parameter will be ignored in this case."
