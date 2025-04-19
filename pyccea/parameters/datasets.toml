@@ -44,6 +44,14 @@ task = "classification"
 file = "har.csv"
 task = "classification"
 
+[itt_f]
+file = "itt_f.csv"
+task = "regression"
+
+[itt_m]
+file = "itt_m.csv"
+task = "regression"
+
 [isolet5]
 file = "isolet5.csv"
 task = "classification"
