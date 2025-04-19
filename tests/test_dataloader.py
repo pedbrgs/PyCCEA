@@ -4,7 +4,9 @@ import logging
 import tempfile
 import numpy as np
 import pandas as pd
+from unittest.mock import patch
 from pyccea.utils.datasets import DataLoader
+from sklearn.model_selection import KFold, LeaveOneOut, StratifiedKFold
 
 
 # Disable logging output during tests
@@ -47,6 +49,14 @@ def test_parse_splitter_parameters_missing_kfolds(complete_data_conf: dict) -> N
         DataLoader("dummy_dataset", complete_data_conf)
 
 
+def test_parse_splitter_parameters_preset_true_and_test_ratio(complete_data_conf: dict) -> None:
+    """Test DataLoader initialization with preset and test ratio."""
+    complete_data_conf["splitter"]["preset"] = True
+    complete_data_conf["splitter"]["test_ratio"] = 0.2
+    dl = DataLoader("dummy_dataset", complete_data_conf)
+    assert dl.test_ratio is None
+
+
 def test_parse_splitter_parameters_missing_test_ratio_and_preset_false(complete_data_conf: dict) -> None:
     """Test DataLoader initialization with missing test ratio when preset is false."""
     complete_data_conf["splitter"]["preset"] = False
@@ -87,11 +97,141 @@ def test_parse_normalization_parameters_method_and_normalize_false(complete_data
         DataLoader("dummy_dataset", complete_data_conf)
 
 
+def test_get_ready_calls_all_methods(mocker, complete_data_conf: dict) -> None:
+    """Test get_ready method when normalize is True."""
+    loader = DataLoader("dummy", complete_data_conf)
+
+    # Mock _load to assign synthetic data
+    def _mock_load():
+        loader.data = pd.DataFrame({
+            0: [1, 2, 3, 4, 5],
+            1: [6, 7, 8, 9, 0],
+            2: [0, 1, 0, 1, 1],
+            3: ["train", "train", "train", "test", "test"]
+        })
+
+    mocker.patch.object(loader, "_load", side_effect=_mock_load)
+
+    # Mock the other methods just to track their calls
+    mocker.patch.object(loader, "_preprocess")
+    mocker.patch.object(loader, "_split")
+    mocker.patch.object(loader, "_normalize_subsets")
+    mocker.patch.object(loader, "_model_selection")
+
+    # Act
+    loader.get_ready()
+
+    # Assert: all methods called once
+    loader._load.assert_called_once()
+    loader._preprocess.assert_called_once()
+    loader._split.assert_called_once()
+    loader._normalize_subsets.assert_called_once()
+    loader._model_selection.assert_called_once()
+
+
+def test_get_ready_without_normalize(mocker, complete_data_conf: dict) -> None:
+    """Test get_ready method when normalize is False."""
+    complete_data_conf["normalization"]["normalize"] = False
+    del complete_data_conf["normalization"]["method"]
+    loader = DataLoader("dummy", complete_data_conf)
+
+    # Mock _load to assign synthetic data
+    def _mock_load():
+        loader.data = pd.DataFrame({
+            0: [1, 2, 3, 4, 5],
+            1: [6, 7, 8, 9, 0],
+            2: [0, 1, 0, 1, 1],
+            3: ["train", "train", "train", "test", "test"]
+        })
+
+    mocker.patch.object(loader, "_load", side_effect=_mock_load)
+
+    # Mock the other methods just to track their calls
+    mocker.patch.object(loader, "_preprocess")
+    mocker.patch.object(loader, "_split")
+    mocker.patch.object(loader, "_normalize_subsets")
+    mocker.patch.object(loader, "_model_selection")
+
+    # Act
+    loader.get_ready()
+
+    # Assert: normalization should NOT be called
+    loader._load.assert_called_once()
+    loader._preprocess.assert_called_once()
+    loader._split.assert_called_once()
+    loader._normalize_subsets.assert_not_called()
+    loader._model_selection.assert_called_once()
+
+
 def test_load_data_invalid_dataset_name(complete_data_conf: dict) -> None:
     """Test DataLoader initialization with an invalid dataset name."""
     with pytest.raises(ValueError):
         dl = DataLoader("invalid_dataset", complete_data_conf)
         dl._load()
+
+
+def test_load_dataset_with_header(monkeypatch, complete_data_conf: dict) -> None:
+    """Test _load reads CSV correctly with header."""
+
+    loader = DataLoader("dummy_dataset", complete_data_conf)
+
+    # Patch os.path.dirname and os.path.join to return a dummy path
+    monkeypatch.setattr("os.path.dirname", lambda _: "/dummy_dir")
+    monkeypatch.setattr("os.path.join", lambda *args: "/dummy_dir/datasets/dummy.csv")
+
+    # Patch DataLoader.DATASETS to simulate dataset file mapping
+    dummy_dataset_info = {"dummy_dataset": {"file": "dummy.csv", "task": "regression"}}
+    with patch.object(DataLoader, "DATASETS", dummy_dataset_info):
+
+        # Mock _check_header to return True
+        monkeypatch.setattr(loader, "_check_header", lambda _: True)
+
+        # Mock pd.read_csv to return a dummy DataFrame
+        dummy_df = pd.DataFrame({
+            "A": [1, 2],
+            "B": [3, 4]
+        })
+
+        with patch("pandas.read_csv", return_value=dummy_df) as mock_read_csv:
+            loader._load()
+
+            # Assert pd.read_csv called with expected args (header=None because _check_header returns True)
+            mock_read_csv.assert_called_once_with("/dummy_dir/datasets/dummy.csv", header=None)
+
+            # Assert the data attribute got assigned
+            pd.testing.assert_frame_equal(loader.data, dummy_df)
+
+
+def test_load_dataset_without_header(monkeypatch, complete_data_conf: dict) -> None:
+    """Test _load reads CSV correctly without header."""
+
+    loader = DataLoader("dummy_dataset", complete_data_conf)
+
+    # Patch os.path.dirname and os.path.join to return a dummy path
+    monkeypatch.setattr("os.path.dirname", lambda _: "/dummy_dir")
+    monkeypatch.setattr("os.path.join", lambda *args: "/dummy_dir/datasets/dummy.csv")
+
+    # Patch DataLoader.DATASETS to simulate dataset file mapping
+    dummy_dataset_info = {"dummy_dataset": {"file": "dummy.csv", "task": "regression"}}
+    with patch.object(DataLoader, "DATASETS", dummy_dataset_info):
+
+        # Mock _check_header to return True
+        monkeypatch.setattr(loader, "_check_header", lambda _: False)
+
+        # Mock pd.read_csv to return a dummy DataFrame
+        dummy_df = pd.DataFrame({
+            "A": [1, 2],
+            "B": [3, 4]
+        })
+
+        with patch("pandas.read_csv", return_value=dummy_df) as mock_read_csv:
+            loader._load()
+
+            # Assert pd.read_csv called with expected args
+            mock_read_csv.assert_called_once_with("/dummy_dir/datasets/dummy.csv")
+
+            # Assert the data attribute got assigned
+            pd.testing.assert_frame_equal(loader.data, dummy_df)
 
 
 def test_check_header_true(complete_data_conf: dict) -> None:
@@ -257,7 +397,7 @@ def test_standard_normalization(complete_data_conf: dict) -> None:
     assert np.allclose(loader.X_train.std(axis=0), np.ones(loader.X_train.shape[1]))
 
 
-def test_kfold_model_selection(monkeypatch, complete_data_conf: dict) -> None:
+def test_stratified_kfold_model_selection(monkeypatch, complete_data_conf: dict) -> None:
     """Test _model_selection with k_fold splitter."""
     complete_data_conf["splitter"]["kfolds"] = 2
     loader = DataLoader("dummy", complete_data_conf)
@@ -269,12 +409,28 @@ def test_kfold_model_selection(monkeypatch, complete_data_conf: dict) -> None:
 
     assert len(loader.train_folds) == loader.kfolds
     assert len(loader.val_folds) == loader.kfolds
+    assert isinstance(loader.splitter, StratifiedKFold)
+
+
+def test_kfold_model_selection(monkeypatch, complete_data_conf: dict) -> None:
+    """Test _model_selection with k_fold splitter."""
+    complete_data_conf["splitter"]["kfolds"] = 2
+    loader = DataLoader("dummy", complete_data_conf)
+    monkeypatch.setitem(DataLoader.DATASETS, "dummy", {"task": "regression"})
+    loader.X_train = np.array([[1], [2], [3], [4], [5], [6]])
+    loader.y_train = np.array([0, 1, 0, 1, 1, 0])
+
+    loader._model_selection()
+
+    assert len(loader.train_folds) == loader.kfolds
+    assert len(loader.val_folds) == loader.kfolds
+    assert isinstance(loader.splitter, KFold)
 
 
 def test_leave_one_out_model_selection(complete_data_conf: dict) -> None:
     """Test _model_selection with leave_one_out splitter."""
     complete_data_conf["splitter"]["kfolds"] = 1
-    complete_data_conf["splitter"]["stratefied"] = False
+    complete_data_conf["splitter"]["stratified"] = False
     complete_data_conf["general"]["splitter_type"] = "leave_one_out"
     loader = DataLoader("dummy", complete_data_conf)
     loader.data = pd.DataFrame({
@@ -293,3 +449,4 @@ def test_leave_one_out_model_selection(complete_data_conf: dict) -> None:
 
     assert len(loader.train_folds) == len(loader.X_train)
     assert len(loader.val_folds) == len(loader.X_train)
+    assert isinstance(loader.splitter, LeaveOneOut)
