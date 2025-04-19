@@ -2,7 +2,7 @@
 
 [coevolution]
 subpop_sizes = [100]
-max_gen = 10000
+max_gen = 5
 max_gen_without_improvement = 100
 optimized_resource_allocation = true
 
@@ -20,7 +20,7 @@ model_type = "k_nearest_neighbors"
 
 [evaluation]
 fitness_function = "penalty"
-eval_function = "accuracy"
+eval_function = "balanced_accuracy"
 eval_mode = "k_fold"
 weights = [1.00, 0.00]
 
