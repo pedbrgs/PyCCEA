@@ -32,6 +32,10 @@ task = "classification"
 file = "dlbcl.parquet"
 task = "classification"
 
+[dorothea]
+file = "dorothea.parquet"
+task = "classification"
+
 [gfe]
 file = "gfe.parquet"
 task = "classification"
