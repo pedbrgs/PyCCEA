@@ -74,7 +74,6 @@ def test_regression_metrics() -> None:
         "mae": 0.6,
         "mse": 0.472,
         "rmse": 0.687,
-        "r2": 0.9229,
         "mape": 31.8571
     }
 
@@ -115,5 +114,4 @@ def test_regression_metrics_verbose_output(caplog) -> None:
         assert "MAE" in caplog.text
         assert "MSE" in caplog.text
         assert "RMSE" in caplog.text
-        assert "R2" in caplog.text
         assert "MAPE" in caplog.text

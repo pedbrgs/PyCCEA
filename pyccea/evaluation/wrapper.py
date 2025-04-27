@@ -3,10 +3,11 @@ import logging
 import warnings
 import numpy as np
 from ..utils.datasets import DataLoader
-from ..utils.models import ClassificationModel
-from ..utils.metrics import ClassificationMetrics
+from ..utils.models import ClassificationModel, RegressionModel
+from ..utils.metrics import ClassificationMetrics, RegressionMetrics
 
 warnings.filterwarnings(action="ignore", category=UserWarning, message="y_pred contains classes")
+
 
 class WrapperEvaluation():
     """Evaluate selected features based on the predictive performance of a machine learning model.
@@ -26,8 +27,8 @@ class WrapperEvaluation():
         and k when 'eval_mode' is set to "k_fold" or "leave_one_out".
     """
 
-    models = {"classification": ClassificationModel}
-    metrics = {"classification": ClassificationMetrics}
+    models = {"classification": ClassificationModel, "regression": RegressionModel}
+    metrics = {"classification": ClassificationMetrics, "regression": RegressionMetrics}
     eval_modes = ["hold_out", "k_fold", "leave_one_out"]
 
     def __init__(
@@ -59,8 +60,13 @@ class WrapperEvaluation():
                 f"Task '{task}' is not implemented. "
                 f"The available tasks are {', '.join(WrapperEvaluation.metrics.keys())}."
             )
-        # Initialize the model evaluator
-        self.model_evaluator = WrapperEvaluation.metrics[task](n_classes=n_classes)
+        # Initialize the model evaluator according to the task
+        task_kwargs = {
+            "classification": {"n_classes": n_classes},
+            "regression": {},
+        }
+        self.model_evaluator = WrapperEvaluation.metrics[task](**task_kwargs[task])
+        self.task = task
         # Check if the chosen evaluation function is available
         if not eval_function in self.model_evaluator.metrics:
             raise NotImplementedError(

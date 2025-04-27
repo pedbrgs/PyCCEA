@@ -54,5 +54,9 @@ class SubsetSizePenalty(WrapperFitnessFunction):
         penalty = context_vector.sum()/data.n_features
         evaluations = self._evaluate_predictive_performance(context_vector, data)
         evaluation = evaluations[self.evaluator.eval_function]
-        fitness = self.w1*evaluation - self.w2*penalty
+        # Since we are maximizing:
+        # - For regression: invert the evaluation (lower error is better)
+        # - For classification: use evaluation directly (higher accuracy is better)
+        sign = -1 if self.evaluator.task == "regression" else 1
+        fitness = sign * self.w1 * evaluation - self.w2 * penalty
         return fitness

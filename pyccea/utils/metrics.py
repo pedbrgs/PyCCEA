@@ -10,7 +10,6 @@ from sklearn.metrics import (
     mean_absolute_percentage_error,
     mean_squared_error,
     precision_score,
-    r2_score,
     recall_score
 )
 
@@ -31,8 +30,6 @@ class RegressionMetrics():
         "mse",
         # Root mean squared error
         "rmse",
-        # R-squared score
-        "r2",
         # Mean absolute percentage error
         "mape",
     ]
@@ -68,7 +65,6 @@ class RegressionMetrics():
         self.values["mae"] = round(mean_absolute_error(y_test, y_pred), 4)
         self.values["mse"] = round(mean_squared_error(y_test, y_pred), 4)
         self.values["rmse"] = round(mean_squared_error(y_test, y_pred, squared=False), 4)
-        self.values["r2"] = round(r2_score(y_test, y_pred), 4)
         self.values["mape"] = round(mean_absolute_percentage_error(y_test, y_pred) * 100, 4)
 
         # Show evaluation metrics
@@ -77,7 +73,6 @@ class RegressionMetrics():
             logging.info(f"MAE: {self.values['mae']}")
             logging.info(f"MSE: {self.values['mse']}")
             logging.info(f"RMSE: {self.values['rmse']}")
-            logging.info(f"R2: {self.values['r2']}")
             logging.info(f"MAPE: {self.values['mape']}%")
 
 

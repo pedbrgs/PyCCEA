@@ -110,9 +110,13 @@ class DistanceBasedFitness(WrapperFitnessFunction):
         evaluations = self._evaluate_predictive_performance(context_vector, data)
         evaluation = evaluations[self.evaluator.eval_function]
         mean_avg_distance_same_label, mean_avg_distance_diff_label = self._compute_distances(data)
+        # Since we are maximizing:
+        # - For regression: invert the evaluation (lower error is better)
+        # - For classification: use evaluation directly (higher accuracy is better)
+        sign = -1 if self.evaluator.task == "regression" else 1
         fitness = (
-            self.w1*evaluation +
-            self.w2*(mean_avg_distance_diff_label/sqrt_n_selected_features) +
-            self.w3*(1-(mean_avg_distance_same_label/sqrt_n_selected_features))
+            sign * self.w1 * evaluation +
+            self.w2 * (mean_avg_distance_diff_label/sqrt_n_selected_features) +
+            self.w3 * (1 - (mean_avg_distance_same_label/sqrt_n_selected_features))
         )
         return fitness
