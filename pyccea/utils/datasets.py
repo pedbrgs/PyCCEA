@@ -192,23 +192,6 @@ class DataLoader():
             self._normalize_subsets()
         self._model_selection()
 
-    def _check_header(self, file: str) -> bool:
-        """Check if a CSV file has a header.
-
-        Parameters
-        ----------
-        file : str
-            Name of the CSV file.
-
-        Returns
-        -------
-        has_header : bool
-            True if file has a header.
-        """
-        data = pd.read_csv(file, header=None, nrows=1)
-        has_header = data.dtypes.nunique() != 1
-        return has_header
-
     def _load(self) -> None:
         """Load dataset according to dataset given as a parameter."""
         try:
@@ -222,10 +205,7 @@ class DataLoader():
             )
         # Load dataset
         logging.info(f"Dataset: {self.dataset}")
-        if self._check_header(path):
-            self.data = pd.read_csv(path, header=None)
-        else:
-            self.data = pd.read_csv(path)
+        self.data = pd.read_parquet(path)
 
     def _get_input(self) -> pd.DataFrame:
         """Get the input data X from the dataset.

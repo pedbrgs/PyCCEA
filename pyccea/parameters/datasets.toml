@@ -1,117 +1,117 @@
 # This file specifies the datasets
 
 [11_tumor]
-file = "11_tumor.csv"
+file = "11_tumor.parquet"
 task = "classification"
 
 [9_tumor]
-file = "9_tumor.csv"
+file = "9_tumor.parquet"
 task = "classification"
 
 [brain_tumor_1]
-file = "brain_tumor_1.csv"
+file = "brain_tumor_1.parquet"
 task = "classification"
 
 [brain_tumor_2]
-file = "brain_tumor_2.csv"
+file = "brain_tumor_2.parquet"
 task = "classification"
 
 [cbd]
-file = "cbd.csv"
+file = "cbd.parquet"
 task = "classification"
 
 [dermatology]
-file = "dermatology.csv"
+file = "dermatology.parquet"
 task = "classification"
 
 [divorce]
-file = "divorce.csv"
+file = "divorce.parquet"
 task = "classification"
 
 [dlbcl]
-file = "dlbcl.csv"
+file = "dlbcl.parquet"
 task = "classification"
 
 [gfe]
-file = "gfe.csv"
+file = "gfe.parquet"
 task = "classification"
 
 [hapt]
-file = "hapt.csv"
+file = "hapt.parquet"
 task = "classification"
 
 [har]
-file = "har.csv"
+file = "har.parquet"
 task = "classification"
 
 [itt_f]
-file = "itt_f.csv"
+file = "itt_f.parquet"
 task = "regression"
 
 [itt_m]
-file = "itt_m.csv"
+file = "itt_m.parquet"
 task = "regression"
 
 [isolet5]
-file = "isolet5.csv"
+file = "isolet5.parquet"
 task = "classification"
 
 [leukemia_1]
-file = "leukemia_1.csv"
+file = "leukemia_1.parquet"
 task = "classification"
 
 [leukemia_2]
-file = "leukemia_2.csv"
+file = "leukemia_2.parquet"
 task = "classification"
 
 [leukemia_3]
-file = "leukemia_3.csv"
+file = "leukemia_3.parquet"
 task = "classification"
 
 [libras]
-file = "libras.csv"
+file = "libras.parquet"
 task = "classification"
 
 [lsvt]
-file = "lsvt.csv"
+file = "lsvt.parquet"
 task = "classification"
 
 [lungc]
-file = "lungc.csv"
+file = "lungc.parquet"
 task = "classification"
 
 [madelon_valid]
-file = "madelon_valid.csv"
+file = "madelon_valid.parquet"
 task = "classification"
 
 [mfd]
-file = "mfd.csv"
+file = "mfd.parquet"
 task = "classification"
 
 [orh]
-file = "orh.csv"
+file = "orh.parquet"
 task = "classification"
 
 [prostate_tumor_1]
-file = "prostate_tumor_1.csv"
+file = "prostate_tumor_1.parquet"
 task = "classification"
 
 [qsar_toxicity]
-file = "qsar_oral_toxicity.csv"
+file = "qsar_oral_toxicity.parquet"
 task = "classification"
 
 [scadi]
-file = "scadi.csv"
+file = "scadi.parquet"
 task = "classification"
 
 [shd]
-file = "shd.csv"
+file = "shd.parquet"
 task = "classification"
 
 [uji_indoor]
-file = "uji_indoor_loc.csv"
+file = "uji_indoor_loc.parquet"
 task = "classification"
 
 [wdbc]
-file = "wdbc.csv"
+file = "wdbc.parquet"
 task = "classification"

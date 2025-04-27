@@ -170,97 +170,33 @@ def test_load_data_invalid_dataset_name(complete_data_conf: dict) -> None:
         dl._load()
 
 
-def test_load_dataset_with_header(monkeypatch, complete_data_conf: dict) -> None:
-    """Test _load reads CSV correctly with header."""
+def test_load_dataset(monkeypatch, complete_data_conf: dict) -> None:
+    """Test _load reads PARQUET correctly."""
 
     loader = DataLoader("dummy_dataset", complete_data_conf)
 
     # Patch os.path.dirname and os.path.join to return a dummy path
     monkeypatch.setattr("os.path.dirname", lambda _: "/dummy_dir")
-    monkeypatch.setattr("os.path.join", lambda *args: "/dummy_dir/datasets/dummy.csv")
+    monkeypatch.setattr("os.path.join", lambda *args: "/dummy_dir/datasets/dummy.parquet")
 
     # Patch DataLoader.DATASETS to simulate dataset file mapping
-    dummy_dataset_info = {"dummy_dataset": {"file": "dummy.csv", "task": "regression"}}
+    dummy_dataset_info = {"dummy_dataset": {"file": "dummy.parquet", "task": "regression"}}
     with patch.object(DataLoader, "DATASETS", dummy_dataset_info):
 
-        # Mock _check_header to return True
-        monkeypatch.setattr(loader, "_check_header", lambda _: True)
-
-        # Mock pd.read_csv to return a dummy DataFrame
+        # Mock pd.read_parquet to return a dummy DataFrame
         dummy_df = pd.DataFrame({
             "A": [1, 2],
             "B": [3, 4]
         })
 
-        with patch("pandas.read_csv", return_value=dummy_df) as mock_read_csv:
+        with patch("pandas.read_parquet", return_value=dummy_df) as mock_read_parquet:
             loader._load()
 
-            # Assert pd.read_csv called with expected args (header=None because _check_header returns True)
-            mock_read_csv.assert_called_once_with("/dummy_dir/datasets/dummy.csv", header=None)
+            # Assert pd.read_parquet called
+            mock_read_parquet.assert_called_once_with("/dummy_dir/datasets/dummy.parquet")
 
             # Assert the data attribute got assigned
             pd.testing.assert_frame_equal(loader.data, dummy_df)
-
-
-def test_load_dataset_without_header(monkeypatch, complete_data_conf: dict) -> None:
-    """Test _load reads CSV correctly without header."""
-
-    loader = DataLoader("dummy_dataset", complete_data_conf)
-
-    # Patch os.path.dirname and os.path.join to return a dummy path
-    monkeypatch.setattr("os.path.dirname", lambda _: "/dummy_dir")
-    monkeypatch.setattr("os.path.join", lambda *args: "/dummy_dir/datasets/dummy.csv")
-
-    # Patch DataLoader.DATASETS to simulate dataset file mapping
-    dummy_dataset_info = {"dummy_dataset": {"file": "dummy.csv", "task": "regression"}}
-    with patch.object(DataLoader, "DATASETS", dummy_dataset_info):
-
-        # Mock _check_header to return True
-        monkeypatch.setattr(loader, "_check_header", lambda _: False)
-
-        # Mock pd.read_csv to return a dummy DataFrame
-        dummy_df = pd.DataFrame({
-            "A": [1, 2],
-            "B": [3, 4]
-        })
-
-        with patch("pandas.read_csv", return_value=dummy_df) as mock_read_csv:
-            loader._load()
-
-            # Assert pd.read_csv called with expected args
-            mock_read_csv.assert_called_once_with("/dummy_dir/datasets/dummy.csv")
-
-            # Assert the data attribute got assigned
-            pd.testing.assert_frame_equal(loader.data, dummy_df)
-
-
-def test_check_header_true(complete_data_conf: dict) -> None:
-    """Test _check_header returns True when CSV has a header."""
-    csv_content = "col1,1,col3\n1,2,3\n"
-    with tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix=".csv") as tmp:
-        tmp.write(csv_content)
-        tmp.flush()
-        tmp_path = tmp.name
-
-    loader = DataLoader("dummy", complete_data_conf)
-    assert loader._check_header(tmp_path) is True
-
-    os.remove(tmp_path)
-
-
-def test_check_header_false(complete_data_conf: dict) -> None:
-    """Test _check_header returns False when CSV has no header."""
-    csv_content = "1,2,3\n4,5,6\n"
-    with tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix=".csv") as tmp:
-        tmp.write(csv_content)
-        tmp.flush()
-        tmp_path = tmp.name
-
-    loader = DataLoader("dummy", complete_data_conf)
-    logging.warning(loader._check_header(tmp_path))
-    assert loader._check_header(tmp_path) is False
-
-    os.remove(tmp_path)
 
 
 def test_get_input_and_output(complete_data_conf: dict) -> None:
