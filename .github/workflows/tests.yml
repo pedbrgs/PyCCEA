@@ -25,7 +25,7 @@ jobs:
           pip install pytest pytest-cov codecov
 
       - name: Run tests with coverage
-        run: pytest --cov=pyccea/utils --cov=pyccea/coevolution --cov=pyccea/cooperation --cov-report=xml
+        run: pytest --cov=pyccea/utils --cov=pyccea/coevolution --cov=pyccea/cooperation
 
       - name: Upload coverage report to Codecov
         uses: codecov/codecov-action@v4
