@@ -1,4 +1,5 @@
 import pytest
+import numpy as np
 from sklearn.datasets import make_classification, make_regression
 
 
@@ -36,3 +37,45 @@ def regression_data():
         random_state=42
     )
     return X, y
+
+
+@pytest.fixture
+def generation():
+    """Fixture for subpopulations."""
+    # Current subpopulation is the subpopulation after evolve
+    current_subpops = [
+        np.array([np.array([1, 1, 0, 0, 1]), np.array([0, 0, 0, 1, 0])]),
+        np.array([np.array([1, 1])]),
+        np.array([np.array([1, 1, 0]), np.array([1, 0, 1]), np.array([0, 1, 1])])
+    ]
+    # Previous subpopulation is the subpopulation before evolve (already evaluated)
+    previous_subpops = [
+        np.array([np.array([0, 1, 0, 1, 1]), np.array([1, 0, 1, 1, 0])]),
+        np.array([np.array([1, 0])]),
+        np.array([np.array([1, 0, 1]), np.array([0, 1, 1]), np.array([0, 0, 1])])
+    ]
+    # Fitness values of the individuals in the previous subpopulations
+    fitness = [
+        [0.63, 0.86],
+        [0.31],
+        [0.44, 0.15, 0.81]
+    ]
+    # Best individuals and context vectors related to the previous subpopulations
+    current_best = {
+        0: {
+            "individual": np.array([1, 0, 1, 1, 0]),
+            "context_vector": np.array([1, 0, 1, 1, 0, 1, 1, 0, 0, 1]),
+            "fitness": 0.86
+        },
+        1: {
+            "individual": np.array([1, 0]),
+            "context_vector": np.array([0, 0, 1, 1, 1, 1, 0, 1, 0, 1]),
+            "fitness": 0.31
+        },
+        2: {
+            "individual": np.array([0, 0, 1]),
+            "context_vector": np.array([0, 1, 1, 0, 1, 0, 1, 0, 0, 1]),
+            "fitness": 0.81
+        }
+    }
+    return current_subpops, fitness, current_best, previous_subpops
