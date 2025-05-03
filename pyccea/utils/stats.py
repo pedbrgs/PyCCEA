@@ -63,12 +63,15 @@ def statistical_comparison_between_independent_samples(
         or 'less'.
     """
 
+    if alternative not in ["two-sided", "greater", "less"]:
+        raise ValueError("Alternative hypothesis must be 'two-sided', 'greater', or 'less'.")
+
     logging.info(f"Sample sizes: x: {len(x)}, y: {len(y)}")
 
     if len(x) < 3:
-        logging.info(f"1st sample has only {len(x)} observation(s).")
+        raise ValueError(f"1st sample has only {len(x)} observation(s).")
     if len(y) < 3:
-        logging.info(f"2nd sample has only {len(y)} observation(s).")
+        raise ValueError(f"2nd sample has only {len(y)} observation(s).")
     logging.info("")
     if len(x) >= 3 and len(y) >= 3:
 
