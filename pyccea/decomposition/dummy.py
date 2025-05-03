@@ -13,35 +13,29 @@ class DummyFeatureGrouping(FeatureGrouping):
         """
         Parameters
         ----------
-        n_subcomps: int
+        n_subcomps : int
             Number of subcomponents, where each subcomponent is a subset of features.
-        subcomp_sizes: list
+        subcomp_sizes : list
             Number of features in each subcomponent.
-        scores: np.ndarray
-            Scores relative to the features and that allows sorting them by priority.
-        method: str
-            Grouping method used to decompose the problem according to scores.
-        ascending: bool, default True
-            If True, sort in ascending order. Otherwise, sort in descending order.
+        feature_idxs : np.ndarray
+            Indexes of features sorted according to a predetermined method.
         """
         self.feature_idxs = feature_idxs.copy()
 
-    def decompose(self, X: np.ndarray, feature_idxs: np.ndarray = None):
+    def decompose(self, X: np.ndarray):
         """Divide an n-dimensional problem into m subproblems.
 
         Parameters
         ----------
         X: np.ndarray
             n-dimensional input data.
-        feature_idxs: np.ndarray, default None
-            Indexes of features sorted according to a predetermined method.
 
         Returns
         -------
-        subcomponents: list
+        subcomponents : list
             Subcomponents, where each subcomponent is an array that can be accessed by indexing
             the list.
-        feature_idxs: np.ndarray, default None
+        feature_idxs : np.ndarray, default None
             Indexes of features sorted according to a predetermined method.
         """
         # Shuffle the data features according to the indexes
