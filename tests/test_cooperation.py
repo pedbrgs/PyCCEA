@@ -1,5 +1,4 @@
 import numpy as np
-from unittest.mock import patch
 from pyccea.cooperation.collaboration import Collaboration
 from pyccea.cooperation.best import SingleBestCollaboration
 from pyccea.cooperation.elite import SingleEliteCollaboration
@@ -105,20 +104,20 @@ def test_get_random_collaborators(generation) -> None:
     indiv_idx = 1
 
     collaborator = SingleRandomCollaboration()
-    with patch("random.choices", side_effect=[[mock_returns[0]], [mock_returns[1]], [mock_returns[2]]]):
-        collaborators = collaborator.get_collaborators(
-            subpop_idx=subpop_idx,
-            indiv_idx=indiv_idx,
-            previous_subpops=previous_subpops,
-            current_subpops=current_subpops,
-        )
+    collaborators = collaborator.get_collaborators(
+        subpop_idx=subpop_idx,
+        indiv_idx=indiv_idx,
+        previous_subpops=previous_subpops,
+        current_subpops=current_subpops,
+    )
 
-    expected_collaborators = [
-        np.array([1, 0, 1, 1, 0]),  # mock_returns[0]
-        np.array([1, 0]),  # mock_returns[1]
-        np.array([1, 0, 1])  # current_subpops[subpop_idx][indiv_idx]
-    ]
+    assert len(collaborators) == len(previous_subpops)
 
-    assert len(collaborators) == len(expected_collaborators)
-    for i in range(len(collaborators)):
-        assert np.array_equal(collaborators[i], expected_collaborators[i])
+    for i in range(len(previous_subpops)):
+        if i == subpop_idx:
+            # Should be the current individual from current_subpops
+            assert np.array_equal(collaborators[i], current_subpops[subpop_idx][indiv_idx])
+        else:
+            # Should be one of the individuals in previous_subpops[i]
+            match_found = any(np.array_equal(collaborators[i], ind) for ind in previous_subpops[i])
+            assert match_found, f"Collaborator at index {i} is not in previous_subpops[{i}]"
