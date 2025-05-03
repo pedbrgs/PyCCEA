@@ -1,8 +1,10 @@
 import numpy as np
-from pyccea.cooperation.collaboration import Collaboration
-from pyccea.cooperation.best import SingleBestCollaboration
-from pyccea.cooperation.elite import SingleEliteCollaboration
-from pyccea.cooperation.random import SingleRandomCollaboration
+from pyccea.cooperation import (
+    Collaboration,
+    SingleBestCollaboration,
+    SingleEliteCollaboration,
+    SingleRandomCollaboration
+)
 
 
 def test_build_context_vector_concatenates_correctly() -> None:
