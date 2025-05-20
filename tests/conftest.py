@@ -109,3 +109,19 @@ def dummy_dataloader():
     data_loader = MagicMock(spec=DataLoader)
     data_loader.n_features = 10
     return data_loader
+
+
+@pytest.fixture
+def dummy_collaborator():
+    """Fixture for a dummy collaborator."""
+    from pyccea.cooperation import Collaboration
+    collaborator = MagicMock(spec=Collaboration)
+    return collaborator
+
+
+@pytest.fixture
+def dummy_fitness_function():
+    """Fixture for a dummy fitness function."""
+    from pyccea.fitness import WrapperFitnessFunction
+    fitness_function = MagicMock(spec=WrapperFitnessFunction)
+    return fitness_function
