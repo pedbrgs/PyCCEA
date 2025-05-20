@@ -54,7 +54,7 @@ class DistanceBasedFitness(WrapperFitnessFunction):
         avg_distances_diff_label = list()
 
         # If no feature is selected, no estimator has been trained
-        if self.evaluator.estimators:
+        if not self.evaluator.estimators:
             return 0, 0
 
         # For all estimator
@@ -79,7 +79,7 @@ class DistanceBasedFitness(WrapperFitnessFunction):
                 # Neighbors with different labels
                 diff_label_indices = np.where(data.y_train[indices[i]] != data.y_train[i])[0]
                 sum_ith_distance_diff_label = np.sum(distances[i][diff_label_indices])
-                n_neighbors_diff_label += len(diff_label_indices) - 1
+                n_neighbors_diff_label += len(diff_label_indices)
                 sum_distances_diff_label.append(sum_ith_distance_diff_label)
             # Average distances for each estimator
             avg_distances_same_label.append(np.sum(sum_distances_same_label)/n_neighbors_same_label)

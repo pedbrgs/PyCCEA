@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+from unittest.mock import MagicMock
 from sklearn.datasets import make_classification, make_regression
 
 
@@ -79,3 +80,32 @@ def generation():
         }
     }
     return current_subpops, fitness, current_best, previous_subpops
+
+
+@pytest.fixture
+def dummy_classification_evaluator():
+    """Fixture for a dummy classification evaluator."""
+    from pyccea.evaluation.wrapper import WrapperEvaluation
+    evaluator = MagicMock(spec=WrapperEvaluation)
+    evaluator.task = "classification"
+    evaluator.eval_function = "accuracy"
+    return evaluator
+
+
+@pytest.fixture
+def dummy_regression_evaluator():
+    """Fixture for a dummy regression evaluator."""
+    from pyccea.evaluation.wrapper import WrapperEvaluation
+    evaluator = MagicMock(spec=WrapperEvaluation)
+    evaluator.task = "regression"
+    evaluator.eval_function = "mse"
+    return evaluator
+
+
+@pytest.fixture
+def dummy_dataloader():
+    """Fixture for a dummy DataLoader."""
+    from pyccea.utils.datasets import DataLoader
+    data_loader = MagicMock(spec=DataLoader)
+    data_loader.n_features = 10
+    return data_loader
