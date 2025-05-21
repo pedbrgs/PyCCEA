@@ -138,6 +138,8 @@ def optimizer_config():
             "selection_method": "generational",
             "tournament_sample_size": 1,
             "elite_size": 1,
+            "crossover_probability": 0.9,
+            "scaling_factor": 0.5
         },
         "coevolution": {
             "subpop_sizes": [30],

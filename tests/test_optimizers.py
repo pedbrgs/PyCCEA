@@ -305,3 +305,214 @@ def test_binary_genetic_algorithm_steady_state_evolve(monkeypatch, optimizer_con
     assert uniform_calls["count"] == 4  # 2 per offspring (crossover + mutation), 2 offspring
 
 
+def test_differential_evolution_initialization(optimizer_config, dummy_dataloader) -> None:
+    """Test the initialization of the DifferentialEvolution class."""
+    optimizer_config["optimizer"]["method"] = "DE"
+    optimizer = DifferentialEvolution(
+        subpop_size=optimizer_config["coevolution"]["subpop_sizes"][0],
+        n_features=dummy_dataloader.n_features,
+        conf=optimizer_config
+    )
+    # Check that the attributes are set correctly
+    assert optimizer.n_features == dummy_dataloader.n_features
+    assert optimizer.subpop_size == optimizer_config["coevolution"]["subpop_sizes"][0]
+    assert optimizer.scaling_factor == optimizer_config["optimizer"]["scaling_factor"]
+    assert optimizer.crossover_probability == optimizer_config["optimizer"]["crossover_probability"]
+
+
+def test_differential_evolution_invalid_initialization(optimizer_config, dummy_dataloader) -> None:
+    """Test the invalid initialization of the DifferentialEvolution class."""
+    optimizer_config["optimizer"]["method"] = "DE"
+    # Test with invalid scaling factor
+    with pytest.raises(ValueError):
+        DifferentialEvolution(
+            subpop_size=optimizer_config["coevolution"]["subpop_sizes"][0],
+            n_features=dummy_dataloader.n_features,
+            conf={"optimizer": {**optimizer_config["optimizer"], "scaling_factor": 3}}
+        )
+    # Test with invalid crossover probability
+    with pytest.raises(ValueError):
+        DifferentialEvolution(
+            subpop_size=optimizer_config["coevolution"]["subpop_sizes"][0],
+            n_features=dummy_dataloader.n_features,
+            conf={"optimizer": {**optimizer_config["optimizer"], "crossover_probability": -0.1}}
+        )
+    # Test with invalid subpopulation size
+    with pytest.raises(ValueError):
+        DifferentialEvolution(
+            subpop_size=3,
+            n_features=dummy_dataloader.n_features,
+            conf=optimizer_config
+        )
+
+
+def test_select_solutions(optimizer_config) -> None:
+    """Test the _select_solutions method of the DifferentialEvolution class."""
+    optimizer_config["optimizer"]["method"] = "DE"
+    optimizer = DifferentialEvolution(
+        subpop_size=5,
+        n_features=3,
+        conf=optimizer_config
+    )
+    # Create a population with 5 individuals
+    population = np.array([
+        [1.5, 0.2, 1.0],
+        [0.1, 1.0, 0.5],
+        [1.0, 0.5, 0.2],
+        [0.3, -0.8, 1.2],
+        [-1.2, 0.4, 0.9]
+    ])
+    target_vector_idx = 2
+    selected_solutions = optimizer._select_solutions(population, target_vector_idx)
+    # Check that the selected solutions are different from the target vector
+    for solution in selected_solutions:
+        assert not np.array_equal(solution, population[target_vector_idx])
+    # Check that the selected solutions are different from each other
+    for i in range(len(selected_solutions)):
+        for j in range(i + 1, len(selected_solutions)):
+            assert not np.array_equal(selected_solutions[i], selected_solutions[j])
+
+
+def test_mutation_differential_evolution(monkeypatch, optimizer_config) -> None:
+    """Test the _mutation method of the DifferentialEvolution class with controlled selection."""
+    optimizer_config["optimizer"]["method"] = "DE"
+    optimizer_config["optimizer"]["scaling_factor"] = 0.5
+    optimizer = DifferentialEvolution(
+        subpop_size=5,
+        n_features=3,
+        conf=optimizer_config
+    )
+    # Create a population with 5 individuals
+    population = np.array([
+        [1.0, 2.0, 3.0],
+        [4.0, 5.0, 6.0],
+        [7.0, 8.0, 9.0],
+        [10.0, 11.0, 12.0],
+        [13.0, 14.0, 15.0]
+    ])
+    target_vector_idx = 0
+
+    # Mock _select_solutions to return fixed individuals
+    def fake_select_solutions(pop, idx):
+        # Return individuals 1, 2, 3 for reproducibility
+        return np.array([population[1], population[2], population[3]])
+    monkeypatch.setattr(optimizer, "_select_solutions", fake_select_solutions)
+
+    donor_vector = optimizer._mutation(population, target_vector_idx)
+    # donor_vector = indiv_1 + F * (indiv_2 - indiv_3)
+    # = [4,5,6] + 0.5 * ([7,8,9] - [10,11,12])
+    expected_donor_vector = np.array([2.5, 3.5, 4.5])
+    assert np.allclose(donor_vector, expected_donor_vector)
+
+
+def test_exponential_crossover(monkeypatch, optimizer_config):
+    """Test the _exponential_crossover method of the DifferentialEvolution class with mocked randomness."""
+    optimizer_config["optimizer"]["method"] = "DE"
+    optimizer_config["optimizer"]["crossover_probability"] = 0.7
+    optimizer = DifferentialEvolution(
+        subpop_size=5,
+        n_features=4,
+        conf=optimizer_config
+    )
+    target_vector = np.array([1.0, 2.0, 3.0, 4.0])
+    donor_vector = np.array([10.0, 20.0, 30.0, 40.0])
+
+    # Mock np.random.choice to always start at index 1
+    start_index = 1
+    monkeypatch.setattr("numpy.random.choice", lambda a: start_index)
+    # Mock np.random.uniform to control crossover: first two <= 0.7, then > 0.7
+    crossover_probs = [0.5, 0.6, 0.8]  # Will cross first two, then stop
+    def fake_uniform():
+        return crossover_probs.pop(0)
+    monkeypatch.setattr("numpy.random.uniform", fake_uniform)
+
+    trial_vector = optimizer._exponential_crossover(target_vector, donor_vector)
+    expected_trial_vector = np.array([1.0, 20.0, 30.0, 40.0])
+    assert np.allclose(trial_vector, expected_trial_vector)
+
+
+def test_apply_boundary_constraints(optimizer_config) -> None:
+    """Test the _apply_boundary_constraints method of the DifferentialEvolution class."""
+    optimizer_config["optimizer"]["method"] = "DE"
+    optimizer = DifferentialEvolution(
+        subpop_size=4,
+        n_features=3,
+        conf=optimizer_config
+    )
+    # Create trial vectors with values outside the bounds
+    trial_vectors = np.array([
+        [1.5, 0.0, -2.0],
+        [-1.5, 2.0, 0.5],
+        [0.8, -1.2, 1.2],
+        [2.0, 0.5, -1.5]
+    ])
+    # Apply boundary constraints (assuming bounds are (0.0, 1.0))
+    constrained = optimizer._apply_boundary_constraints(trial_vectors)
+    expected = np.array([
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.5],
+        [0.8, 0.0, 1.0],
+        [1.0, 0.5, 0.0]
+    ])
+    assert np.allclose(constrained, expected)
+
+
+def test_differential_evolution_evolve(monkeypatch, optimizer_config) -> None:
+    """Test the evolve method of the DifferentialEvolution class."""
+    optimizer_config["optimizer"]["method"] = "DE"
+    subpop_size = 4
+    optimizer = DifferentialEvolution(
+        subpop_size=subpop_size,
+        n_features=3,
+        conf=optimizer_config
+    )
+    # Create a subpopulation and fitness
+    subpop = np.array([
+        [1.0, 2.0, 3.0],
+        [4.0, 5.0, 6.0],
+        [7.0, 8.0, 9.0],
+        [10.0, 11.0, 12.0]
+    ])
+    fitness = [0.5, 0.2, 0.8, 0.1]
+
+    # Call counters
+    mutation_calls = {"count": 0}
+    crossover_calls = {"count": 0}
+    apply_boundary_calls = {"count": 0}
+
+    def fake_mutation(*args, **kwargs):
+        mutation_calls["count"] += 1
+        return np.array([2.5, 3.5, 4.5])
+    monkeypatch.setattr(optimizer, "_mutation", fake_mutation)
+
+    def fake_exponential_crossover(*args, **kwargs):
+        crossover_calls["count"] += 1
+        return np.array([1.0, 20.0, 30.0])
+    monkeypatch.setattr(optimizer, "_exponential_crossover", fake_exponential_crossover)
+
+    # Mock _apply_boundary_constraints to just return the input as np.array
+    def fake_apply_boundary_constraints(trial_vectors):
+        apply_boundary_calls["count"] += 1
+        return np.array(trial_vectors)
+    monkeypatch.setattr(optimizer, "_apply_boundary_constraints", fake_apply_boundary_constraints)
+
+    # Run evolve
+    new_subpop = optimizer.evolve(subpop, fitness)
+
+    # Check shape and type
+    assert isinstance(new_subpop, np.ndarray)
+    assert new_subpop.shape == subpop.shape
+
+    # Check that all individuals are the mocked trial vector
+    expected = np.array([
+        [1.0, 20.0, 30.0],
+        [1.0, 20.0, 30.0],
+        [1.0, 20.0, 30.0],
+        [1.0, 20.0, 30.0]
+    ])
+    assert np.allclose(new_subpop, expected)
+
+    # Assert the number of calls
+    assert mutation_calls["count"] == subpop_size
+    assert crossover_calls["count"] == subpop_size
+    assert apply_boundary_calls["count"] == 1
