@@ -125,3 +125,22 @@ def dummy_fitness_function():
     from pyccea.fitness import WrapperFitnessFunction
     fitness_function = MagicMock(spec=WrapperFitnessFunction)
     return fitness_function
+
+
+@pytest.fixture
+def optimizer_config():
+    """Fixture for optimizer configuration."""
+    return {
+        "optimizer": {
+            "method": "GA",
+            "mutation_rate": 0.05,
+            "crossover_rate": 1.00,
+            "selection_method": "generational",
+            "tournament_sample_size": 1,
+            "elite_size": 1,
+        },
+        "coevolution": {
+            "subpop_sizes": [30],
+            "n_subcomps": 4
+        }
+    }

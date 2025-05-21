@@ -56,6 +56,12 @@ class BinaryGeneticAlgorithm():
                 f"Population selection method '{self.selection_method}' was not found. "
                 f"The available methods are {', '.join(BinaryGeneticAlgorithm.selection_methods)}."
             )
+        # Check if the mutation rate is in the range [0, 1]
+        if self.mutation_rate < 0 or self.mutation_rate > 1:
+            raise ValueError("Mutation rate should be in the range [0, 1].")
+        # Check if the crossover rate is in the range [0, 1]
+        if self.crossover_rate < 0 or self.crossover_rate > 1:
+            raise ValueError("Crossover rate should be in the range [0, 1].")
         # Elite size
         self.elite_size = self.conf["optimizer"].get("elite_size")
         # Number of features
