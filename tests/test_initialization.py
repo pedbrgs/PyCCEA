@@ -148,3 +148,115 @@ def test_evaluate_individuals(
         assert len(instance.fitness[i]) == len(subpop)
         # Fitness values should be what dummy_fitness_function.evaluate returns (42.0)
         assert all(f == fitness_value for f in instance.fitness[i])
+
+
+def test_subpopulation_initialization_abstract_methods(
+        dummy_collaborator,
+        dummy_fitness_function,
+        dummy_dataloader
+    ) -> None:
+
+    class DummySubpopInit(SubpopulationInitialization):
+        # Override abstract methods but call super() to test base implementation
+        def _get_subpop(self, subcomp_size, subpop_size):
+            return super()._get_subpop(subcomp_size, subpop_size)
+
+        def _build_context_vector(self, subpop_idx, indiv_idx, subpops):
+            return super()._build_context_vector(subpop_idx, indiv_idx, subpops)
+
+    instance = DummySubpopInit(
+        data=dummy_dataloader,
+        subcomp_sizes=[1],
+        subpop_sizes=[1],
+        collaborator=dummy_collaborator,
+        fitness_function=dummy_fitness_function
+    )
+
+    instance._get_subpop(5, 10)
+    instance._build_context_vector(0, 0, [])
+
+
+def test_build_context_vector_binary_initialization(
+        dummy_collaborator,
+        dummy_fitness_function,
+        dummy_dataloader
+    ) -> None:
+    """Test the _build_context_vector method for binary initialization."""
+    subpop_idx = 1
+    indiv_idx = 4
+    subcomp_sizes = [7, 4]
+    subpop_sizes = [2, 5]
+
+    # Patch dummy collaborator methods
+    dummy_collaborator.get_collaborators = lambda *args, **kwargs: []
+    dummy_collaborator.build_context_vector = lambda collaborators: np.ones(sum(subcomp_sizes))
+
+    # Patch dummy fitness function to return a fixed fitness
+    fitness_value = 0.5
+    dummy_fitness_function.evaluate = lambda x, data: fitness_value
+
+    # Instantiate the concrete class with dummy data
+    instance = RandomBinaryInitialization(
+        data=dummy_dataloader,
+        subcomp_sizes=subcomp_sizes,
+        subpop_sizes=subpop_sizes,
+        collaborator=dummy_collaborator,
+        fitness_function=dummy_fitness_function,
+    )
+
+    # Initialize subpopulations (required before evaluation)
+    instance.build_subpopulations()
+
+    # Run method under test
+    context_vector = instance._build_context_vector(
+        subpop_idx=subpop_idx,
+        indiv_idx=indiv_idx,
+        subpops=instance.subpops
+    )
+
+    # Assertion
+    assert context_vector.shape == (sum(subcomp_sizes),)
+
+
+def test_build_context_vector_continuous_initialization(
+        dummy_collaborator,
+        dummy_fitness_function,
+        dummy_dataloader
+    ) -> None:
+    """Test the _build_context_vector method for continuous initialization."""
+    subpop_idx = 1
+    indiv_idx = 4
+    subcomp_sizes = [7, 4]
+    subpop_sizes = [2, 5]
+    bounds = (-10, 10)
+
+    # Patch dummy collaborator methods
+    dummy_collaborator.get_collaborators = lambda *args, **kwargs: []
+    dummy_collaborator.build_context_vector = lambda collaborators: np.ones(sum(subcomp_sizes))
+
+    # Patch dummy fitness function to return a fixed fitness
+    fitness_value = 0.5
+    dummy_fitness_function.evaluate = lambda x, data: fitness_value
+
+    # Instantiate the concrete class with dummy data
+    instance = RandomContinuousInitialization(
+        data=dummy_dataloader,
+        subcomp_sizes=subcomp_sizes,
+        subpop_sizes=subpop_sizes,
+        collaborator=dummy_collaborator,
+        fitness_function=dummy_fitness_function,
+        bounds=bounds
+    )
+
+    # Initialize subpopulations (required before evaluation)
+    instance.build_subpopulations()
+
+    # Run method under test
+    context_vector = instance._build_context_vector(
+        subpop_idx=subpop_idx,
+        indiv_idx=indiv_idx,
+        subpops=instance.subpops
+    )
+
+    # Assertion
+    assert context_vector.shape == (sum(subcomp_sizes),)
