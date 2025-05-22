@@ -6,6 +6,7 @@ scikit-learn==1.0.2
 scipy==1.10.1
 toml==0.10.2
 tqdm==4.65.0
+tqdm-joblib==0.0.4
 pyarrow==17.0.0
 pytest==8.3.5
 pytest-cov==6.1.1
