@@ -210,29 +210,25 @@ class DataLoader():
     def _get_input(self) -> pd.DataFrame:
         """Get the input data X from the dataset.
 
-        By default, the penultimate column of the dataset is the label and the last is the
-        predefined division of train and test set.
-
         Returns
         -------
         X : pd.DataFrame (n_examples, n_features)
             Input data (features).
         """
-        X = self.data.iloc[:,:-2].copy()
+        selected_cols = set(self.data.columns) - set(["label", "subset", "fold"])
+        selected_cols = sorted([int(col) for col in selected_cols])
+        X = self.data.iloc[:, selected_cols].copy()
         return X
 
     def _get_output(self) -> pd.Series:
         """Get the output data y from the dataset.
-
-        By default, the penultimate column of the dataset is the label and the last is the
-        predefined division of train and test set.
 
         Returns
         -------
         y : pd.Series (n_examples, )
             Output data (labels).
         """
-        y = self.data.iloc[:,-2].copy()
+        y = self.data.loc[:, "label"].copy()
         return y
 
     def _preprocess(self, dropna: bool = True) -> None:
