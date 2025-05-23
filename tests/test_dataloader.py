@@ -201,17 +201,17 @@ def test_get_input_and_output(complete_data_conf: dict) -> None:
     """Test _get_input and _get_output extract correct columns."""
     loader = DataLoader("dummy", complete_data_conf)
     loader.data = pd.DataFrame({
-        0: [1, 2],
-        1: [3, 4],
-        2: [5, 6],
-        3: ["train", "test"]
+        "0": [1, 2],
+        "1": [3, 4],
+        "label": [5, 6],
+        "subset": ["train", "test"]
     })
 
     X = loader._get_input()
     y = loader._get_output()
 
-    expected_X = pd.DataFrame({0: [1, 2], 1: [3, 4]})
-    expected_y = pd.Series([5, 6], name=2)
+    expected_X = pd.DataFrame({"0": [1, 2], "1": [3, 4]})
+    expected_y = pd.Series([5, 6], name="label")
 
     pd.testing.assert_frame_equal(X, expected_X)
     pd.testing.assert_series_equal(y, expected_y)
@@ -221,10 +221,10 @@ def test_preprocess(monkeypatch, complete_data_conf: dict) -> None:
     """Test _preprocess replaces ? with NaN, drops rows if required."""
     loader = DataLoader("dummy", complete_data_conf)
     loader.data = pd.DataFrame({
-        0: [1, "?", 3],
-        1: [4, 5, None],
-        2: [0, 1, 0],
-        3: ["train", "test", "train"]
+        "0": [1, "?", 3],
+        "1": [4, 5, None],
+        "label": [0, 1, 0],
+        "subset": ["train", "test", "train"]
     })
 
     monkeypatch.setitem(DataLoader.DATASETS, "dummy", {"task": "classification"})
@@ -243,10 +243,10 @@ def test_split_preset(monkeypatch, complete_data_conf: dict) -> None:
     """Test _split with preset splits."""
     loader = DataLoader("dummy", complete_data_conf)
     loader.data = pd.DataFrame({
-        0: [1, 2, 3, 4, 5],
-        1: [6, 7, 8, 9, 0],
-        2: [0, 1, 0, 1, 1],
-        3: ["train", "train", "train", "test", "test"]
+        "0": [1, 2, 3, 4, 5],
+        "1": [6, 7, 8, 9, 0],
+        "label": [0, 1, 0, 1, 1],
+        "subset": ["train", "train", "train", "test", "test"]
     })
     loader.X = loader._get_input()
     loader.y = loader._get_output()
@@ -264,10 +264,10 @@ def test_split_without_preset(complete_data_conf: dict) -> None:
     loader = DataLoader("dummy", complete_data_conf)
     n_samples = 100
     loader.data = pd.DataFrame({
-        0: np.arange(n_samples),
-        1: np.arange(n_samples, 2*n_samples),
-        2: [0, 1] * 50,
-        3: ["train"] * 70 + ["test"] * 30
+        "0": np.arange(n_samples),
+        "1": np.arange(n_samples, 2*n_samples),
+        "label": [0, 1] * 50,
+        "subset": ["train"] * 70 + ["test"] * 30
     })
     loader.X = loader._get_input()
     loader.y = loader._get_output()
@@ -298,10 +298,10 @@ def test_min_max_normalization(complete_data_conf: dict) -> None:
     complete_data_conf["normalization"]["method"] = "min_max"
     loader = DataLoader("dummy", complete_data_conf)
     loader.data = pd.DataFrame({
-        0: [1, 2, 3, 4, 5],
-        1: [6, 7, 8, 9, 0],
-        2: [0, 1, 0, 1, 1],
-        3: ["train", "train", "train", "test", "test"]
+        "0": [1, 2, 3, 4, 5],
+        "1": [6, 7, 8, 9, 0],
+        "label": [0, 1, 0, 1, 1],
+        "subset": ["train", "train", "train", "test", "test"]
     })
     loader.X = loader._get_input()
     loader.y = loader._get_output()
@@ -317,10 +317,10 @@ def test_standard_normalization(complete_data_conf: dict) -> None:
     complete_data_conf["normalization"]["method"] = "standard"
     loader = DataLoader("dummy", complete_data_conf)
     loader.data = pd.DataFrame({
-        0: [1, 2, 3, 4, 5],
-        1: [6, 7, 8, 9, 0],
-        2: [0, 1, 0, 1, 1],
-        3: ["train", "train", "train", "test", "test"]
+        "0": [1, 2, 3, 4, 5],
+        "1": [6, 7, 8, 9, 0],
+        "label": [0, 1, 0, 1, 1],
+        "subset": ["train", "train", "train", "test", "test"]
     })
     loader.X = loader._get_input()
     loader.y = loader._get_output()
@@ -368,10 +368,10 @@ def test_leave_one_out_model_selection(complete_data_conf: dict) -> None:
     complete_data_conf["general"]["splitter_type"] = "leave_one_out"
     loader = DataLoader("dummy", complete_data_conf)
     loader.data = pd.DataFrame({
-        0: [1, 2, 3, 4, 5],
-        1: [6, 7, 8, 9, 0],
-        2: [0, 1, 0, 1, 1],
-        3: ["train", "train", "train", "test", "test"]
+        "0": [1, 2, 3, 4, 5],
+        "1": [6, 7, 8, 9, 0],
+        "label": [0, 1, 0, 1, 1],
+        "subset": ["train", "train", "train", "test", "test"]
     })
     loader.X = loader._get_input()
     loader.y = loader._get_output()

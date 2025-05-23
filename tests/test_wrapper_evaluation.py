@@ -51,6 +51,10 @@ def test_hold_out_validation(monkeypatch, classification_data, complete_data_con
     split_idx = int(0.7 * n_samples)
     train_test_split = np.array(["train"] * split_idx + ["test"] * (n_samples - split_idx))
     dl.data[6] = train_test_split
+    dl.data = dl.data.rename(columns={
+        dl.data.columns[-2]: "label",
+        dl.data.columns[-1]: "subset"
+    })
     dl.X = dl._get_input()
     dl.y = dl._get_output()
     dl._split()
@@ -109,6 +113,10 @@ def test_kfold_cross_validation(monkeypatch, classification_data, complete_data_
     split_idx = int(0.7 * n_samples)
     train_test_split = np.array(["train"] * split_idx + ["test"] * (n_samples - split_idx))
     dl.data[6] = train_test_split
+    dl.data = dl.data.rename(columns={
+        dl.data.columns[-2]: "label",
+        dl.data.columns[-1]: "subset"
+    })
     dl.X = dl._get_input()
     dl.y = dl._get_output()
     dl._split()
