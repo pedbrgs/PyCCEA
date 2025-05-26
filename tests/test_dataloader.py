@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from unittest.mock import patch
 from pyccea.utils.datasets import DataLoader
-from sklearn.model_selection import KFold, LeaveOneOut, StratifiedKFold
+from sklearn.model_selection import GroupKFold, KFold, LeaveOneOut, StratifiedKFold
 
 
 # Disable logging output during tests
@@ -331,6 +331,46 @@ def test_standard_normalization(complete_data_conf: dict) -> None:
     assert np.allclose(loader.X_train.std(axis=0), np.ones(loader.X_train.shape[1]))
 
 
+def test_kfold_model_selection_prefold_missing_fold_column(monkeypatch, complete_data_conf: dict) -> None:
+    """Test k-fold model selection when 'prefold' is True but the dataset lacks the required 'fold' column."""
+    complete_data_conf["splitter"]["prefold"] = True
+    complete_data_conf["splitter"]["kfolds"] = 3
+    loader = DataLoader("dummy", complete_data_conf)
+    monkeypatch.setitem(DataLoader.DATASETS, "dummy", {"task": "classification"})
+    loader.data = pd.DataFrame({
+        "0": [1, 2, 3, 4, 5],
+        "1": [6, 7, 8, 9, 0],
+        "label": [0, 1, 0, 1, 1],
+        "subset": ["train", "train", "train", "test", "test"]
+    })
+    loader.X = loader._get_input()
+    loader.y = loader._get_output()
+    loader._split()
+    with pytest.raises(AssertionError, match="The 'fold' column should be specified"):
+        loader._model_selection()
+
+
+def test_kfold_model_selection_prefold_mismatched_folds(monkeypatch, complete_data_conf: dict) -> None:
+    """Test k-fold model selection with 'prefold' set to True and kfolds specified does not match the number of
+    folds in the dataset."""
+    complete_data_conf["splitter"]["prefold"] = True
+    complete_data_conf["splitter"]["kfolds"] = 4
+    loader = DataLoader("dummy", complete_data_conf)
+    monkeypatch.setitem(DataLoader.DATASETS, "dummy", {"task": "classification"})
+    loader.data = pd.DataFrame({
+        "0": [1, 2, 3, 4, 5],
+        "1": [6, 7, 8, 9, 0],
+        "label": [0, 1, 0, 1, 1],
+        "subset": ["train", "train", "train", "test", "test"],
+        "fold": [1, 2, 3, 1, 2]
+    })
+    loader.X = loader._get_input()
+    loader.y = loader._get_output()
+    loader._split()
+    with pytest.raises(AssertionError, match="The number of folds in the training set"):
+        loader._model_selection()
+
+
 def test_stratified_kfold_model_selection(monkeypatch, complete_data_conf: dict) -> None:
     """Test _model_selection with k_fold splitter."""
     complete_data_conf["splitter"]["kfolds"] = 2
@@ -361,10 +401,94 @@ def test_kfold_model_selection(monkeypatch, complete_data_conf: dict) -> None:
     assert isinstance(loader.splitter, KFold)
 
 
+def test_group_kfold_model_selection(monkeypatch, complete_data_conf: dict) -> None:
+    """Test k-fold model selection when 'prefold' is True."""
+    complete_data_conf["splitter"]["prefold"] = True
+    del complete_data_conf["splitter"]["stratified"]
+    del complete_data_conf["splitter"]["kfolds"]
+    loader = DataLoader("dummy", complete_data_conf)
+    monkeypatch.setitem(DataLoader.DATASETS, "dummy", {"task": "classification"})
+    loader.data = pd.DataFrame({
+        "0": [1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
+        "1": [6, 7, 8, 9, 0, 1, 2, 3, 4, 5],
+        "label": [0, 1, 0, 1, 1, 0, 1, 0, 1, 0],
+        "subset": ["train"] * 7 + ["test"] * 3,
+        "fold": [1, 2, 3, 1, 2, 3, 1, 4, 4, 5]
+    })
+    loader.X = loader._get_input()
+    loader.y = loader._get_output()
+    loader._split()
+    loader._model_selection()
+
+    assert len(loader.train_folds) == loader.kfolds
+    assert len(loader.val_folds) == loader.kfolds
+    assert isinstance(loader.splitter, GroupKFold)
+
+    # Original group counts by fold (only for training subset)
+    original_group_counts = (
+        loader.data.query("subset == 'train'").groupby("fold")["fold"].count()
+    )
+
+    for i, _ in enumerate(zip(loader.train_folds, loader.val_folds)):
+        val_indices = loader.val_indices[i]
+        train_indices = loader.train_indices[i]
+
+        # Folds present in the training and validation sets
+        train_folds_present = loader.data.iloc[train_indices]["fold"].unique()
+        val_folds_present = loader.data.iloc[val_indices]["fold"].unique()
+
+        # Ensure that the union of training and validation folds equals the full set of original folds
+        total_folds_seen = set(train_folds_present).union(set(val_folds_present))
+        assert total_folds_seen == set(original_group_counts.index)
+
+        # Ensure that no fold is present in both training and validation sets
+        intersection = set(train_folds_present).intersection(set(val_folds_present))
+        assert not intersection
+
+        # Ensure that all samples from each training fold are correctly included in train_indices
+        for train_fold in train_folds_present:
+            expected_train_indices = loader.data.query(f"fold == {train_fold} and subset == 'train'").index.tolist()
+            actual_train_indices = loader.data.iloc[train_indices].query(f"fold == {train_fold}").index.tolist()
+            assert set(actual_train_indices) == set(expected_train_indices)
+        # Ensure that all samples from the validation fold are correctly included in val_indices
+        for val_fold in val_folds_present:
+            expected_val_indices = loader.data.query(f"fold == {val_fold} and subset == 'train'").index.tolist()
+            actual_val_indices = loader.data.iloc[val_indices].query(f"fold == {val_fold}").index.tolist()
+            assert set(actual_val_indices) == set(expected_val_indices)
+
+
+def test_leave_one_out_model_selection_prefold(monkeypatch, complete_data_conf: dict) -> None:
+    """Test leave one out model selection when 'prefold' is True."""
+    complete_data_conf["splitter"]["prefold"] = True
+    complete_data_conf["general"]["splitter_type"] = "leave_one_out"
+    del complete_data_conf["splitter"]["kfolds"]
+    del complete_data_conf["splitter"]["stratified"]
+    with pytest.warns(UserWarning, match="You specified the 'prefold' parameter"):
+        _ = DataLoader("dummy", complete_data_conf)
+
+
+def test_leave_one_out_model_selection_kfolds(monkeypatch, complete_data_conf: dict) -> None:
+    """Test leave one out model selection when kfolds is specified."""
+    complete_data_conf["general"]["splitter_type"] = "leave_one_out"
+    complete_data_conf["splitter"]["kfolds"] = 3
+    del complete_data_conf["splitter"]["stratified"]
+    with pytest.warns(UserWarning, match="You specified the number of folds using Leave-One-Out"):
+        _ = DataLoader("dummy", complete_data_conf)
+
+
+def test_leave_one_out_model_selection_stratified(monkeypatch, complete_data_conf: dict) -> None:
+    """Test leave one out model selection when stratified is True."""
+    complete_data_conf["general"]["splitter_type"] = "leave_one_out"
+    complete_data_conf["splitter"]["stratified"] = True
+    del complete_data_conf["splitter"]["kfolds"]
+    with pytest.warns(UserWarning, match="You specified the 'stratified' parameter using Leave-One-Out"):
+        _ = DataLoader("dummy", complete_data_conf)
+
+
 def test_leave_one_out_model_selection(complete_data_conf: dict) -> None:
     """Test _model_selection with leave_one_out splitter."""
-    complete_data_conf["splitter"]["kfolds"] = 1
-    complete_data_conf["splitter"]["stratified"] = False
+    del complete_data_conf["splitter"]["kfolds"]
+    del complete_data_conf["splitter"]["stratified"]
     complete_data_conf["general"]["splitter_type"] = "leave_one_out"
     loader = DataLoader("dummy", complete_data_conf)
     loader.data = pd.DataFrame({
@@ -376,8 +500,6 @@ def test_leave_one_out_model_selection(complete_data_conf: dict) -> None:
     loader.X = loader._get_input()
     loader.y = loader._get_output()
     loader._split()
-    loader.X_train = np.array([[1], [2], [3], [4], [5], [6]])
-    loader.y_train = np.array([0, 1, 0, 1, 1, 0])
 
     loader._model_selection()
 

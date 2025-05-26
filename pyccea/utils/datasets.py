@@ -1,12 +1,13 @@
 import os
 import toml
 import logging
+import warnings
 import numpy as np
 import pandas as pd
 import importlib.resources
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
-from sklearn.model_selection import KFold, LeaveOneOut, StratifiedKFold
+from sklearn.model_selection import GroupKFold, KFold, LeaveOneOut, StratifiedKFold
 
 
 class DataLoader():
@@ -107,29 +108,35 @@ class DataLoader():
     def _parse_splitter_parameters(self) -> None:
         """Parse parameters from the splitter section of the data configuration file."""
         if self.splitter_type == "k_fold":
-            if "kfolds" not in self.conf["splitter"]:
+            if ("kfolds" not in self.conf["splitter"]) and (self.conf["splitter"].get("prefold", False) is False):
                 raise AssertionError(
                     "The parameter 'kfolds' should be specified in the splitter section of the "
-                    "data configuration file when 'splitter_type' is set to 'k_fold'."
+                    "data configuration file when 'splitter_type' is set to 'k_fold' and 'prefold' "
+                    "is set to False or is not defined in the splitter section."
                 )
-            self.kfolds = self.conf["splitter"]["kfolds"]
+            self.kfolds = self.conf["splitter"].get("kfolds")
             self.stratified = self.conf["splitter"].get("stratified", False)
         if self.splitter_type == "leave_one_out":
-            logging.warning(
-                "Careful! It is not recommended to use Leave-One-Out when your problem has large "
-                "datasets or costly machine learning models to fit."
-            )
             if "kfolds" in self.conf["splitter"]:
-                logging.warning(
+                warnings.warn(
                     "You specified the number of folds using Leave-One-Out (LOO). However, LOO is"
                     " equivalent to K-Fold when K is equal to the number of examples. Therefore, "
-                    "the value of 'kfolds' parameter will be ignored in this case."
+                    "the value of 'kfolds' parameter will be ignored in this case.",
+                    UserWarning
                 )
             if "stratified" in self.conf["splitter"]:
-                logging.warning(
+                warnings.warn(
                     "You specified the 'stratified' parameter using Leave-One-Out (LOO). However," 
                     " the validation folds made by the LOO have only one sample. Therefore, the "
-                    "value of 'stratified' parameter will be ignored in this case."
+                    "value of 'stratified' parameter will be ignored in this case.",
+                    UserWarning
+                )
+            if self.conf["splitter"].get("prefold"):
+                warnings.warn(
+                    "You specified the 'prefold' parameter using Leave-One-Out (LOO). However, "
+                    "the validation folds made by the LOO have only one sample. Therefore, the "
+                    "value of 'prefold' parameter will be ignored in this case.",
+                    UserWarning
                 )
         self.preset = self.conf["splitter"].get("preset", False)
         if self.preset:
@@ -152,6 +159,7 @@ class DataLoader():
                     "The 'test_ratio' parameter should be within the range of 0 and 1, excluding "
                     "extreme values (i.e., 0 < 'test_ratio' < 1)."
                 )
+        self.prefold = self.conf["splitter"].get("prefold", False)
 
     def _parse_normalization_parameters(self) -> None:
         """Parse parameters from the normalization section of the data configuration file."""
@@ -215,9 +223,10 @@ class DataLoader():
         X : pd.DataFrame (n_examples, n_features)
             Input data (features).
         """
-        selected_cols = set(self.data.columns) - set(["label", "subset", "fold"])
-        selected_cols = sorted([int(col) for col in selected_cols])
-        X = self.data.iloc[:, selected_cols].copy()
+        # Get all columns except 'label', 'subset', and 'fold' while preserving order
+        excluded_cols = ["label", "subset", "fold"]
+        selected_cols = [col for col in self.data.columns if col not in excluded_cols]
+        X = self.data.loc[:, selected_cols].copy()
         return X
 
     def _get_output(self) -> pd.Series:
@@ -277,13 +286,19 @@ class DataLoader():
         if self.preset:
             logging.info("Using predefined sets...")
             # Get predefined training set
-            train_idx, = np.where(self.data.iloc[:, -1] == "train")
-            self.X_train = self.X.iloc[train_idx].to_numpy()
-            self.y_train = self.y.iloc[train_idx].to_numpy()
+            self.X_train = (
+                self.data.query("subset == 'train'")
+                .drop(columns=["label", "subset", "fold"], errors="ignore")
+                .to_numpy()
+            )
+            self.y_train = self.data.query("subset == 'train'")["label"].to_numpy()
             # Get predefined test set
-            test_idx, = np.where(self.data.iloc[:, -1] == "test")
-            self.X_test = self.X.iloc[test_idx].to_numpy()
-            self.y_test = self.y.iloc[test_idx].to_numpy()
+            self.X_test = (
+                self.data.query("subset == 'test'")
+                .drop(columns=["label", "subset", "fold"], errors="ignore")
+                .to_numpy()
+            )
+            self.y_test = self.data.query("subset == 'test'")["label"].to_numpy()
         else:
             logging.info("Splitting data...")
             # Split data into training and test sets
@@ -299,6 +314,7 @@ class DataLoader():
         # Set subset sizes
         self.train_size = self.X_train.shape[0]
         self.test_size = self.X_test.shape[0]
+        self.test_ratio = round(self.test_size / (self.train_size + self.test_size), 4)
         logging.info(f"Training set with {self.train_size} observations.")
         logging.info(f"Test set with {self.test_size} observations.")
 
@@ -317,33 +333,50 @@ class DataLoader():
         """Prepare data according to the specified splitter type."""
         logging.info(f"Splitter type: {self.splitter_type}.")
 
+        def _populate_folds(splitter, X, y, groups=None):
+            "Populate the train and validation folds using the provided splitter."
+            self.train_folds = []
+            self.val_folds = []
+            self.train_indices = []
+            self.val_indices = []
+            split_args = (X, y) if groups is None else (X, y, groups)
+            for train_idx, val_idx in splitter.split(*split_args):
+                self.train_folds.append([X[train_idx].copy(), y[train_idx].copy()])
+                self.val_folds.append([X[val_idx].copy(), y[val_idx].copy()])
+                self.train_indices.append(train_idx)
+                self.val_indices.append(val_idx)
+
         if self.splitter_type == "k_fold":
-            if self.stratified and DataLoader.DATASETS[self.dataset]["task"] == "classification":
-                self.splitter = StratifiedKFold(
-                    n_splits=self.kfolds,
-                    shuffle=True,
-                    random_state=self.seed
-                )
+            if self.prefold:
+                if "fold" not in self.data.columns:
+                    raise AssertionError(
+                        "The 'fold' column should be specified in the dataset when 'prefold' "
+                        "is set to True."
+                    )
+                logging.info("Using predefined folds...")
+                train_data = self.data.query("subset == 'train'")
+                kfolds = train_data["fold"].nunique()
+                if self.kfolds is not None and kfolds != self.kfolds:
+                    raise AssertionError(
+                        f"The number of folds in the training set ({kfolds}) does not match the "
+                        f"number of folds specified in the configuration file ({self.kfolds})."
+                    )
+                self.kfolds = kfolds
+                self.splitter = GroupKFold(n_splits=self.kfolds)
+                _populate_folds(self.splitter, self.X_train, self.y_train, groups=train_data["fold"])
             else:
-                self.splitter = KFold(
-                    n_splits=self.kfolds,
-                    shuffle=True,
-                    random_state=self.seed
-                )
+                is_classification = DataLoader.DATASETS[self.dataset]["task"] == "classification"
+                if self.stratified and is_classification:
+                    self.splitter = StratifiedKFold(
+                        n_splits=self.kfolds, shuffle=True, random_state=self.seed
+                    )
+                else:
+                    self.splitter = KFold(
+                        n_splits=self.kfolds, shuffle=True, random_state=self.seed
+                    )
+                _populate_folds(self.splitter, self.X_train, self.y_train)
+
         elif self.splitter_type == "leave_one_out":
             self.splitter = LeaveOneOut()
-            # The number of folds will be equal to the number of training examples
             self.kfolds = self.train_size
-
-        # Store training and validation folds built from the splitter
-        self.train_folds = list()
-        self.val_folds = list()
-        for train_idx, val_idx in self.splitter.split(self.X_train, self.y_train):
-            self.train_folds.append(
-                [self.X_train[train_idx].copy(), 
-                self.y_train[train_idx].copy()]
-            )
-            self.val_folds.append(
-                [self.X_train[val_idx].copy(),
-                self.y_train[val_idx].copy()]
-            )
+            _populate_folds(self.splitter, self.X_train, self.y_train)
