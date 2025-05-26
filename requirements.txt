@@ -1,8 +1,8 @@
-imbalanced-learn==0.10.1
+imbalanced-learn==0.13.0
 kneed==0.8.5
 numpy==1.24.4
 pandas==2.0.3
-scikit-learn==1.0.2
+scikit-learn==1.6.1
 scipy==1.10.1
 toml==0.10.2
 tqdm==4.65.0

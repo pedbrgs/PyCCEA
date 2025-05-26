@@ -362,7 +362,7 @@ class DataLoader():
                         f"number of folds specified in the configuration file ({self.kfolds})."
                     )
                 self.kfolds = kfolds
-                self.splitter = GroupKFold(n_splits=self.kfolds)
+                self.splitter = GroupKFold(n_splits=self.kfolds, shuffle=True, random_state=self.seed)
                 _populate_folds(self.splitter, self.X_train, self.y_train, groups=train_data["fold"])
             else:
                 is_classification = DataLoader.DATASETS[self.dataset]["task"] == "classification"

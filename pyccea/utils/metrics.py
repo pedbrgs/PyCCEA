@@ -64,7 +64,7 @@ class RegressionMetrics():
         # Measures
         self.values["mae"] = round(mean_absolute_error(y_test, y_pred), 4)
         self.values["mse"] = round(mean_squared_error(y_test, y_pred), 4)
-        self.values["rmse"] = round(mean_squared_error(y_test, y_pred, squared=False), 4)
+        self.values["rmse"] = round(np.sqrt(self.values["mse"]), 4)
         self.values["mape"] = round(mean_absolute_percentage_error(y_test, y_pred) * 100, 4)
 
         # Show evaluation metrics

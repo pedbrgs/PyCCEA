@@ -99,7 +99,7 @@ class RegressionModel():
         elif self.model_type == "random_forest":
             self.grid = {
                 "n_estimators": np.arange(10, 201, 10),
-                "max_features": ["auto", "sqrt", "log2", None],
+                "max_features": ["sqrt", "log2", None],
                 "min_samples_split": [2, 5, 10],
                 "min_samples_leaf": [1, 2, 4],
                 "bootstrap": [True, False]
