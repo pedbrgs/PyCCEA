@@ -3,8 +3,8 @@
 [coevolution]
 subpop_sizes = [30]
 n_subcomps = 4
-max_gen = 10000
-max_gen_without_improvement = 100
+max_gen = 10
+max_gen_without_improvement = 5
 
 [collaboration]
 method = "best"
