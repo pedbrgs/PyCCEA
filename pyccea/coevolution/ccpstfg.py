@@ -186,7 +186,11 @@ class CCPSTFG(CCGA):
         metrics = dict()
         max_removal_quantile = self.conf["decomposition"].get("max_removal_quantile", 0.50)
         remove_quantile_step_size = self.conf["decomposition"].get("removal_quantile_step_size", 0.05)
-        quantiles = range(0, (max_removal_quantile+remove_quantile_step_size), remove_quantile_step_size)
+        quantiles = np.arange(
+            start=0,
+            stop=(max_removal_quantile+remove_quantile_step_size),
+            step=remove_quantile_step_size
+        ).round(2)
         logging.info(f"Search space (quantile): {quantiles}")
         for quantile in quantiles:
             data_q = copy.deepcopy(self.data)
