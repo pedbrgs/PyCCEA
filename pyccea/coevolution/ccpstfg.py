@@ -101,7 +101,9 @@ class CCPSTFG(CCGA):
         n_components : int
             Best number of components to keep after the decomposition into a latent space.
         """
-        n_components_range = range(2, min(30, X_train.shape[1]))
+        max_n_pls_components = self.conf["decomposition"].get("max_n_pls_components", 30)
+        n_components_range = range(2, min(max_n_pls_components, X_train.shape[1]))
+        logging.info(f"Search space (PLS components): {n_components_range}")
         r_squared_values = list()
 
         for n_components in n_components_range:
@@ -139,7 +141,9 @@ class CCPSTFG(CCGA):
         n_subcomps : int
             Best number of subcomponents to decompose the original problem.
         """
-        n_clusters_range = range(2, min(10, feature_loadings.shape[0]))
+        max_n_clusters = self.conf["decomposition"].get("max_n_clusters", 10)
+        n_clusters_range = range(2, min(max_n_clusters, feature_loadings.shape[0]))
+        logging.info(f"Search space (clusters): {n_clusters_range}")
         silhouette_scores = list()
 
         for n_clusters in n_clusters_range:
@@ -180,7 +184,14 @@ class CCPSTFG(CCGA):
             feature importance distribution will be removed.
         """
         metrics = dict()
-        quantiles = np.arange(0, 0.55, 0.05).round(2)
+        max_removal_quantile = self.conf["decomposition"].get("max_removal_quantile", 0.50)
+        remove_quantile_step_size = self.conf["decomposition"].get("removal_quantile_step_size", 0.05)
+        quantiles = np.arange(
+            start=0,
+            stop=(max_removal_quantile+remove_quantile_step_size),
+            step=remove_quantile_step_size
+        ).round(2)
+        logging.info(f"Search space (quantile): {quantiles}")
         for quantile in quantiles:
             data_q = copy.deepcopy(self.data)
             vip_threshold = round(np.quantile(importances, quantile), 4)

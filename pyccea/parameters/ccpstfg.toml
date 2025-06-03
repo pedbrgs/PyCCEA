@@ -2,13 +2,17 @@
 
 [coevolution]
 subpop_sizes = [100]
-max_gen = 5
+max_gen = 10000
 max_gen_without_improvement = 100
 optimized_resource_allocation = true
 
 [decomposition]
 method = "clustering"
 drop = true
+max_n_clusters = 10
+max_n_pls_components = 30
+removal_quantile_step_size = 0.05
+max_removal_quantile = 1.00
 clustering_model_type = "agglomerative_clustering"
 
 [collaboration]
