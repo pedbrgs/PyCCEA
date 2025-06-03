@@ -17,7 +17,7 @@ else:
 
 setup(
     name="pyccea",
-    version="0.2.0",
+    version="1.0.0",
     description="Cooperative co-evolutionary algorithms for feature selection in high-dimensional data",
     long_description=long_description,
     long_description_content_type="text/markdown",
