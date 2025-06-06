@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyccea"
+version = "1.0.1"
+description = "Cooperative co-evolutionary algorithms for feature selection in high-dimensional data"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name="Pedro Vinícius A. B. Venâncio", email="pedbrgs@gmail.com" }
+]
+license = { text = "MIT" }
+dependencies = [
+  "imbalanced-learn==0.13.0",
+  "kneed==0.8.5",
+  "numpy==2.2.0",
+  "pandas==2.2.3",
+  "scikit-learn==1.6.1",
+  "scipy==1.15.3",
+  "toml==0.10.2",
+  "tqdm==4.65.0",
+  "tqdm-joblib==0.0.4",
+  "pyarrow==20.0.0",
+  "fsspec==2025.5.1"
+]
+
+[project.urls]
+Homepage = "https://github.com/pedbrgs/PyCCEA"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["pyccea*"]
+
+[tool.setuptools.package-data]
+pyccea = ["datasets/*.parquet", "parameters/*.toml"]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==8.3.5",
+  "pytest-cov==6.1.1",
+  "pytest-asyncio==0.26.0",
+  "pytest-deadfixtures==2.2.1",
+  "pytest-mock==3.14.0"
+]
