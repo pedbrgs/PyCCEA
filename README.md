@@ -15,7 +15,7 @@ PyCCEA is an open-source package developed as part of ongoing doctoral research.
 
 ## :computer: Installation
 
-To install the package directly from PyPI, use the following command:
+To install the PyCCEA package directly from PyPI, use the following command in a Python ≥ 3.10 environment:
 
 ```
 pip install pyccea
