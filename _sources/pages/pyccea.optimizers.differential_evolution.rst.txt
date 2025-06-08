@@ -1,0 +1,7 @@
+pyccea.optimizers.differential\_evolution module
+================================================
+
+.. automodule:: pyccea.optimizers.differential_evolution
+   :members:
+   :show-inheritance:
+   :undoc-members:

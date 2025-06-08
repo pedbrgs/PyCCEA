@@ -1,0 +1,23 @@
+pyccea.coevolution package
+==========================
+
+.. automodule:: pyccea.coevolution
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pyccea.coevolution.ccea
+   pyccea.coevolution.cceafs
+   pyccea.coevolution.ccfc
+   pyccea.coevolution.ccfsrfg1
+   pyccea.coevolution.ccfsrfg2
+   pyccea.coevolution.ccga
+   pyccea.coevolution.ccilfg
+   pyccea.coevolution.ccpstfg
+   pyccea.coevolution.ccsufg

@@ -1,0 +1,7 @@
+pyccea.decomposition.ranking module
+===================================
+
+.. automodule:: pyccea.decomposition.ranking
+   :members:
+   :show-inheritance:
+   :undoc-members:

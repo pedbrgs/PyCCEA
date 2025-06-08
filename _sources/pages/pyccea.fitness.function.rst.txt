@@ -1,0 +1,7 @@
+pyccea.fitness.function module
+==============================
+
+.. automodule:: pyccea.fitness.function
+   :members:
+   :show-inheritance:
+   :undoc-members:

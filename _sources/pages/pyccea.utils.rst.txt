@@ -1,0 +1,20 @@
+pyccea.utils package
+====================
+
+.. automodule:: pyccea.utils
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pyccea.utils.config
+   pyccea.utils.datasets
+   pyccea.utils.mapping
+   pyccea.utils.metrics
+   pyccea.utils.models
+   pyccea.utils.stats

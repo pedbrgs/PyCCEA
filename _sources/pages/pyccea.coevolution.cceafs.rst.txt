@@ -1,0 +1,7 @@
+pyccea.coevolution.cceafs module
+================================
+
+.. automodule:: pyccea.coevolution.cceafs
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+pyccea.fitness.penalty module
+=============================
+
+.. automodule:: pyccea.fitness.penalty
+   :members:
+   :show-inheritance:
+   :undoc-members:

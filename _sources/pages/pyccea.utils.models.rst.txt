@@ -1,0 +1,7 @@
+pyccea.utils.models module
+==========================
+
+.. automodule:: pyccea.utils.models
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+pyccea.cooperation.elite module
+===============================
+
+.. automodule:: pyccea.cooperation.elite
+   :members:
+   :show-inheritance:
+   :undoc-members:

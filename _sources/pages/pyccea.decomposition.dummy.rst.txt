@@ -1,0 +1,7 @@
+pyccea.decomposition.dummy module
+=================================
+
+.. automodule:: pyccea.decomposition.dummy
+   :members:
+   :show-inheritance:
+   :undoc-members:

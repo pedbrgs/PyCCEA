@@ -1,0 +1,20 @@
+pyccea.decomposition package
+============================
+
+.. automodule:: pyccea.decomposition
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pyccea.decomposition.clustering
+   pyccea.decomposition.dummy
+   pyccea.decomposition.grouping
+   pyccea.decomposition.random
+   pyccea.decomposition.ranking
+   pyccea.decomposition.static

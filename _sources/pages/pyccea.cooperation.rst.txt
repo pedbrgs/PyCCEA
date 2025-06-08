@@ -1,0 +1,18 @@
+pyccea.cooperation package
+==========================
+
+.. automodule:: pyccea.cooperation
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pyccea.cooperation.best
+   pyccea.cooperation.collaboration
+   pyccea.cooperation.elite
+   pyccea.cooperation.random

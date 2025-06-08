@@ -1,0 +1,20 @@
+pyccea namespace
+================
+
+.. py:module:: pyccea
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pyccea.coevolution
+   pyccea.cooperation
+   pyccea.decomposition
+   pyccea.evaluation
+   pyccea.fitness
+   pyccea.initialization
+   pyccea.optimizers
+   pyccea.projection
+   pyccea.utils

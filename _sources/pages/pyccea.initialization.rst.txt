@@ -1,0 +1,17 @@
+pyccea.initialization package
+=============================
+
+.. automodule:: pyccea.initialization
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pyccea.initialization.binary
+   pyccea.initialization.build
+   pyccea.initialization.continuous

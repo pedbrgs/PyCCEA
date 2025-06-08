@@ -1,0 +1,16 @@
+pyccea.optimizers package
+=========================
+
+.. automodule:: pyccea.optimizers
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pyccea.optimizers.differential_evolution
+   pyccea.optimizers.genetic_algorithm

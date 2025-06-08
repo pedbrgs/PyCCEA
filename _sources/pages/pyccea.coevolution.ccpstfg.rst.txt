@@ -1,0 +1,7 @@
+pyccea.coevolution.ccpstfg module
+=================================
+
+.. automodule:: pyccea.coevolution.ccpstfg
+   :members:
+   :show-inheritance:
+   :undoc-members:

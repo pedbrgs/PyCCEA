@@ -1,0 +1,7 @@
+pyccea.initialization.binary module
+===================================
+
+.. automodule:: pyccea.initialization.binary
+   :members:
+   :show-inheritance:
+   :undoc-members:

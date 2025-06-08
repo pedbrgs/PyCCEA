@@ -1,0 +1,7 @@
+pyccea.cooperation.random module
+================================
+
+.. automodule:: pyccea.cooperation.random
+   :members:
+   :show-inheritance:
+   :undoc-members:

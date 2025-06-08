@@ -1,0 +1,7 @@
+pyccea.utils.mapping module
+===========================
+
+.. automodule:: pyccea.utils.mapping
+   :members:
+   :show-inheritance:
+   :undoc-members:

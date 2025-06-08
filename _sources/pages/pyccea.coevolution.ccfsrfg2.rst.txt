@@ -1,0 +1,7 @@
+pyccea.coevolution.ccfsrfg2 module
+==================================
+
+.. automodule:: pyccea.coevolution.ccfsrfg2
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,0 +1,7 @@
+pyccea.decomposition.grouping module
+====================================
+
+.. automodule:: pyccea.decomposition.grouping
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -1,7 +1,11 @@
 Documentation
 ====================
 
-PyCCEA is an open-source Python package for feature selection in high-dimensional datasets using cooperative co-evolutionary algorithms (CCEAs). It provides a modular framework that enables researchers and practitioners to implement, evaluate, and extend CCEAs through interchangeable components such as decomposition strategies, fitness evaluators, and optimizers. Designed with reproducibility and experimentation in mind, PyCCEA supports wrapper-based evaluations with scikit-learn models and includes benchmark datasets and baseline algorithms for comparative analysis in classification and regression tasks.
+PyCCEA is an open-source Python package for feature selection in high-dimensional datasets using
+cooperative co-evolutionary algorithms (CCEAs). It provides a modular framework that enables
+researchers and practitioners to implement, evaluate, and extend CCEAs through interchangeable
+components such as decomposition strategies, cooperation schemes, fitness evaluation methods, and
+evolutionary optimizers.
 
 .. toctree::
    :maxdepth: 1
@@ -10,4 +14,6 @@ PyCCEA is an open-source Python package for feature selection in high-dimensiona
 
    pages/installation
    pages/quickstart
+   pages/api
    pages/contributing
+   pages/citation
