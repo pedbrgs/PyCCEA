@@ -7,3 +7,6 @@
 *.ipynb
 *.out
 *.code-workspace
+*.egg-info
+**/dist/
+**_build/
