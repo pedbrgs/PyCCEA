@@ -1,7 +1,10 @@
-pyccea namespace
-================
+pyccea package
+==============
 
-.. py:module:: pyccea
+.. automodule:: pyccea
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
 Subpackages
 -----------
