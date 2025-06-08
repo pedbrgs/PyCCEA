@@ -22,11 +22,7 @@ jobs:
 
       - name: Generate module-level .rst files
         run: |
-          sphinx-apidoc -o docs/source/pages pyccea \
-            --force \
-            --separate \
-            --module-first \
-            --implicit-namespaces
+          sphinx-apidoc -o docs/source/pages pyccea
 
       - name: Build Sphinx docs
         run: |
