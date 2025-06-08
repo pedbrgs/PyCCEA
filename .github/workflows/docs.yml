@@ -1,8 +1,8 @@
-name: Build and Deploy Docs
+name: Build and deploy documentation
 
 on:
   push:
-    branches: [main]  # ou sua branch principal
+    branches: [main]
 
 jobs:
   build:
@@ -21,13 +21,12 @@ jobs:
           pip install sphinx sphinx_rtd_theme numpydoc
 
       - name: Build Docs
-        run: |
-          cd docs
-          make html
+        working-directory: docs
+        run: make html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            publish_dir: ./docs/build/html
-            publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build/html
+          publish_branch: gh-pages
