@@ -14,6 +14,6 @@ evolutionary optimizers.
 
    pages/installation
    pages/quickstart
-   pages/modules
+   pages/api
    pages/contributing
    pages/citation
