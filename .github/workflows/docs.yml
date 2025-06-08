@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,9 +20,12 @@ jobs:
         run: |
           pip install sphinx sphinx_rtd_theme numpydoc
 
-      - name: Build Docs
-        working-directory: docs
-        run: make html
+      - name: Build Sphinx docs
+        run: |
+          python -m sphinx -b html docs/source docs/_build/html
+
+      - name: Check built docs files
+        run: ls -l docs/_build/html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
