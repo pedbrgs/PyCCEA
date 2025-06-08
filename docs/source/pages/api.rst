@@ -4,15 +4,15 @@ API Reference
 The following is the API reference for the PyCCEA package.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Modules
 
-   pyccea.coevolution
-   pyccea.cooperation
-   pyccea.decomposition
-   pyccea.evaluation
-   pyccea.fitness
-   pyccea.initialization
-   pyccea.optimizers
-   pyccea.projection
-   pyccea.utils
+   pages/pyccea.coevolution
+   pages/pyccea.cooperation
+   pages/pyccea.decomposition
+   pages/pyccea.evaluation
+   pages/pyccea.fitness
+   pages/pyccea.initialization
+   pages/pyccea.optimizers
+   pages/pyccea.projection
+   pages/pyccea.utils
