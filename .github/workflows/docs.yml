@@ -26,8 +26,7 @@ jobs:
             --force \
             --separate \
             --module-first \
-            --implicit-namespaces \
-            pyccea/__init__.py
+            --implicit-namespaces
 
       - name: Build Sphinx docs
         run: |
