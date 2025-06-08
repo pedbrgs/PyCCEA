@@ -1,7 +1,0 @@
-pyccea.fitness.distance module
-==============================
-
-.. automodule:: pyccea.fitness.distance
-   :members:
-   :show-inheritance:
-   :undoc-members:

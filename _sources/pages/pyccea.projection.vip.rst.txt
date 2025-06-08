@@ -1,7 +1,0 @@
-pyccea.projection.vip module
-============================
-
-.. automodule:: pyccea.projection.vip
-   :members:
-   :show-inheritance:
-   :undoc-members:

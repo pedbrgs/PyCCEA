@@ -1,17 +1,37 @@
 pyccea.fitness package
 ======================
 
-.. automodule:: pyccea.fitness
+Submodules
+----------
+
+pyccea.fitness.distance module
+------------------------------
+
+.. automodule:: pyccea.fitness.distance
    :members:
    :show-inheritance:
    :undoc-members:
 
-Submodules
-----------
+pyccea.fitness.function module
+------------------------------
 
-.. toctree::
-   :maxdepth: 4
+.. automodule:: pyccea.fitness.function
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
-   pyccea.fitness.distance
-   pyccea.fitness.function
-   pyccea.fitness.penalty
+pyccea.fitness.penalty module
+-----------------------------
+
+.. automodule:: pyccea.fitness.penalty
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: pyccea.fitness
+   :members:
+   :show-inheritance:
+   :undoc-members:

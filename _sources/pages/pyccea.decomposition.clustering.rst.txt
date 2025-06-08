@@ -1,7 +1,0 @@
-pyccea.decomposition.clustering module
-======================================
-
-.. automodule:: pyccea.decomposition.clustering
-   :members:
-   :show-inheritance:
-   :undoc-members:

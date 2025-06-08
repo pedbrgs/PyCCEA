@@ -1,7 +1,0 @@
-pyccea.cooperation.collaboration module
-=======================================
-
-.. automodule:: pyccea.cooperation.collaboration
-   :members:
-   :show-inheritance:
-   :undoc-members:

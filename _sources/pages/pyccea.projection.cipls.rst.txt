@@ -1,7 +1,0 @@
-pyccea.projection.cipls module
-==============================
-
-.. automodule:: pyccea.projection.cipls
-   :members:
-   :show-inheritance:
-   :undoc-members:

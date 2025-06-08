@@ -1,7 +1,0 @@
-pyccea.initialization.build module
-==================================
-
-.. automodule:: pyccea.initialization.build
-   :members:
-   :show-inheritance:
-   :undoc-members:

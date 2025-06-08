@@ -1,16 +1,29 @@
 pyccea.projection package
 =========================
 
-.. automodule:: pyccea.projection
+Submodules
+----------
+
+pyccea.projection.cipls module
+------------------------------
+
+.. automodule:: pyccea.projection.cipls
    :members:
    :show-inheritance:
    :undoc-members:
 
-Submodules
-----------
+pyccea.projection.vip module
+----------------------------
 
-.. toctree::
-   :maxdepth: 4
+.. automodule:: pyccea.projection.vip
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
-   pyccea.projection.cipls
-   pyccea.projection.vip
+Module contents
+---------------
+
+.. automodule:: pyccea.projection
+   :members:
+   :show-inheritance:
+   :undoc-members:

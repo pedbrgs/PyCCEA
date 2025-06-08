@@ -1,7 +1,0 @@
-pyccea.utils.stats module
-=========================
-
-.. automodule:: pyccea.utils.stats
-   :members:
-   :show-inheritance:
-   :undoc-members:

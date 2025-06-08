@@ -1,7 +1,0 @@
-pyccea.decomposition.random module
-==================================
-
-.. automodule:: pyccea.decomposition.random
-   :members:
-   :show-inheritance:
-   :undoc-members:

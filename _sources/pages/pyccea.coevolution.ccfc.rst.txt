@@ -1,7 +1,0 @@
-pyccea.coevolution.ccfc module
-==============================
-
-.. automodule:: pyccea.coevolution.ccfc
-   :members:
-   :show-inheritance:
-   :undoc-members:

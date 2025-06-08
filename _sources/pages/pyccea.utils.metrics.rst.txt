@@ -1,7 +1,0 @@
-pyccea.utils.metrics module
-===========================
-
-.. automodule:: pyccea.utils.metrics
-   :members:
-   :show-inheritance:
-   :undoc-members:

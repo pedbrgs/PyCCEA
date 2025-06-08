@@ -1,7 +1,0 @@
-pyccea.coevolution.ccga module
-==============================
-
-.. automodule:: pyccea.coevolution.ccga
-   :members:
-   :show-inheritance:
-   :undoc-members:

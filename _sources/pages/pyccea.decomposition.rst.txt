@@ -1,20 +1,61 @@
 pyccea.decomposition package
 ============================
 
-.. automodule:: pyccea.decomposition
+Submodules
+----------
+
+pyccea.decomposition.clustering module
+--------------------------------------
+
+.. automodule:: pyccea.decomposition.clustering
    :members:
    :show-inheritance:
    :undoc-members:
 
-Submodules
-----------
+pyccea.decomposition.dummy module
+---------------------------------
 
-.. toctree::
-   :maxdepth: 4
+.. automodule:: pyccea.decomposition.dummy
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
-   pyccea.decomposition.clustering
-   pyccea.decomposition.dummy
-   pyccea.decomposition.grouping
-   pyccea.decomposition.random
-   pyccea.decomposition.ranking
-   pyccea.decomposition.static
+pyccea.decomposition.grouping module
+------------------------------------
+
+.. automodule:: pyccea.decomposition.grouping
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+pyccea.decomposition.random module
+----------------------------------
+
+.. automodule:: pyccea.decomposition.random
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+pyccea.decomposition.ranking module
+-----------------------------------
+
+.. automodule:: pyccea.decomposition.ranking
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+pyccea.decomposition.static module
+----------------------------------
+
+.. automodule:: pyccea.decomposition.static
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: pyccea.decomposition
+   :members:
+   :show-inheritance:
+   :undoc-members:

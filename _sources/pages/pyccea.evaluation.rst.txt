@@ -1,15 +1,21 @@
 pyccea.evaluation package
 =========================
 
-.. automodule:: pyccea.evaluation
+Submodules
+----------
+
+pyccea.evaluation.wrapper module
+--------------------------------
+
+.. automodule:: pyccea.evaluation.wrapper
    :members:
    :show-inheritance:
    :undoc-members:
 
-Submodules
-----------
+Module contents
+---------------
 
-.. toctree::
-   :maxdepth: 4
-
-   pyccea.evaluation.wrapper
+.. automodule:: pyccea.evaluation
+   :members:
+   :show-inheritance:
+   :undoc-members:

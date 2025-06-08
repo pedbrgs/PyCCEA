@@ -1,7 +1,0 @@
-pyccea.cooperation.best module
-==============================
-
-.. automodule:: pyccea.cooperation.best
-   :members:
-   :show-inheritance:
-   :undoc-members:

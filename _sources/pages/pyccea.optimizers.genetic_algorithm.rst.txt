@@ -1,7 +1,0 @@
-pyccea.optimizers.genetic\_algorithm module
-===========================================
-
-.. automodule:: pyccea.optimizers.genetic_algorithm
-   :members:
-   :show-inheritance:
-   :undoc-members:

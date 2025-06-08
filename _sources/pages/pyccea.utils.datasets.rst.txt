@@ -1,7 +1,0 @@
-pyccea.utils.datasets module
-============================
-
-.. automodule:: pyccea.utils.datasets
-   :members:
-   :show-inheritance:
-   :undoc-members:

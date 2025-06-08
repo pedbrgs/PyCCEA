@@ -1,20 +1,61 @@
 pyccea.utils package
 ====================
 
-.. automodule:: pyccea.utils
+Submodules
+----------
+
+pyccea.utils.config module
+--------------------------
+
+.. automodule:: pyccea.utils.config
    :members:
    :show-inheritance:
    :undoc-members:
 
-Submodules
-----------
+pyccea.utils.datasets module
+----------------------------
 
-.. toctree::
-   :maxdepth: 4
+.. automodule:: pyccea.utils.datasets
+   :members:
+   :show-inheritance:
+   :undoc-members:
 
-   pyccea.utils.config
-   pyccea.utils.datasets
-   pyccea.utils.mapping
-   pyccea.utils.metrics
-   pyccea.utils.models
-   pyccea.utils.stats
+pyccea.utils.mapping module
+---------------------------
+
+.. automodule:: pyccea.utils.mapping
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+pyccea.utils.metrics module
+---------------------------
+
+.. automodule:: pyccea.utils.metrics
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+pyccea.utils.models module
+--------------------------
+
+.. automodule:: pyccea.utils.models
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+pyccea.utils.stats module
+-------------------------
+
+.. automodule:: pyccea.utils.stats
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Module contents
+---------------
+
+.. automodule:: pyccea.utils
+   :members:
+   :show-inheritance:
+   :undoc-members:

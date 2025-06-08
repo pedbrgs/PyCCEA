@@ -1,7 +1,0 @@
-pyccea.utils.config module
-==========================
-
-.. automodule:: pyccea.utils.config
-   :members:
-   :show-inheritance:
-   :undoc-members:

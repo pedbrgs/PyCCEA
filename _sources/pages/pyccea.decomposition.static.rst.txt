@@ -1,7 +1,0 @@
-pyccea.decomposition.static module
-==================================
-
-.. automodule:: pyccea.decomposition.static
-   :members:
-   :show-inheritance:
-   :undoc-members:

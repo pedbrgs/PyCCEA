@@ -1,7 +1,0 @@
-pyccea.coevolution.ccilfg module
-================================
-
-.. automodule:: pyccea.coevolution.ccilfg
-   :members:
-   :show-inheritance:
-   :undoc-members:
