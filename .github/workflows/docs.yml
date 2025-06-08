@@ -26,10 +26,7 @@ jobs:
 
       - name: Build Sphinx docs
         run: |
-          python -m sphinx -b html docs/source docs/_build/html
-
-      - name: Check built docs files
-        run: ls -l docs/_build/html
+          sphinx-build -b html docs/source docs/_build/html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
