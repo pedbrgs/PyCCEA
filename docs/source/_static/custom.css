@@ -1,0 +1,8 @@
+.wy-side-nav-search .wy-dropdown > a img.logo,
+.wy-side-nav-search > a img.logo {
+  min-width: 150px;
+  width: 150px;
+}
+div.body, .document, .section {
+    text-align: justify;
+}
