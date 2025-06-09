@@ -30,11 +30,6 @@ pip install git+https://github.com/pedbrgs/pyccea.git
 
 Ensure you have `pip` and an active internet connection to download dependencies.
 
-## :books: Documentation
-
-Full documentation, including a quickstart tutorial, API reference, and contribution guidelines, is available at [**PyCCEA Documentation**](https://pedbrgs.github.io/PyCCEA/).
-
-
 ## :high_brightness: Quickstart
 
 This quickstart demonstrates how to use the CCFSRFG1 algorithm — a CCEA variant with random feature grouping — to perform feature selection on the Wisconsin Diagnostic Breast Cancer (WDBC) dataset.
@@ -72,6 +67,10 @@ ccea.optimize()
 ```
 
 The best feature subset found is stored in the attribute `best_context_vector`, a binary array where 1 indicates a selected feature and 0 indicates an unselected one.
+
+## :books: Documentation
+
+Full documentation, including a quickstart tutorial, API reference, and contribution guidelines, is available at [**PyCCEA docs**](https://pedbrgs.github.io/PyCCEA/).
 
 ## :scroll: Citation info
 
