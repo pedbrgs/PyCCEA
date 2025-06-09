@@ -20,9 +20,14 @@ jobs:
         run: |
           pip install sphinx sphinx_rtd_theme numpydoc
 
-      - name: Generate module-level .rst files
-        run: |
-          sphinx-apidoc -o docs/source/pages pyccea
+      - name: Clean build
+        run: rm -rf docs/_build
+
+      - name: Install your package
+        run: pip install -e .
+
+      - name: Generate .rst files
+        run: sphinx-apidoc -o docs/source/pages pyccea --module-first
 
       - name: Build Sphinx docs
         run: |
