@@ -21,7 +21,7 @@ tqdm-joblib = "0.0.4"
 pyarrow = "20.0.0"
 fsspec = "2025.5.1"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pytest = "8.3.5"
 pytest-cov = "6.1.1"
 pytest-asyncio = "0.26.0"
