@@ -36,6 +36,8 @@ Homepage = "https://github.com/pedbrgs/PyCCEA"
 requires = ["poetry-core>=1.5.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.include]
-"datasets/*.parquet" = "pyccea/datasets"
-"parameters/*.toml" = "pyccea/parameters"
+[[tool.poetry.include]]
+path = "pyccea/datasets/*.parquet"
+
+[[tool.poetry.include]]
+path = "pyccea/parameters/*.toml"
