@@ -30,6 +30,15 @@ pip install git+https://github.com/pedbrgs/pyccea.git
 
 Ensure you have `pip` and an active internet connection to download dependencies.
 
+## :book: Documentation
+
+Comprehensive documentation for PyCCEA provides a tutorial, API references, and contributing guidelines to help you get the most out of the package.
+
+
+You can find the full documentation at:
+
+[https://pedbrgs.github.io/PyCCEA/](https://pedbrgs.github.io/PyCCEA/)
+
 ## :high_brightness: Quickstart
 
 This quickstart demonstrates how to use the CCFSRFG1 algorithm — a CCEA variant with random feature grouping — to perform feature selection on the Wisconsin Diagnostic Breast Cancer (WDBC) dataset.
