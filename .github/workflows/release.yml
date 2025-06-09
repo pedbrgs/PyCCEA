@@ -30,41 +30,47 @@ jobs:
       - name: Run tests
         run: poetry run pytest
 
-      - name: "Check commit message and bump version (patch) if prefix 'release: ' is present"
+      - name: Check commit message and bump version if prefix 'release:' is present
         id: bump_version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Set Git user for commits
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          # Fetch tags to identify latest tag
           git fetch --tags
+
           LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
           echo "Last commit message: $LAST_COMMIT_MSG"
 
           if [[ "$LAST_COMMIT_MSG" == release:* ]]; then
-            # Generate changelog
-            LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-            if [ -n "$LAST_TAG" ]; then
-              git log "$LAST_TAG"..HEAD --pretty=format:"* %s (%an)" > CHANGELOG.md
+            # Get last tag (if any)
+            LAST_TAG=$(git tag --sort=-creatordate | head -n 1)
+
+            if [[ -n "$LAST_TAG" ]]; then
+              git log $LAST_TAG..HEAD --pretty=format:"* %s (%an)" > CHANGELOG.md
             else
               git log --pretty=format:"* %s (%an)" > CHANGELOG.md
             fi
+
             git add CHANGELOG.md
             git commit -m "docs: update changelog [skip ci]"
 
             # Bump version
             poetry version patch
-            git config user.name "github-actions"
-            git config user.email "github-actions@github.com"
             git add pyproject.toml
             git commit -m "ci: bump version [skip ci]"
 
-            # Create and push tag
+            # Tag and push
             NEW_VERSION=$(poetry version -s)
             git tag "v$NEW_VERSION"
+            git push origin main --tags
             git push origin main
-            git push origin "v$NEW_VERSION"
 
             echo "version_bumped=true" >> $GITHUB_OUTPUT
-            echo "version_tag=v$NEW_VERSION" >> $GITHUB_OUTPUT
+            echo "new_version=v$NEW_VERSION" >> $GITHUB_OUTPUT
           else
             echo "version_bumped=false" >> $GITHUB_OUTPUT
           fi
