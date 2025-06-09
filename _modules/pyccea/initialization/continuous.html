@@ -109,31 +109,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bounds</span> <span class="o">=</span> <span class="n">bounds</span>
 
-<div class="viewcode-block" id="RandomContinuousInitialization.build_subpopulations">
-<a class="viewcode-back" href="../../../pages/pyccea.initialization.html#pyccea.initialization.RandomContinuousInitialization.build_subpopulations">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">build_subpopulations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize individuals from all subpopulations.</span>
-
-<span class="sd">        Inherited from SubpopulationInitialization.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">build_subpopulations</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="RandomContinuousInitialization.evaluate_individuals">
-<a class="viewcode-back" href="../../../pages/pyccea.initialization.html#pyccea.initialization.RandomContinuousInitialization.evaluate_individuals">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_individuals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate all individuals from all subpopulations.</span>
-
-<span class="sd">        Inherited from SubpopulationInitialization.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">evaluate_individuals</span><span class="p">()</span></div>
-
-
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_subpop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subcomp_size</span><span class="p">,</span> <span class="n">subpop_size</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize continuous individuals.</span>
-
-<span class="sd">        Initialize &#39;subpop_size&#39; individuals with &#39;subcomp_size&#39; continuous values between the</span>
-<span class="sd">        values specified by the bounds.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize &#39;subpop_size&#39; individuals with &#39;subcomp_size&#39; continuous values between</span>
+<span class="sd">        bounds.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
