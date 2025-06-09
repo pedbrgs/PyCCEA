@@ -30,14 +30,10 @@ pip install git+https://github.com/pedbrgs/pyccea.git
 
 Ensure you have `pip` and an active internet connection to download dependencies.
 
-## :book: Documentation
+## :books: Documentation
 
-Comprehensive documentation for PyCCEA provides a tutorial, API references, and contributing guidelines to help you get the most out of the package.
+Full documentation, including a quickstart tutorial, API reference, and contribution guidelines, is available at [**PyCCEA Documentation**](https://pedbrgs.github.io/PyCCEA/).
 
-
-You can find the full documentation at:
-
-[https://pedbrgs.github.io/PyCCEA/](https://pedbrgs.github.io/PyCCEA/)
 
 ## :high_brightness: Quickstart
 
