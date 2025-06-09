@@ -1,6 +1,11 @@
 pyccea.decomposition package
 ============================
 
+.. automodule:: pyccea.decomposition
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 Submodules
 ----------
 
@@ -48,14 +53,6 @@ pyccea.decomposition.static module
 ----------------------------------
 
 .. automodule:: pyccea.decomposition.static
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-Module contents
----------------
-
-.. automodule:: pyccea.decomposition
    :members:
    :show-inheritance:
    :undoc-members:

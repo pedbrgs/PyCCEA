@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyccea.evaluation.wrapper &mdash; PyCCEA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=a8bcbd07" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/installation.html">1. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/quickstart.html">2. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/api.html">3. API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/contributing.html">4. Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/citation.html">5. Citation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PyCCEA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyccea.evaluation.wrapper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyccea.evaluation.wrapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationModel</span><span class="p">,</span> <span class="n">RegressionModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationMetrics</span><span class="p">,</span> <span class="n">RegressionMetrics</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;y_pred contains classes&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="WrapperEvaluation">
+<a class="viewcode-back" href="../../../pages/pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WrapperEvaluation</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Evaluate selected features based on the predictive performance of a machine learning model.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_evaluator : object of one of the metrics classes</span>
+<span class="sd">        Responsible for computing performance metrics to evaluate models.</span>
+<span class="sd">    base_model : sklearn model object</span>
+<span class="sd">        Model that has not been fitted. Works as a template to avoid multiple model</span>
+<span class="sd">        initializations. As each model evaluates a subset of features (individual), the base model</span>
+<span class="sd">        is copied and fitted for each individual.</span>
+<span class="sd">    model : sklearn model object</span>
+<span class="sd">        Model that has been fitted to evaluate the current individual.</span>
+<span class="sd">    estimators : list of sklearn model objects</span>
+<span class="sd">        Estimators used in the current evaluation. It is one when &#39;eval_mode&#39; is set to &quot;hold_out&quot;</span>
+<span class="sd">        and k when &#39;eval_mode&#39; is set to &quot;k_fold&quot; or &quot;leave_one_out&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">models</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;classification&quot;</span><span class="p">:</span> <span class="n">ClassificationModel</span><span class="p">,</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span> <span class="n">RegressionModel</span><span class="p">}</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;classification&quot;</span><span class="p">:</span> <span class="n">ClassificationMetrics</span><span class="p">,</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span> <span class="n">RegressionMetrics</span><span class="p">}</span>
+    <span class="n">eval_modes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;hold_out&quot;</span><span class="p">,</span> <span class="s2">&quot;k_fold&quot;</span><span class="p">,</span> <span class="s2">&quot;leave_one_out&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">task</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">eval_function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">eval_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">n_classes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        task : str</span>
+<span class="sd">            Name of the supervised learning task (e.g., regression, classification).</span>
+<span class="sd">        model_type : str</span>
+<span class="sd">            Name of the machine learning model that will be fitted for the task.</span>
+<span class="sd">        eval_function : str</span>
+<span class="sd">            Metric that will be used to evaluate the performance of the model trained with the</span>
+<span class="sd">            selected subset of features (makes up the fitness of the individual).</span>
+<span class="sd">        eval_mode : str</span>
+<span class="sd">            Evaluation mode. It can be &#39;hold_out&#39;, &#39;leave_one_out&#39;, or &#39;k_fold&#39;.</span>
+<span class="sd">        n_classes : int, default None</span>
+<span class="sd">            Number of classes when task parameter is set to &#39;classification&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if the chosen task is available</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">WrapperEvaluation</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Task &#39;</span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2">&#39; is not implemented. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;The available tasks are </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">WrapperEvaluation</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># Initialize the model evaluator according to the task</span>
+        <span class="n">task_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;classification&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;n_classes&quot;</span><span class="p">:</span> <span class="n">n_classes</span><span class="p">},</span>
+            <span class="s2">&quot;regression&quot;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span> <span class="o">=</span> <span class="n">WrapperEvaluation</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="n">task</span><span class="p">](</span><span class="o">**</span><span class="n">task_kwargs</span><span class="p">[</span><span class="n">task</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="n">task</span>
+        <span class="c1"># Check if the chosen evaluation function is available</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">eval_function</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span><span class="o">.</span><span class="n">metrics</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Evaluation function &#39;</span><span class="si">{</span><span class="n">eval_function</span><span class="si">}</span><span class="s2">&#39; is not implemented. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;The available </span><span class="si">{</span><span class="n">task</span><span class="si">}</span><span class="s2"> metrics are &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span><span class="o">.</span><span class="n">metrics</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_function</span> <span class="o">=</span> <span class="n">eval_function</span>
+        <span class="c1"># Initialize the model present in the wrapper model_evaluator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_model</span> <span class="o">=</span> <span class="n">WrapperEvaluation</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="n">task</span><span class="p">](</span><span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="n">model_type</span>
+        <span class="c1"># Check if the chosen evaluation mode is available</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">eval_mode</span> <span class="ow">in</span> <span class="n">WrapperEvaluation</span><span class="o">.</span><span class="n">eval_modes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Evaluation mode &#39;</span><span class="si">{</span><span class="n">eval_mode</span><span class="si">}</span><span class="s2">&#39; is not implemented. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;The available evaluation modes are </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">WrapperEvaluation</span><span class="o">.</span><span class="n">eval_modes</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval_mode</span> <span class="o">=</span> <span class="n">eval_mode</span>
+        <span class="c1"># Initialize logger with info level</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_hold_out_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution_mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate an individual using hold_out validation (train/test).&quot;&quot;&quot;</span>
+
+        <span class="c1"># Get model that has not been previously fitted</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="p">)</span>
+        <span class="c1"># Select subset of features in the training set</span>
+        <span class="n">X_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">X_train</span><span class="p">[:,</span> <span class="n">solution_mask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">y_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">y_train</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># Select subset of features in the test set</span>
+        <span class="n">X_test</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">X_test</span><span class="p">[:,</span> <span class="n">solution_mask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">y_test</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">y_test</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># Train model with the current subset of features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="o">=</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span> <span class="n">optimize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="p">))</span>
+        <span class="c1"># Evaluate the individual</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span>
+            <span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span>
+            <span class="n">X_test</span><span class="o">=</span><span class="n">X_test</span><span class="p">,</span>
+            <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="c1"># Get evaluation in the test set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cross_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution_mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate an individual using cross-validation (leave-one-out or k-fold).&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">kfolds</span><span class="p">):</span>
+            <span class="c1"># Get training and validations subsets built from the full training set</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">train_folds</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">X_val</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">val_folds</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="c1"># Select subset of features in the training subset</span>
+            <span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[:,</span> <span class="n">solution_mask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="c1"># Select subset of features in the validation subset</span>
+            <span class="n">X_val</span> <span class="o">=</span> <span class="n">X_val</span><span class="p">[:,</span> <span class="n">solution_mask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="c1"># Get model that has not been previously fitted</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="p">)</span>
+            <span class="c1"># Train model with the current subset of features</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="o">=</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span> <span class="n">optimize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="p">))</span>
+            <span class="c1"># Evaluate the individual</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span>
+                <span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span>
+                <span class="n">X_test</span><span class="o">=</span><span class="n">X_val</span><span class="p">,</span>
+                <span class="n">y_test</span><span class="o">=</span><span class="n">y_val</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+        <span class="c1"># Calculate average performance over k folds</span>
+        <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span><span class="o">/</span><span class="n">data</span><span class="o">.</span><span class="n">kfolds</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WrapperEvaluation.evaluate">
+<a class="viewcode-back" href="../../../pages/pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation.evaluate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate an individual represented by a complete solution through the predictive</span>
+<span class="sd">        performance of a machine learning model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        solution : np.ndarray</span>
+<span class="sd">            Solution represented by a binary n-dimensional array, where n is the number of</span>
+<span class="sd">            features.</span>
+<span class="sd">        data : DataLoader</span>
+<span class="sd">            Container with process data and training and test sets.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        : dict</span>
+<span class="sd">            Evaluation metrics.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Estimator(s) used for the current evaluation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimators</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="c1"># If no feature is selected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span> <span class="o">=</span> <span class="p">{</span><span class="n">metric</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span><span class="o">.</span><span class="n">metrics</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">solution</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span>
+        <span class="c1"># Boolean array used to filter which features will be used to fit the model</span>
+        <span class="n">solution_mask</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Hold-out validation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_mode</span> <span class="o">==</span> <span class="s2">&quot;hold_out&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hold_out_validation</span><span class="p">(</span>
+                <span class="n">solution_mask</span><span class="o">=</span><span class="n">solution_mask</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="c1"># K-fold cross validation or leave-one-out cross validation</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;k_fold&quot;</span><span class="p">,</span> <span class="s2">&quot;leave_one_out&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cross_validation</span><span class="p">(</span>
+                <span class="n">solution_mask</span><span class="o">=</span><span class="n">solution_mask</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, pedbrgs.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

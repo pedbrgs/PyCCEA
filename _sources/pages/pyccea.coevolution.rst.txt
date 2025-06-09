@@ -1,6 +1,11 @@
 pyccea.coevolution package
 ==========================
 
+.. automodule:: pyccea.coevolution
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 Submodules
 ----------
 
@@ -72,14 +77,6 @@ pyccea.coevolution.ccsufg module
 --------------------------------
 
 .. automodule:: pyccea.coevolution.ccsufg
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-Module contents
----------------
-
-.. automodule:: pyccea.coevolution
    :members:
    :show-inheritance:
    :undoc-members:

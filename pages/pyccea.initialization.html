@@ -50,9 +50,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">1. Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">2. Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">3. API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html#module-pyccea.evaluation">4. Module Details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">5. Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="citation.html">6. Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">4. Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">5. Citation</a></li>
 </ul>
 
         </div>
@@ -80,22 +79,179 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyccea-initialization-package">
-<h1><span class="section-number">3.6. </span>pyccea.initialization package<a class="headerlink" href="#pyccea-initialization-package" title="Link to this heading"></a></h1>
+  <section id="module-pyccea.initialization">
+<span id="pyccea-initialization-package"></span><h1><span class="section-number">3.6. </span>pyccea.initialization package<a class="headerlink" href="#module-pyccea.initialization" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.initialization.RandomBinaryInitialization">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.initialization.</span></span><span class="sig-name descname"><span class="pre">RandomBinaryInitialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subpop_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collaborator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_function</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/initialization/binary.html#RandomBinaryInitialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.initialization.RandomBinaryInitialization" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.initialization.build.SubpopulationInitialization" title="pyccea.initialization.build.SubpopulationInitialization"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubpopulationInitialization</span></code></a></p>
+<p>Randomly initialize subpopulations with binary representation.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_subpopulations</span></code>()</p></td>
+<td><p>Initialize individuals from all subpopulations.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_individuals</span></code>()</p></td>
+<td><p>Evaluate all individuals from all subpopulations.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.initialization.RandomContinuousInitialization">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.initialization.</span></span><span class="sig-name descname"><span class="pre">RandomContinuousInitialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subpop_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collaborator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0,</span> <span class="pre">1)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/initialization/continuous.html#RandomContinuousInitialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.initialization.RandomContinuousInitialization" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.initialization.build.SubpopulationInitialization" title="pyccea.initialization.build.SubpopulationInitialization"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubpopulationInitialization</span></code></a></p>
+<p>Randomly initialize subpopulations with continuous representation.</p>
+<p>For certain Evolutionary Algorithms, like Differential Evolution, which operate on continuous
+solutions, an appropriate initialization is required based on this representation.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_subpopulations</span></code>()</p></td>
+<td><p>Initialize individuals from all subpopulations.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_individuals</span></code>()</p></td>
+<td><p>Evaluate all individuals from all subpopulations.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.initialization.SubpopulationInitialization">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.initialization.</span></span><span class="sig-name descname"><span class="pre">SubpopulationInitialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subpop_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collaborator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_function</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/initialization/build.html#SubpopulationInitialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.initialization.SubpopulationInitialization" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>An abstract class for subpopulation initialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subpops</strong><span class="classifier">list</span></dt><dd><p>Individuals from all subpopulations.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">list</span></dt><dd><p>Evaluation of all context vectors from all subpopulations.</p>
+</dd>
+<dt><strong>context_vectors: list</strong></dt><dd><p>Complete problem solutions that were randomly initialized.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.initialization.SubpopulationInitialization.build_subpopulations" title="pyccea.initialization.SubpopulationInitialization.build_subpopulations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_subpopulations</span></code></a>()</p></td>
+<td><p>Initialize individuals from all subpopulations.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyccea.initialization.SubpopulationInitialization.evaluate_individuals" title="pyccea.initialization.SubpopulationInitialization.evaluate_individuals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_individuals</span></code></a>()</p></td>
+<td><p>Evaluate all individuals from all subpopulations.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.initialization.SubpopulationInitialization.build_subpopulations">
+<span class="sig-name descname"><span class="pre">build_subpopulations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/initialization/build.html#SubpopulationInitialization.build_subpopulations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.initialization.SubpopulationInitialization.build_subpopulations" title="Link to this definition"></a></dt>
+<dd><p>Initialize individuals from all subpopulations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.initialization.SubpopulationInitialization.evaluate_individuals">
+<span class="sig-name descname"><span class="pre">evaluate_individuals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/initialization/build.html#SubpopulationInitialization.evaluate_individuals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.initialization.SubpopulationInitialization.evaluate_individuals" title="Link to this definition"></a></dt>
+<dd><p>Evaluate all individuals from all subpopulations.</p>
+</dd></dl>
+
+</dd></dl>
+
 <section id="submodules">
 <h2><span class="section-number">3.6.1. </span>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="pyccea-initialization-binary-module">
-<h2><span class="section-number">3.6.2. </span>pyccea.initialization.binary module<a class="headerlink" href="#pyccea-initialization-binary-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.initialization.binary">
+<span id="pyccea-initialization-binary-module"></span><h2><span class="section-number">3.6.2. </span>pyccea.initialization.binary module<a class="headerlink" href="#module-pyccea.initialization.binary" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.initialization.binary.RandomBinaryInitialization">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.initialization.binary.</span></span><span class="sig-name descname"><span class="pre">RandomBinaryInitialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subpop_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collaborator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_function</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/initialization/binary.html#RandomBinaryInitialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.initialization.binary.RandomBinaryInitialization" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.initialization.build.SubpopulationInitialization" title="pyccea.initialization.build.SubpopulationInitialization"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubpopulationInitialization</span></code></a></p>
+<p>Randomly initialize subpopulations with binary representation.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_subpopulations</span></code>()</p></td>
+<td><p>Initialize individuals from all subpopulations.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_individuals</span></code>()</p></td>
+<td><p>Evaluate all individuals from all subpopulations.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </section>
-<section id="pyccea-initialization-build-module">
-<h2><span class="section-number">3.6.3. </span>pyccea.initialization.build module<a class="headerlink" href="#pyccea-initialization-build-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.initialization.build">
+<span id="pyccea-initialization-build-module"></span><h2><span class="section-number">3.6.3. </span>pyccea.initialization.build module<a class="headerlink" href="#module-pyccea.initialization.build" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.initialization.build.SubpopulationInitialization">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.initialization.build.</span></span><span class="sig-name descname"><span class="pre">SubpopulationInitialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subpop_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collaborator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_function</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/initialization/build.html#SubpopulationInitialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.initialization.build.SubpopulationInitialization" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>An abstract class for subpopulation initialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subpops</strong><span class="classifier">list</span></dt><dd><p>Individuals from all subpopulations.</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">list</span></dt><dd><p>Evaluation of all context vectors from all subpopulations.</p>
+</dd>
+<dt><strong>context_vectors: list</strong></dt><dd><p>Complete problem solutions that were randomly initialized.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.initialization.build.SubpopulationInitialization.build_subpopulations" title="pyccea.initialization.build.SubpopulationInitialization.build_subpopulations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_subpopulations</span></code></a>()</p></td>
+<td><p>Initialize individuals from all subpopulations.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyccea.initialization.build.SubpopulationInitialization.evaluate_individuals" title="pyccea.initialization.build.SubpopulationInitialization.evaluate_individuals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_individuals</span></code></a>()</p></td>
+<td><p>Evaluate all individuals from all subpopulations.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.initialization.build.SubpopulationInitialization.build_subpopulations">
+<span class="sig-name descname"><span class="pre">build_subpopulations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/initialization/build.html#SubpopulationInitialization.build_subpopulations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.initialization.build.SubpopulationInitialization.build_subpopulations" title="Link to this definition"></a></dt>
+<dd><p>Initialize individuals from all subpopulations.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.initialization.build.SubpopulationInitialization.evaluate_individuals">
+<span class="sig-name descname"><span class="pre">evaluate_individuals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/initialization/build.html#SubpopulationInitialization.evaluate_individuals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.initialization.build.SubpopulationInitialization.evaluate_individuals" title="Link to this definition"></a></dt>
+<dd><p>Evaluate all individuals from all subpopulations.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-initialization-continuous-module">
-<h2><span class="section-number">3.6.4. </span>pyccea.initialization.continuous module<a class="headerlink" href="#pyccea-initialization-continuous-module" title="Link to this heading"></a></h2>
-</section>
-<section id="module-contents">
-<h2><span class="section-number">3.6.5. </span>Module contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<section id="module-pyccea.initialization.continuous">
+<span id="pyccea-initialization-continuous-module"></span><h2><span class="section-number">3.6.4. </span>pyccea.initialization.continuous module<a class="headerlink" href="#module-pyccea.initialization.continuous" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.initialization.continuous.RandomContinuousInitialization">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.initialization.continuous.</span></span><span class="sig-name descname"><span class="pre">RandomContinuousInitialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subpop_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collaborator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0,</span> <span class="pre">1)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/initialization/continuous.html#RandomContinuousInitialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.initialization.continuous.RandomContinuousInitialization" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.initialization.build.SubpopulationInitialization" title="pyccea.initialization.build.SubpopulationInitialization"><code class="xref py py-class docutils literal notranslate"><span class="pre">SubpopulationInitialization</span></code></a></p>
+<p>Randomly initialize subpopulations with continuous representation.</p>
+<p>For certain Evolutionary Algorithms, like Differential Evolution, which operate on continuous
+solutions, an appropriate initialization is required based on this representation.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_subpopulations</span></code>()</p></td>
+<td><p>Initialize individuals from all subpopulations.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_individuals</span></code>()</p></td>
+<td><p>Evaluate all individuals from all subpopulations.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </section>
 </section>
 

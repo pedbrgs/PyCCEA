@@ -21,7 +21,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="5. Contributing" href="contributing.html" />
+    <link rel="next" title="4. Contributing" href="contributing.html" />
     <link rel="prev" title="3.8. pyccea.projection package" href="pyccea.projection.html" /> 
 </head>
 
@@ -50,9 +50,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">1. Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">2. Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">3. API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html#module-pyccea.evaluation">4. Module Details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">5. Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="citation.html">6. Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">4. Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">5. Citation</a></li>
 </ul>
 
         </div>
@@ -80,31 +79,455 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyccea-utils-package">
-<h1><span class="section-number">3.9. </span>pyccea.utils package<a class="headerlink" href="#pyccea-utils-package" title="Link to this heading"></a></h1>
+  <section id="module-pyccea.utils">
+<span id="pyccea-utils-package"></span><h1><span class="section-number">3.9. </span>pyccea.utils package<a class="headerlink" href="#module-pyccea.utils" title="Link to this heading"></a></h1>
 <section id="submodules">
 <h2><span class="section-number">3.9.1. </span>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="pyccea-utils-config-module">
-<h2><span class="section-number">3.9.2. </span>pyccea.utils.config module<a class="headerlink" href="#pyccea-utils-config-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.utils.config">
+<span id="pyccea-utils-config-module"></span><h2><span class="section-number">3.9.2. </span>pyccea.utils.config module<a class="headerlink" href="#module-pyccea.utils.config" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyccea.utils.config.load_params">
+<span class="sig-prename descclassname"><span class="pre">pyccea.utils.config.</span></span><span class="sig-name descname"><span class="pre">load_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/utils/config.html#load_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.config.load_params" title="Link to this definition"></a></dt>
+<dd><p>Load parameters of a Cooperative Co-Evolutionary Algorithm (CCEA) from configuration file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>conf_path: str</strong></dt><dd><p>Path to the configuration file.</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd></dd>
+<dt><strong>——-</strong></dt><dd></dd>
+<dt><strong>conf: dict</strong></dt><dd><p>Configuration parameters of a CCEA.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="pyccea-utils-datasets-module">
-<h2><span class="section-number">3.9.3. </span>pyccea.utils.datasets module<a class="headerlink" href="#pyccea-utils-datasets-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.utils.datasets">
+<span id="pyccea-utils-datasets-module"></span><h2><span class="section-number">3.9.3. </span>pyccea.utils.datasets module<a class="headerlink" href="#module-pyccea.utils.datasets" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.utils.datasets.DataLoader">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.utils.datasets.</span></span><span class="sig-name descname"><span class="pre">DataLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/utils/datasets.html#DataLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.datasets.DataLoader" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Load dataset and preprocess it to train machine learning algorithms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>data</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>Raw dataset.</p>
+</dd>
+<dt><strong>X</strong><span class="classifier">pd.DataFrame</span></dt><dd><p>Raw input data.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">pd.Series</span></dt><dd><p>Raw output data.</p>
+</dd>
+<dt><strong>X_train</strong><span class="classifier">np.ndarray</span></dt><dd><p>Train input data.</p>
+</dd>
+<dt><strong>X_test</strong><span class="classifier">np.ndarray</span></dt><dd><p>Test input data.</p>
+</dd>
+<dt><strong>y_train</strong><span class="classifier">np.ndarray</span></dt><dd><p>Train output data.</p>
+</dd>
+<dt><strong>y_test</strong><span class="classifier">np.ndarray</span></dt><dd><p>Test output data.</p>
+</dd>
+<dt><strong>n_examples</strong><span class="classifier">int</span></dt><dd><p>Total number of examples.</p>
+</dd>
+<dt><strong>n_features</strong><span class="classifier">int</span></dt><dd><p>Number of features in the dataset.</p>
+</dd>
+<dt><strong>n_classes</strong><span class="classifier">int</span></dt><dd><p>Number of classes.</p>
+</dd>
+<dt><strong>classes</strong><span class="classifier">np.ndarray</span></dt><dd><p>Class identifiers.</p>
+</dd>
+<dt><strong>train_size</strong><span class="classifier">int</span></dt><dd><p>Number of examples in the training set.</p>
+</dd>
+<dt><strong>test_size</strong><span class="classifier">int</span></dt><dd><p>Number of examples in the test set.</p>
+</dd>
+<dt><strong>seed</strong><span class="classifier">int, default None</span></dt><dd><p>It controls the randomness of the data split.</p>
+</dd>
+<dt><strong>preset</strong><span class="classifier">bool, default False</span></dt><dd><p>In some works, the training and testing sets have already been defined. To use them, just
+set this boolean variable to True.</p>
+</dd>
+<dt><strong>test_ratio</strong><span class="classifier">float</span></dt><dd><p>Proportion of the dataset to include in the test set. It should be between 0 and 1.</p>
+</dd>
+<dt><strong>splitter_type</strong><span class="classifier">str</span></dt><dd><p>Model selection strategy. It can be “k_fold” or “leave_one_out”.</p>
+</dd>
+<dt><strong>kfolds</strong><span class="classifier">int or None</span></dt><dd><p>Number of folds in the k-fold cross validation or in the leave-one-out cross validation.</p>
+</dd>
+<dt><strong>stratified</strong><span class="classifier">bool, default False</span></dt><dd><p>If True, the folds are made by preserving the percentage of examples for each class. It is
+only used in case ‘splitter_type’ parameter is set to ‘k_fold’.</p>
+</dd>
+<dt><strong>normalize</strong><span class="classifier">bool, default False</span></dt><dd><p>If True, normalizes training and test sets generated by the split method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.utils.datasets.DataLoader.get_ready" title="pyccea.utils.datasets.DataLoader.get_ready"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_ready</span></code></a>()</p></td>
+<td><p>Prepare the data for a Cooperative Co-Evolutionary Algorithm to perform feature selection.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.utils.datasets.DataLoader.DATASETS">
+<span class="sig-name descname"><span class="pre">DATASETS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'11_tumor':</span> <span class="pre">{'file':</span> <span class="pre">'11_tumor.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'9_tumor':</span> <span class="pre">{'file':</span> <span class="pre">'9_tumor.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'brain_tumor_1':</span> <span class="pre">{'file':</span> <span class="pre">'brain_tumor_1.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'brain_tumor_2':</span> <span class="pre">{'file':</span> <span class="pre">'brain_tumor_2.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'cbd':</span> <span class="pre">{'file':</span> <span class="pre">'cbd.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'dermatology':</span> <span class="pre">{'file':</span> <span class="pre">'dermatology.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'divorce':</span> <span class="pre">{'file':</span> <span class="pre">'divorce.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'dlbcl':</span> <span class="pre">{'file':</span> <span class="pre">'dlbcl.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'dorothea':</span> <span class="pre">{'file':</span> <span class="pre">'dorothea.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'gfe':</span> <span class="pre">{'file':</span> <span class="pre">'gfe.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'hapt':</span> <span class="pre">{'file':</span> <span class="pre">'hapt.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'har':</span> <span class="pre">{'file':</span> <span class="pre">'har.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'isolet5':</span> <span class="pre">{'file':</span> <span class="pre">'isolet5.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'itt_f':</span> <span class="pre">{'file':</span> <span class="pre">'itt_f.parquet',</span> <span class="pre">'task':</span> <span class="pre">'regression'},</span> <span class="pre">'itt_m':</span> <span class="pre">{'file':</span> <span class="pre">'itt_m.parquet',</span> <span class="pre">'task':</span> <span class="pre">'regression'},</span> <span class="pre">'leukemia_1':</span> <span class="pre">{'file':</span> <span class="pre">'leukemia_1.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'leukemia_2':</span> <span class="pre">{'file':</span> <span class="pre">'leukemia_2.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'leukemia_3':</span> <span class="pre">{'file':</span> <span class="pre">'leukemia_3.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'libras':</span> <span class="pre">{'file':</span> <span class="pre">'libras.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'lsvt':</span> <span class="pre">{'file':</span> <span class="pre">'lsvt.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'lungc':</span> <span class="pre">{'file':</span> <span class="pre">'lungc.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'madelon_valid':</span> <span class="pre">{'file':</span> <span class="pre">'madelon_valid.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'mfd':</span> <span class="pre">{'file':</span> <span class="pre">'mfd.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'orh':</span> <span class="pre">{'file':</span> <span class="pre">'orh.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'prostate_tumor_1':</span> <span class="pre">{'file':</span> <span class="pre">'prostate_tumor_1.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'qsar_toxicity':</span> <span class="pre">{'file':</span> <span class="pre">'qsar_oral_toxicity.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'scadi':</span> <span class="pre">{'file':</span> <span class="pre">'scadi.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'shd':</span> <span class="pre">{'file':</span> <span class="pre">'shd.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'uji_indoor':</span> <span class="pre">{'file':</span> <span class="pre">'uji_indoor_loc.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'},</span> <span class="pre">'wdbc':</span> <span class="pre">{'file':</span> <span class="pre">'wdbc.parquet',</span> <span class="pre">'task':</span> <span class="pre">'classification'}}</span></em><a class="headerlink" href="#pyccea.utils.datasets.DataLoader.DATASETS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.utils.datasets.DataLoader.NORMALIZATION_METHODS">
+<span class="sig-name descname"><span class="pre">NORMALIZATION_METHODS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'min_max':</span> <span class="pre">&lt;class</span> <span class="pre">'sklearn.preprocessing._data.MinMaxScaler'&gt;,</span> <span class="pre">'standard':</span> <span class="pre">&lt;class</span> <span class="pre">'sklearn.preprocessing._data.StandardScaler'&gt;}</span></em><a class="headerlink" href="#pyccea.utils.datasets.DataLoader.NORMALIZATION_METHODS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.utils.datasets.DataLoader.PRIMARY_CONF_KEYS">
+<span class="sig-name descname"><span class="pre">PRIMARY_CONF_KEYS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['general',</span> <span class="pre">'splitter',</span> <span class="pre">'normalization']</span></em><a class="headerlink" href="#pyccea.utils.datasets.DataLoader.PRIMARY_CONF_KEYS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.utils.datasets.DataLoader.SPLITTER_TYPES">
+<span class="sig-name descname"><span class="pre">SPLITTER_TYPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['k_fold',</span> <span class="pre">'leave_one_out']</span></em><a class="headerlink" href="#pyccea.utils.datasets.DataLoader.SPLITTER_TYPES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.utils.datasets.DataLoader.get_ready">
+<span class="sig-name descname"><span class="pre">get_ready</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/pyccea/utils/datasets.html#DataLoader.get_ready"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.datasets.DataLoader.get_ready" title="Link to this definition"></a></dt>
+<dd><p>Prepare the data for a Cooperative Co-Evolutionary Algorithm to perform feature selection.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.utils.datasets.DataLoader.toml_file">
+<span class="sig-name descname"><span class="pre">toml_file</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;_io.TextIOWrapper</span> <span class="pre">name='/home/runner/work/PyCCEA/PyCCEA/pyccea/parameters/datasets.toml'</span> <span class="pre">mode='r'</span> <span class="pre">encoding='utf-8'&gt;</span></em><a class="headerlink" href="#pyccea.utils.datasets.DataLoader.toml_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-utils-mapping-module">
-<h2><span class="section-number">3.9.4. </span>pyccea.utils.mapping module<a class="headerlink" href="#pyccea-utils-mapping-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.utils.mapping">
+<span id="pyccea-utils-mapping-module"></span><h2><span class="section-number">3.9.4. </span>pyccea.utils.mapping module<a class="headerlink" href="#module-pyccea.utils.mapping" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyccea.utils.mapping.angle_modulation_function">
+<span class="sig-prename descclassname"><span class="pre">pyccea.utils.mapping.</span></span><span class="sig-name descname"><span class="pre">angle_modulation_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coeffs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/pyccea/utils/mapping.html#angle_modulation_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.mapping.angle_modulation_function" title="Link to this definition"></a></dt>
+<dd><p>Homomorphous mapping between binary-valued and continuous-valued space used by the Angle
+Modulated Differential Evolution (AMDE) algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>coeffs: np.ndarray (4,)</strong></dt><dd><p>The AMDE evolves values for the four coefficients a, b, c, and d. The first coefficient
+represents the horizontal shift of the function, the second coefficient represents the
+maximum frequency of the sine function, the third coefficient represents the frequency of
+the cosine function, and the fourth coefficient represents the vertical shift of the
+function.</p>
+</dd>
+<dt><strong>n_features: int</strong></dt><dd><p>Number of variables in the original space (e.g., features in a subcomponent).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>binary_solution: np.ndarray (n_features,)</dt><dd><p>Binary solution in the original space.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pyccea.utils.mapping.shifted_heaviside_function">
+<span class="sig-prename descclassname"><span class="pre">pyccea.utils.mapping.</span></span><span class="sig-name descname"><span class="pre">shifted_heaviside_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">real_solution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/pyccea/utils/mapping.html#shifted_heaviside_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.mapping.shifted_heaviside_function" title="Link to this definition"></a></dt>
+<dd><p>Convert continuous solutions into binary solutions through the heaviside step function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>real_solution: np.ndarray (n_features,)</strong></dt><dd><p>Solution with continuous values.</p>
+</dd>
+<dt><strong>shift: float, default 0.5</strong></dt><dd><p>Threshold for coding the solution from continuous-valued space to binary-valued space.
+Each solution value will be mapped to 1 if it is greater than or equal to shift and 0
+otherwise.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>binary_solution: np.ndarray (n_features,)</dt><dd><p>Real solution encoded in a binary representation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="pyccea-utils-metrics-module">
-<h2><span class="section-number">3.9.5. </span>pyccea.utils.metrics module<a class="headerlink" href="#pyccea-utils-metrics-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.utils.metrics">
+<span id="pyccea-utils-metrics-module"></span><h2><span class="section-number">3.9.5. </span>pyccea.utils.metrics module<a class="headerlink" href="#module-pyccea.utils.metrics" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.utils.metrics.ClassificationMetrics">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.utils.metrics.</span></span><span class="sig-name descname"><span class="pre">ClassificationMetrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_classes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/utils/metrics.html#ClassificationMetrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.metrics.ClassificationMetrics" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Evaluate machine learning model trained for a classification problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>values</strong><span class="classifier">dict()</span></dt><dd><p>Values of classification metrics.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.utils.metrics.ClassificationMetrics.compute" title="pyccea.utils.metrics.ClassificationMetrics.compute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute</span></code></a>(estimator, X_test, y_test[, verbose])</p></td>
+<td><p>Compute classification metrics.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.utils.metrics.ClassificationMetrics.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseEstimator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/utils/metrics.html#ClassificationMetrics.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.metrics.ClassificationMetrics.compute" title="Link to this definition"></a></dt>
+<dd><p>Compute classification metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>estimator</strong><span class="classifier">BaseEstimator</span></dt><dd><p>Model that will be evaluated.</p>
+</dd>
+<dt><strong>X_test</strong><span class="classifier">np.ndarray</span></dt><dd><p>Input test data.</p>
+</dd>
+<dt><strong>y_test</strong><span class="classifier">np.ndarray</span></dt><dd><p>Output test data.</p>
+</dd>
+<dt><strong>verbose</strong><span class="classifier">bool, default False</span></dt><dd><p>If True, show evaluation metrics.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.utils.metrics.ClassificationMetrics.metrics">
+<span class="sig-name descname"><span class="pre">metrics</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['accuracy',</span> <span class="pre">'balanced_accuracy',</span> <span class="pre">'precision',</span> <span class="pre">'recall',</span> <span class="pre">'f1_score',</span> <span class="pre">'specificity']</span></em><a class="headerlink" href="#pyccea.utils.metrics.ClassificationMetrics.metrics" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.utils.metrics.RegressionMetrics">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.utils.metrics.</span></span><span class="sig-name descname"><span class="pre">RegressionMetrics</span></span><a class="reference internal" href="../_modules/pyccea/utils/metrics.html#RegressionMetrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.metrics.RegressionMetrics" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Evaluate machine learning model trained for a regression problem.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>values</strong><span class="classifier">dict()</span></dt><dd><p>Values of regression metrics.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.utils.metrics.RegressionMetrics.compute" title="pyccea.utils.metrics.RegressionMetrics.compute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute</span></code></a>(estimator, X_test, y_test[, verbose])</p></td>
+<td><p>Compute regression metrics.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.utils.metrics.RegressionMetrics.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseEstimator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/utils/metrics.html#RegressionMetrics.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.metrics.RegressionMetrics.compute" title="Link to this definition"></a></dt>
+<dd><p>Compute regression metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>estimator</strong><span class="classifier">BaseEstimator</span></dt><dd><p>Model that will be evaluated.</p>
+</dd>
+<dt><strong>X_test</strong><span class="classifier">np.ndarray</span></dt><dd><p>Input test data.</p>
+</dd>
+<dt><strong>y_test</strong><span class="classifier">np.ndarray</span></dt><dd><p>Output test data.</p>
+</dd>
+<dt><strong>verbose</strong><span class="classifier">bool, default False</span></dt><dd><p>If True, show evaluation metrics.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.utils.metrics.RegressionMetrics.metrics">
+<span class="sig-name descname"><span class="pre">metrics</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['mae',</span> <span class="pre">'mse',</span> <span class="pre">'rmse',</span> <span class="pre">'mape']</span></em><a class="headerlink" href="#pyccea.utils.metrics.RegressionMetrics.metrics" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-utils-models-module">
-<h2><span class="section-number">3.9.6. </span>pyccea.utils.models module<a class="headerlink" href="#pyccea-utils-models-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.utils.models">
+<span id="pyccea-utils-models-module"></span><h2><span class="section-number">3.9.6. </span>pyccea.utils.models module<a class="headerlink" href="#module-pyccea.utils.models" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.utils.models.ClassificationModel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.utils.models.</span></span><span class="sig-name descname"><span class="pre">ClassificationModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/utils/models.html#ClassificationModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.models.ClassificationModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Load a classification model, adjust its hyperparameters and get the best model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>estimator</strong><span class="classifier">sklearn model object</span></dt><dd><p>Trained model. In case optimize is True, it is the model that was chosen by the Randomized
+Search, i.e., estimator which gave the best result on the validation data.</p>
+</dd>
+<dt><strong>hyperparams</strong><span class="classifier">dict</span></dt><dd><p>Hyperparameters of the model. In case optimize is True, it is the best hyperparameters
+used to fit the machine learning model.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.utils.models.ClassificationModel.train" title="pyccea.utils.models.ClassificationModel.train"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train</span></code></a>(X_train, y_train[, seed, kfolds, ...])</p></td>
+<td><p>Build and train a classification model.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.utils.models.ClassificationModel.models">
+<span class="sig-name descname"><span class="pre">models</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'complement_naive_bayes':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.naive_bayes.ComplementNB'&gt;,</span> <span class="pre">{}),</span> <span class="pre">'gaussian_naive_bayes':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.naive_bayes.GaussianNB'&gt;,</span> <span class="pre">{}),</span> <span class="pre">'k_nearest_neighbors':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.neighbors._classification.KNeighborsClassifier'&gt;,</span> <span class="pre">{'n_neighbors':</span> <span class="pre">1}),</span> <span class="pre">'logistic_regression':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.linear_model._logistic.LogisticRegression'&gt;,</span> <span class="pre">{}),</span> <span class="pre">'multinomial_naive_bayes':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.naive_bayes.MultinomialNB'&gt;,</span> <span class="pre">{}),</span> <span class="pre">'random_forest':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.ensemble._forest.RandomForestClassifier'&gt;,</span> <span class="pre">{'n_jobs':</span> <span class="pre">-1}),</span> <span class="pre">'support_vector_machine':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.svm._classes.SVC'&gt;,</span> <span class="pre">{})}</span></em><a class="headerlink" href="#pyccea.utils.models.ClassificationModel.models" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.utils.models.ClassificationModel.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfolds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/utils/models.html#ClassificationModel.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.models.ClassificationModel.train" title="Link to this definition"></a></dt>
+<dd><p>Build and train a classification model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X_train: np.ndarray</strong></dt><dd><p>Train input data.</p>
+</dd>
+<dt><strong>y_train: np.ndarray</strong></dt><dd><p>Train output data.</p>
+</dd>
+<dt><strong>seed: int, default None</strong></dt><dd><p>Controls the shuffling applied for subsampling the data.</p>
+</dd>
+<dt><strong>kfolds: int, default 10</strong></dt><dd><p>Number of folds in the k-fold cross validation.</p>
+</dd>
+<dt><strong>n_iter: int, default 100</strong></dt><dd><p>Number of hyperparameter settings that are sampled. It trades off runtime and quality
+of the solution.</p>
+</dd>
+<dt><strong>optimize: bool, default False</strong></dt><dd><p>If True, optimize the hyperparameters of the model and return the best model.</p>
+</dd>
+<dt><strong>verbose: bool, default False</strong></dt><dd><p>If True, show logs.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.utils.models.RegressionModel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.utils.models.</span></span><span class="sig-name descname"><span class="pre">RegressionModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/utils/models.html#RegressionModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.models.RegressionModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Load a regression model, adjust its hyperparameters and get the best model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>estimator</strong><span class="classifier">sklearn model object</span></dt><dd><p>Trained model. In case optimize is True, it is the model that was chosen by the Randomized
+Search, i.e., estimator which gave the best result on the validation data.</p>
+</dd>
+<dt><strong>hyperparams</strong><span class="classifier">dict</span></dt><dd><p>Hyperparameters of the model. In case optimize is True, it is the best hyperparameters
+used to fit the machine learning model.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.utils.models.RegressionModel.train" title="pyccea.utils.models.RegressionModel.train"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train</span></code></a>(X_train, y_train[, seed, kfolds, ...])</p></td>
+<td><p>Build and train a regression model.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.utils.models.RegressionModel.models">
+<span class="sig-name descname"><span class="pre">models</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'elastic_net':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.linear_model._coordinate_descent.ElasticNet'&gt;,</span> <span class="pre">{}),</span> <span class="pre">'lasso':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.linear_model._coordinate_descent.Lasso'&gt;,</span> <span class="pre">{}),</span> <span class="pre">'linear':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.linear_model._base.LinearRegression'&gt;,</span> <span class="pre">{}),</span> <span class="pre">'random_forest':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.ensemble._forest.RandomForestRegressor'&gt;,</span> <span class="pre">{}),</span> <span class="pre">'ridge':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.linear_model._ridge.Ridge'&gt;,</span> <span class="pre">{}),</span> <span class="pre">'support_vector_machine':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.svm._classes.SVR'&gt;,</span> <span class="pre">{})}</span></em><a class="headerlink" href="#pyccea.utils.models.RegressionModel.models" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.utils.models.RegressionModel.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kfolds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_iter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/utils/models.html#RegressionModel.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.models.RegressionModel.train" title="Link to this definition"></a></dt>
+<dd><p>Build and train a regression model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X_train: np.ndarray</strong></dt><dd><p>Train input data.</p>
+</dd>
+<dt><strong>y_train: np.ndarray</strong></dt><dd><p>Train output data.</p>
+</dd>
+<dt><strong>seed: int, default None</strong></dt><dd><p>Controls the shuffling applied for subsampling the data.</p>
+</dd>
+<dt><strong>kfolds: int, default 10</strong></dt><dd><p>Number of folds in the k-fold cross validation.</p>
+</dd>
+<dt><strong>n_iter: int, default 100</strong></dt><dd><p>Number of hyperparameter settings that are sampled. It trades off runtime and quality
+of the solution.</p>
+</dd>
+<dt><strong>optimize: bool, default False</strong></dt><dd><p>If True, optimize the hyperparameters of the model and return the best model.</p>
+</dd>
+<dt><strong>verbose: bool, default False</strong></dt><dd><p>If True, show logs.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-utils-stats-module">
-<h2><span class="section-number">3.9.7. </span>pyccea.utils.stats module<a class="headerlink" href="#pyccea-utils-stats-module" title="Link to this heading"></a></h2>
-</section>
-<section id="module-pyccea.utils">
-<span id="module-contents"></span><h2><span class="section-number">3.9.8. </span>Module contents<a class="headerlink" href="#module-pyccea.utils" title="Link to this heading"></a></h2>
+<section id="module-pyccea.utils.stats">
+<span id="pyccea-utils-stats-module"></span><h2><span class="section-number">3.9.7. </span>pyccea.utils.stats module<a class="headerlink" href="#module-pyccea.utils.stats" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyccea.utils.stats.statistical_comparison_between_independent_samples">
+<span class="sig-prename descclassname"><span class="pre">pyccea.utils.stats.</span></span><span class="sig-name descname"><span class="pre">statistical_comparison_between_independent_samples</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alternative</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'two-sided'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/pyccea/utils/stats.html#statistical_comparison_between_independent_samples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.utils.stats.statistical_comparison_between_independent_samples" title="Link to this definition"></a></dt>
+<dd><p>Perform a statistical comparison between two independent samples.</p>
+<p>This function compares two independent samples <cite>x</cite> and <cite>y</cite> using a
+statistical test (e.g., t-test) to determine if there is a significant
+difference between them. The test is two-sided by default, but can be
+configured to perform one-sided tests. It returns the test statistic
+name, the computed p-value, the test statistic, and whether the null
+hypothesis is rejected at the given significance level <cite>alpha</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>x</strong><span class="classifier">np.ndarray</span></dt><dd><p>The first independent sample.</p>
+</dd>
+<dt><strong>y</strong><span class="classifier">np.ndarray</span></dt><dd><p>The second independent sample.</p>
+</dd>
+<dt><strong>alpha</strong><span class="classifier">float, optional</span></dt><dd><p>The significance level for the hypothesis test (default is 0.05).</p>
+</dd>
+<dt><strong>alternative</strong><span class="classifier">str, optional</span></dt><dd><p>Defines the alternative hypothesis. Options are ‘two-sided’, 
+‘greater’, or ‘less’ (default is ‘two-sided’).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>test_name</strong><span class="classifier">str</span></dt><dd><p>The name of the statistical test used (e.g., ‘t-test’, ‘mann-whitney-u’).</p>
+</dd>
+<dt><strong>p_comparison</strong><span class="classifier">float</span></dt><dd><p>The computed p-value of the test.</p>
+</dd>
+<dt><strong>statistic</strong><span class="classifier">float</span></dt><dd><p>The test statistic from the hypothesis test.</p>
+</dd>
+<dt><strong>reject_null</strong><span class="classifier">bool</span></dt><dd><p>True if the null hypothesis is rejected at the given significance level,
+False otherwise.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ValueError</dt><dd><p>If the input arrays <cite>x</cite> and <cite>y</cite> have different lengths or are not 
+one-dimensional.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If the <cite>alternative</cite> argument is not one of ‘two-sided’, ‘greater’, 
+or ‘less’.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 
@@ -113,7 +536,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="pyccea.projection.html" class="btn btn-neutral float-left" title="3.8. pyccea.projection package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="contributing.html" class="btn btn-neutral float-right" title="5. Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="contributing.html" class="btn btn-neutral float-right" title="4. Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

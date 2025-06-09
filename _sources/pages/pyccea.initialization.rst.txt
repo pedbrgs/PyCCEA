@@ -1,6 +1,11 @@
 pyccea.initialization package
 =============================
 
+.. automodule:: pyccea.initialization
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 Submodules
 ----------
 
@@ -24,14 +29,6 @@ pyccea.initialization.continuous module
 ---------------------------------------
 
 .. automodule:: pyccea.initialization.continuous
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-Module contents
----------------
-
-.. automodule:: pyccea.initialization
    :members:
    :show-inheritance:
    :undoc-members:

@@ -50,9 +50,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">1. Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">2. Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">3. API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html#module-pyccea.evaluation">4. Module Details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">5. Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="citation.html">6. Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">4. Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">5. Citation</a></li>
 </ul>
 
         </div>
@@ -80,19 +79,260 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyccea-optimizers-package">
-<h1><span class="section-number">3.7. </span>pyccea.optimizers package<a class="headerlink" href="#pyccea-optimizers-package" title="Link to this heading"></a></h1>
+  <section id="module-pyccea.optimizers">
+<span id="pyccea-optimizers-package"></span><h1><span class="section-number">3.7. </span>pyccea.optimizers package<a class="headerlink" href="#module-pyccea.optimizers" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.optimizers.BinaryGeneticAlgorithm">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.optimizers.</span></span><span class="sig-name descname"><span class="pre">BinaryGeneticAlgorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/optimizers/genetic_algorithm.html#BinaryGeneticAlgorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.optimizers.BinaryGeneticAlgorithm" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Binary genetic algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mutation_rate: float</strong></dt><dd><p>Probability of a mutation occurring.</p>
+</dd>
+<dt><strong>crossover_rate: float</strong></dt><dd><p>Probability of a crossover occurring.</p>
+</dd>
+<dt><strong>tournament_sample_size: int</strong></dt><dd><p>Sample size of the subpopulation that will be used in Tournament Selection.</p>
+</dd>
+<dt><strong>selection_method: str</strong></dt><dd><p>Population update method employed in each generation, which can take one of two options:
+(i) generational, where the entire population is replaced in each generation (excluding a
+specified ‘elite_size’ individuals), or (ii) steady-state, where only the two least fit
+individuals are replaced.</p>
+</dd>
+<dt><strong>elite_size: int, optional</strong></dt><dd><p>Number of individuals that will be preserved from the current to the next generation. They
+are selected according to the fitness, i.e., if it is N, the N best individuals of the
+current generation will be preserved for the next generation. This parameter is only used
+if the selection_method is generational.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.optimizers.BinaryGeneticAlgorithm.evolve" title="pyccea.optimizers.BinaryGeneticAlgorithm.evolve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evolve</span></code></a>(subpop, fitness)</p></td>
+<td><p>Evolve a subpopulation for a single generation.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.optimizers.BinaryGeneticAlgorithm.evolve">
+<span class="sig-name descname"><span class="pre">evolve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/optimizers/genetic_algorithm.html#BinaryGeneticAlgorithm.evolve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.optimizers.BinaryGeneticAlgorithm.evolve" title="Link to this definition"></a></dt>
+<dd><p>Evolve a subpopulation for a single generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subpop: np.ndarray</strong></dt><dd><p>Individuals of the subpopulation, where each individual is an array of size equal to
+the number of features.</p>
+</dd>
+<dt><strong>fitness: list</strong></dt><dd><p>Evaluation of all individuals in the subpopulation.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>next_subpop: np.ndarray</dt><dd><p>Individuals in the subpopulation of the next generation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.optimizers.BinaryGeneticAlgorithm.selection_methods">
+<span class="sig-name descname"><span class="pre">selection_methods</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['generational',</span> <span class="pre">'steady-state']</span></em><a class="headerlink" href="#pyccea.optimizers.BinaryGeneticAlgorithm.selection_methods" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.optimizers.DifferentialEvolution">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.optimizers.</span></span><span class="sig-name descname"><span class="pre">DifferentialEvolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/optimizers/differential_evolution.html#DifferentialEvolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.optimizers.DifferentialEvolution" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Differential Evolution (AMDE) algorithm (rand/1/exp).</p>
+<p>Storn, Rainer, and Kenneth Price. “Differential Evolution - A Simple and Efficient Heuristic
+for Global Optimization over Continuous Spaces” Journal of global optimization 11 (1997):
+341-359.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>scaling_factor: float</strong></dt><dd><p>The mutation constant. In the literature this is also known as differential weight,
+being denoted by F. It should be in the range [0, 2].</p>
+</dd>
+<dt><strong>crossover_probability: float</strong></dt><dd><p>The recombination constant, should be in the range [0, 1]. In the literature this is
+also known as the crossover probability. Increasing this value allows a larger number
+of mutants to progress into the next generation, but at the risk of population
+stability.</p>
+</dd>
+<dt><strong>bounds: tuple[float, float]</strong></dt><dd><p>Bounds for continuous variables (min, max).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.optimizers.DifferentialEvolution.evolve" title="pyccea.optimizers.DifferentialEvolution.evolve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evolve</span></code></a>(subpop, fitness)</p></td>
+<td><p>Evolve a subpopulation for a single generation.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.optimizers.DifferentialEvolution.evolve">
+<span class="sig-name descname"><span class="pre">evolve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/optimizers/differential_evolution.html#DifferentialEvolution.evolve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.optimizers.DifferentialEvolution.evolve" title="Link to this definition"></a></dt>
+<dd><p>Evolve a subpopulation for a single generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subpop: np.ndarray</strong></dt><dd><p>Individuals of the subpopulation, where each individual is an array of size equal to
+the number of features.</p>
+</dd>
+<dt><strong>fitness: list</strong></dt><dd><p>Evaluation of all individuals in the subpopulation.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>next_subpop: np.ndarray</dt><dd><p>Individuals in the subpopulation of the next generation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <section id="submodules">
 <h2><span class="section-number">3.7.1. </span>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="pyccea-optimizers-differential-evolution-module">
-<h2><span class="section-number">3.7.2. </span>pyccea.optimizers.differential_evolution module<a class="headerlink" href="#pyccea-optimizers-differential-evolution-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.optimizers.differential_evolution">
+<span id="pyccea-optimizers-differential-evolution-module"></span><h2><span class="section-number">3.7.2. </span>pyccea.optimizers.differential_evolution module<a class="headerlink" href="#module-pyccea.optimizers.differential_evolution" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.optimizers.differential_evolution.DifferentialEvolution">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.optimizers.differential_evolution.</span></span><span class="sig-name descname"><span class="pre">DifferentialEvolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/optimizers/differential_evolution.html#DifferentialEvolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.optimizers.differential_evolution.DifferentialEvolution" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Differential Evolution (AMDE) algorithm (rand/1/exp).</p>
+<p>Storn, Rainer, and Kenneth Price. “Differential Evolution - A Simple and Efficient Heuristic
+for Global Optimization over Continuous Spaces” Journal of global optimization 11 (1997):
+341-359.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>scaling_factor: float</strong></dt><dd><p>The mutation constant. In the literature this is also known as differential weight,
+being denoted by F. It should be in the range [0, 2].</p>
+</dd>
+<dt><strong>crossover_probability: float</strong></dt><dd><p>The recombination constant, should be in the range [0, 1]. In the literature this is
+also known as the crossover probability. Increasing this value allows a larger number
+of mutants to progress into the next generation, but at the risk of population
+stability.</p>
+</dd>
+<dt><strong>bounds: tuple[float, float]</strong></dt><dd><p>Bounds for continuous variables (min, max).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.optimizers.differential_evolution.DifferentialEvolution.evolve" title="pyccea.optimizers.differential_evolution.DifferentialEvolution.evolve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evolve</span></code></a>(subpop, fitness)</p></td>
+<td><p>Evolve a subpopulation for a single generation.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.optimizers.differential_evolution.DifferentialEvolution.evolve">
+<span class="sig-name descname"><span class="pre">evolve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/optimizers/differential_evolution.html#DifferentialEvolution.evolve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.optimizers.differential_evolution.DifferentialEvolution.evolve" title="Link to this definition"></a></dt>
+<dd><p>Evolve a subpopulation for a single generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subpop: np.ndarray</strong></dt><dd><p>Individuals of the subpopulation, where each individual is an array of size equal to
+the number of features.</p>
+</dd>
+<dt><strong>fitness: list</strong></dt><dd><p>Evaluation of all individuals in the subpopulation.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>next_subpop: np.ndarray</dt><dd><p>Individuals in the subpopulation of the next generation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-optimizers-genetic-algorithm-module">
-<h2><span class="section-number">3.7.3. </span>pyccea.optimizers.genetic_algorithm module<a class="headerlink" href="#pyccea-optimizers-genetic-algorithm-module" title="Link to this heading"></a></h2>
-</section>
-<section id="module-contents">
-<h2><span class="section-number">3.7.4. </span>Module contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<section id="module-pyccea.optimizers.genetic_algorithm">
+<span id="pyccea-optimizers-genetic-algorithm-module"></span><h2><span class="section-number">3.7.3. </span>pyccea.optimizers.genetic_algorithm module<a class="headerlink" href="#module-pyccea.optimizers.genetic_algorithm" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.optimizers.genetic_algorithm.BinaryGeneticAlgorithm">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.optimizers.genetic_algorithm.</span></span><span class="sig-name descname"><span class="pre">BinaryGeneticAlgorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/optimizers/genetic_algorithm.html#BinaryGeneticAlgorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.optimizers.genetic_algorithm.BinaryGeneticAlgorithm" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Binary genetic algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>mutation_rate: float</strong></dt><dd><p>Probability of a mutation occurring.</p>
+</dd>
+<dt><strong>crossover_rate: float</strong></dt><dd><p>Probability of a crossover occurring.</p>
+</dd>
+<dt><strong>tournament_sample_size: int</strong></dt><dd><p>Sample size of the subpopulation that will be used in Tournament Selection.</p>
+</dd>
+<dt><strong>selection_method: str</strong></dt><dd><p>Population update method employed in each generation, which can take one of two options:
+(i) generational, where the entire population is replaced in each generation (excluding a
+specified ‘elite_size’ individuals), or (ii) steady-state, where only the two least fit
+individuals are replaced.</p>
+</dd>
+<dt><strong>elite_size: int, optional</strong></dt><dd><p>Number of individuals that will be preserved from the current to the next generation. They
+are selected according to the fitness, i.e., if it is N, the N best individuals of the
+current generation will be preserved for the next generation. This parameter is only used
+if the selection_method is generational.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.optimizers.genetic_algorithm.BinaryGeneticAlgorithm.evolve" title="pyccea.optimizers.genetic_algorithm.BinaryGeneticAlgorithm.evolve"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evolve</span></code></a>(subpop, fitness)</p></td>
+<td><p>Evolve a subpopulation for a single generation.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.optimizers.genetic_algorithm.BinaryGeneticAlgorithm.evolve">
+<span class="sig-name descname"><span class="pre">evolve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/optimizers/genetic_algorithm.html#BinaryGeneticAlgorithm.evolve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.optimizers.genetic_algorithm.BinaryGeneticAlgorithm.evolve" title="Link to this definition"></a></dt>
+<dd><p>Evolve a subpopulation for a single generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subpop: np.ndarray</strong></dt><dd><p>Individuals of the subpopulation, where each individual is an array of size equal to
+the number of features.</p>
+</dd>
+<dt><strong>fitness: list</strong></dt><dd><p>Evaluation of all individuals in the subpopulation.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>next_subpop: np.ndarray</dt><dd><p>Individuals in the subpopulation of the next generation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.optimizers.genetic_algorithm.BinaryGeneticAlgorithm.selection_methods">
+<span class="sig-name descname"><span class="pre">selection_methods</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['generational',</span> <span class="pre">'steady-state']</span></em><a class="headerlink" href="#pyccea.optimizers.genetic_algorithm.BinaryGeneticAlgorithm.selection_methods" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 

@@ -50,9 +50,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">1. Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">2. Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">3. API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html#module-pyccea.evaluation">4. Module Details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">5. Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="citation.html">6. Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">4. Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">5. Citation</a></li>
 </ul>
 
         </div>
@@ -80,22 +79,265 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyccea-fitness-package">
-<h1><span class="section-number">3.5. </span>pyccea.fitness package<a class="headerlink" href="#pyccea-fitness-package" title="Link to this heading"></a></h1>
+  <section id="module-pyccea.fitness">
+<span id="pyccea-fitness-package"></span><h1><span class="section-number">3.5. </span>pyccea.fitness package<a class="headerlink" href="#module-pyccea.fitness" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.fitness.DistanceBasedFitness">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.fitness.</span></span><span class="sig-name descname"><span class="pre">DistanceBasedFitness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evaluator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation" title="pyccea.evaluation.wrapper.WrapperEvaluation"><span class="pre">WrapperEvaluation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/fitness/distance.html#DistanceBasedFitness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.fitness.DistanceBasedFitness" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.fitness.function.WrapperFitnessFunction" title="pyccea.fitness.function.WrapperFitnessFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">WrapperFitnessFunction</span></code></a></p>
+<p>Objective function that maximizes balanced accuracy based on a k-nearest neighbors classifier.</p>
+<p>The fitness function is designed as a three-objective optimization, aimed at achieving a
+balance between maximizing balanced accuracy while simultaneously minimizing the average
+distance between instances sharing the same label and maximizing the average distance between
+instances with different labels.</p>
+<p>Firouznia, Marjan, Pietro Ruiu, and Giuseppe A. Trunfio. “Adaptive cooperative coevolutionary
+differential evolution for parallel feature selection in high-dimensional datasets.”
+The Journal of Supercomputing (2023): 1-30.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>w1: float</strong></dt><dd><p>Predictive performance weight.</p>
+</dd>
+<dt><strong>w2: float</strong></dt><dd><p>Weight of the complement of the average distance between instances and their neighbors
+with the same class.</p>
+</dd>
+<dt><strong>w3: float</strong></dt><dd><p>Weight of the average distance between instances and their neighbors of different classes.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.fitness.DistanceBasedFitness.evaluate" title="pyccea.fitness.DistanceBasedFitness.evaluate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate</span></code></a>(context_vector, data)</p></td>
+<td><p>Evaluate the given context vector using the fitness function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.fitness.DistanceBasedFitness.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/fitness/distance.html#DistanceBasedFitness.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.fitness.DistanceBasedFitness.evaluate" title="Link to this definition"></a></dt>
+<dd><p>Evaluate the given context vector using the fitness function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>context_vector: np.ndarray</strong></dt><dd><p>Solution of the complete problem.</p>
+</dd>
+<dt><strong>data: DataLoader</strong></dt><dd><p>Container with process data and training and test sets.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>fitness: float</dt><dd><p>Quality of the context vector.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.fitness.SubsetSizePenalty">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.fitness.</span></span><span class="sig-name descname"><span class="pre">SubsetSizePenalty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evaluator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation" title="pyccea.evaluation.wrapper.WrapperEvaluation"><span class="pre">WrapperEvaluation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/fitness/penalty.html#SubsetSizePenalty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.fitness.SubsetSizePenalty" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.fitness.function.WrapperFitnessFunction" title="pyccea.fitness.function.WrapperFitnessFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">WrapperFitnessFunction</span></code></a></p>
+<p>Objective function that penalizes large subsets of features.</p>
+<p>Rashid, A.N.M Bazlur, et al. “A novel penalty-based wrapper objective function for feature
+selection in Big Data using cooperative co-evolution.” IEEE Access 8 (2020): 150113-150129.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>w1: float</strong></dt><dd><p>Predictive performance weight.</p>
+</dd>
+<dt><strong>w2: float</strong></dt><dd><p>Penalty weight.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.fitness.SubsetSizePenalty.evaluate" title="pyccea.fitness.SubsetSizePenalty.evaluate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate</span></code></a>(context_vector, data)</p></td>
+<td><p>Evaluate the given context vector using the fitness function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.fitness.SubsetSizePenalty.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/fitness/penalty.html#SubsetSizePenalty.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.fitness.SubsetSizePenalty.evaluate" title="Link to this definition"></a></dt>
+<dd><p>Evaluate the given context vector using the fitness function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>context_vector: np.ndarray</strong></dt><dd><p>Solution of the complete problem.</p>
+</dd>
+<dt><strong>data: DataLoader</strong></dt><dd><p>Container with process data and training and test sets.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>fitness: float</dt><dd><p>Quality of the context vector.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.fitness.WrapperFitnessFunction">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.fitness.</span></span><span class="sig-name descname"><span class="pre">WrapperFitnessFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evaluator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation" title="pyccea.evaluation.wrapper.WrapperEvaluation"><span class="pre">WrapperEvaluation</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/fitness/function.html#WrapperFitnessFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.fitness.WrapperFitnessFunction" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>An abstract class for a wrapper objective function.</p>
+<p>It measures the quality of a solution according to the predictive performance of a machine
+learning model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>evaluator: object of one of the evaluation classes</strong></dt><dd><p>Responsible for evaluating individuals, that is, subsets of features.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 <section id="submodules">
 <h2><span class="section-number">3.5.1. </span>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="pyccea-fitness-distance-module">
-<h2><span class="section-number">3.5.2. </span>pyccea.fitness.distance module<a class="headerlink" href="#pyccea-fitness-distance-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.fitness.distance">
+<span id="pyccea-fitness-distance-module"></span><h2><span class="section-number">3.5.2. </span>pyccea.fitness.distance module<a class="headerlink" href="#module-pyccea.fitness.distance" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.fitness.distance.DistanceBasedFitness">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.fitness.distance.</span></span><span class="sig-name descname"><span class="pre">DistanceBasedFitness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evaluator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation" title="pyccea.evaluation.wrapper.WrapperEvaluation"><span class="pre">WrapperEvaluation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/fitness/distance.html#DistanceBasedFitness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.fitness.distance.DistanceBasedFitness" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.fitness.function.WrapperFitnessFunction" title="pyccea.fitness.function.WrapperFitnessFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">WrapperFitnessFunction</span></code></a></p>
+<p>Objective function that maximizes balanced accuracy based on a k-nearest neighbors classifier.</p>
+<p>The fitness function is designed as a three-objective optimization, aimed at achieving a
+balance between maximizing balanced accuracy while simultaneously minimizing the average
+distance between instances sharing the same label and maximizing the average distance between
+instances with different labels.</p>
+<p>Firouznia, Marjan, Pietro Ruiu, and Giuseppe A. Trunfio. “Adaptive cooperative coevolutionary
+differential evolution for parallel feature selection in high-dimensional datasets.”
+The Journal of Supercomputing (2023): 1-30.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>w1: float</strong></dt><dd><p>Predictive performance weight.</p>
+</dd>
+<dt><strong>w2: float</strong></dt><dd><p>Weight of the complement of the average distance between instances and their neighbors
+with the same class.</p>
+</dd>
+<dt><strong>w3: float</strong></dt><dd><p>Weight of the average distance between instances and their neighbors of different classes.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.fitness.distance.DistanceBasedFitness.evaluate" title="pyccea.fitness.distance.DistanceBasedFitness.evaluate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate</span></code></a>(context_vector, data)</p></td>
+<td><p>Evaluate the given context vector using the fitness function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.fitness.distance.DistanceBasedFitness.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/fitness/distance.html#DistanceBasedFitness.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.fitness.distance.DistanceBasedFitness.evaluate" title="Link to this definition"></a></dt>
+<dd><p>Evaluate the given context vector using the fitness function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>context_vector: np.ndarray</strong></dt><dd><p>Solution of the complete problem.</p>
+</dd>
+<dt><strong>data: DataLoader</strong></dt><dd><p>Container with process data and training and test sets.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>fitness: float</dt><dd><p>Quality of the context vector.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-fitness-function-module">
-<h2><span class="section-number">3.5.3. </span>pyccea.fitness.function module<a class="headerlink" href="#pyccea-fitness-function-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.fitness.function">
+<span id="pyccea-fitness-function-module"></span><h2><span class="section-number">3.5.3. </span>pyccea.fitness.function module<a class="headerlink" href="#module-pyccea.fitness.function" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.fitness.function.WrapperFitnessFunction">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.fitness.function.</span></span><span class="sig-name descname"><span class="pre">WrapperFitnessFunction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evaluator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation" title="pyccea.evaluation.wrapper.WrapperEvaluation"><span class="pre">WrapperEvaluation</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/fitness/function.html#WrapperFitnessFunction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.fitness.function.WrapperFitnessFunction" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>An abstract class for a wrapper objective function.</p>
+<p>It measures the quality of a solution according to the predictive performance of a machine
+learning model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>evaluator: object of one of the evaluation classes</strong></dt><dd><p>Responsible for evaluating individuals, that is, subsets of features.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="pyccea-fitness-penalty-module">
-<h2><span class="section-number">3.5.4. </span>pyccea.fitness.penalty module<a class="headerlink" href="#pyccea-fitness-penalty-module" title="Link to this heading"></a></h2>
-</section>
-<section id="module-contents">
-<h2><span class="section-number">3.5.5. </span>Module contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<section id="module-pyccea.fitness.penalty">
+<span id="pyccea-fitness-penalty-module"></span><h2><span class="section-number">3.5.4. </span>pyccea.fitness.penalty module<a class="headerlink" href="#module-pyccea.fitness.penalty" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.fitness.penalty.SubsetSizePenalty">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.fitness.penalty.</span></span><span class="sig-name descname"><span class="pre">SubsetSizePenalty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">evaluator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation" title="pyccea.evaluation.wrapper.WrapperEvaluation"><span class="pre">WrapperEvaluation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/fitness/penalty.html#SubsetSizePenalty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.fitness.penalty.SubsetSizePenalty" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.fitness.function.WrapperFitnessFunction" title="pyccea.fitness.function.WrapperFitnessFunction"><code class="xref py py-class docutils literal notranslate"><span class="pre">WrapperFitnessFunction</span></code></a></p>
+<p>Objective function that penalizes large subsets of features.</p>
+<p>Rashid, A.N.M Bazlur, et al. “A novel penalty-based wrapper objective function for feature
+selection in Big Data using cooperative co-evolution.” IEEE Access 8 (2020): 150113-150129.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>w1: float</strong></dt><dd><p>Predictive performance weight.</p>
+</dd>
+<dt><strong>w2: float</strong></dt><dd><p>Penalty weight.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.fitness.penalty.SubsetSizePenalty.evaluate" title="pyccea.fitness.penalty.SubsetSizePenalty.evaluate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate</span></code></a>(context_vector, data)</p></td>
+<td><p>Evaluate the given context vector using the fitness function.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.fitness.penalty.SubsetSizePenalty.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context_vector</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/fitness/penalty.html#SubsetSizePenalty.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.fitness.penalty.SubsetSizePenalty.evaluate" title="Link to this definition"></a></dt>
+<dd><p>Evaluate the given context vector using the fitness function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>context_vector: np.ndarray</strong></dt><dd><p>Solution of the complete problem.</p>
+</dd>
+<dt><strong>data: DataLoader</strong></dt><dd><p>Container with process data and training and test sets.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>fitness: float</dt><dd><p>Quality of the context vector.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 

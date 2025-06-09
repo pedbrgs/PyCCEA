@@ -1,6 +1,11 @@
 pyccea.evaluation package
 =========================
 
+.. automodule:: pyccea.evaluation
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 Submodules
 ----------
 
@@ -8,14 +13,6 @@ pyccea.evaluation.wrapper module
 --------------------------------
 
 .. automodule:: pyccea.evaluation.wrapper
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-Module contents
----------------
-
-.. automodule:: pyccea.evaluation
    :members:
    :show-inheritance:
    :undoc-members:

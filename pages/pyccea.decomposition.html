@@ -50,9 +50,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">1. Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">2. Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">3. API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html#module-pyccea.evaluation">4. Module Details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">5. Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="citation.html">6. Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">4. Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">5. Citation</a></li>
 </ul>
 
         </div>
@@ -80,31 +79,454 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyccea-decomposition-package">
-<h1><span class="section-number">3.3. </span>pyccea.decomposition package<a class="headerlink" href="#pyccea-decomposition-package" title="Link to this heading"></a></h1>
+  <section id="module-pyccea.decomposition">
+<span id="pyccea-decomposition-package"></span><h1><span class="section-number">3.3. </span>pyccea.decomposition package<a class="headerlink" href="#module-pyccea.decomposition" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.decomposition.ClusteringFeatureGrouping">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.decomposition.</span></span><span class="sig-name descname"><span class="pre">ClusteringFeatureGrouping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_subcomps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">array([],</span> <span class="pre">dtype=float64)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/clustering.html#ClusteringFeatureGrouping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.ClusteringFeatureGrouping" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.decomposition.grouping.FeatureGrouping" title="pyccea.decomposition.grouping.FeatureGrouping"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureGrouping</span></code></a></p>
+<p>Decompose the problem (a collection of features) according to a clustering.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.decomposition.ClusteringFeatureGrouping.decompose" title="pyccea.decomposition.ClusteringFeatureGrouping.decompose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompose</span></code></a>(X[, feature_idxs])</p></td>
+<td><p>Divide an n-dimensional problem into m subproblems.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.decomposition.ClusteringFeatureGrouping.decompose">
+<span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_idxs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/clustering.html#ClusteringFeatureGrouping.decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.ClusteringFeatureGrouping.decompose" title="Link to this definition"></a></dt>
+<dd><p>Divide an n-dimensional problem into m subproblems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X: np.ndarray</strong></dt><dd><p>n-dimensional input data.</p>
+</dd>
+<dt><strong>feature_idxs: np.ndarray, default None</strong></dt><dd><p>Feature indexes sorted according to clustering. It is passed as a parameter if it has
+been previously generated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>subcomponents: list</dt><dd><p>Subcomponents, where each subcomponent is an array that can be accessed by indexing
+the list.</p>
+</dd>
+<dt>feature_idxs: np.ndarray, default None</dt><dd><p>Feature indexes sorted according to clustering. For example, if the first
+subpopulation has size x, the first x elements of this list will be the features of
+the first subcomponent and so on.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.decomposition.DummyFeatureGrouping">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.decomposition.</span></span><span class="sig-name descname"><span class="pre">DummyFeatureGrouping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_subcomps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_idxs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/dummy.html#DummyFeatureGrouping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.DummyFeatureGrouping" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.decomposition.grouping.FeatureGrouping" title="pyccea.decomposition.grouping.FeatureGrouping"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureGrouping</span></code></a></p>
+<p>Decompose the problem (a collection of features) according to preset indexes.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.decomposition.DummyFeatureGrouping.decompose" title="pyccea.decomposition.DummyFeatureGrouping.decompose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompose</span></code></a>(X)</p></td>
+<td><p>Divide an n-dimensional problem into m subproblems.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.decomposition.DummyFeatureGrouping.decompose">
+<span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/dummy.html#DummyFeatureGrouping.decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.DummyFeatureGrouping.decompose" title="Link to this definition"></a></dt>
+<dd><p>Divide an n-dimensional problem into m subproblems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X: np.ndarray</strong></dt><dd><p>n-dimensional input data.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>subcomponents</strong><span class="classifier">list</span></dt><dd><p>Subcomponents, where each subcomponent is an array that can be accessed by indexing
+the list.</p>
+</dd>
+<dt><strong>feature_idxs</strong><span class="classifier">np.ndarray, default None</span></dt><dd><p>Indexes of features sorted according to a predetermined method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.decomposition.FeatureGrouping">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.decomposition.</span></span><span class="sig-name descname"><span class="pre">FeatureGrouping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_subcomps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/grouping.html#FeatureGrouping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.FeatureGrouping" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>An abstract class for a feature grouping approach.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.decomposition.RandomFeatureGrouping">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.decomposition.</span></span><span class="sig-name descname"><span class="pre">RandomFeatureGrouping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_subcomps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/random.html#RandomFeatureGrouping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.RandomFeatureGrouping" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.decomposition.grouping.FeatureGrouping" title="pyccea.decomposition.grouping.FeatureGrouping"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureGrouping</span></code></a></p>
+<p>Decompose the problem (a collection of features) randomly.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.decomposition.RandomFeatureGrouping.decompose" title="pyccea.decomposition.RandomFeatureGrouping.decompose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompose</span></code></a>(X[, feature_idxs])</p></td>
+<td><p>Divide an n-dimensional problem into m subproblems.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.decomposition.RandomFeatureGrouping.decompose">
+<span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_idxs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="../_modules/pyccea/decomposition/random.html#RandomFeatureGrouping.decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.RandomFeatureGrouping.decompose" title="Link to this definition"></a></dt>
+<dd><p>Divide an n-dimensional problem into m subproblems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X: np.ndarray</strong></dt><dd><p>n-dimensional input data.</p>
+</dd>
+<dt><strong>feature_idxs: np.ndarray, default None</strong></dt><dd><p>Shuffled list of feature indexes. It is passed as a parameter if it has been
+previously generated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>subcomponents: list</dt><dd><p>Subcomponents, where each subcomponent is an array that can be accessed by indexing
+the list.</p>
+</dd>
+<dt>feature_idxs: np.ndarray</dt><dd><p>Shuffled list of feature indexes.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.decomposition.RankingFeatureGrouping">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.decomposition.</span></span><span class="sig-name descname"><span class="pre">RankingFeatureGrouping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_subcomps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">array([],</span> <span class="pre">dtype=float64)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ascending</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/ranking.html#RankingFeatureGrouping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.RankingFeatureGrouping" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.decomposition.grouping.FeatureGrouping" title="pyccea.decomposition.grouping.FeatureGrouping"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureGrouping</span></code></a></p>
+<p>Decompose the problem (a collection of features) according to a score-based method.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.decomposition.RankingFeatureGrouping.decompose" title="pyccea.decomposition.RankingFeatureGrouping.decompose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompose</span></code></a>(X[, feature_idxs])</p></td>
+<td><p>Divide an n-dimensional problem into m subproblems.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.decomposition.RankingFeatureGrouping.decompose">
+<span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_idxs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/ranking.html#RankingFeatureGrouping.decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.RankingFeatureGrouping.decompose" title="Link to this definition"></a></dt>
+<dd><p>Divide an n-dimensional problem into m subproblems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X: np.ndarray</strong></dt><dd><p>n-dimensional input data.</p>
+</dd>
+<dt><strong>feature_idxs: np.ndarray, default None</strong></dt><dd><p>Indexes of features sorted according to the score. It is passed as a parameter if it
+has been previously calculated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>subcomponents: list</dt><dd><p>Subcomponents, where each subcomponent is an array that can be accessed by indexing
+the list.</p>
+</dd>
+<dt>feature_idxs: np.ndarray, default None</dt><dd><p>Indexes of features sorted according to the score.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.decomposition.RankingFeatureGrouping.methods">
+<span class="sig-name descname"><span class="pre">methods</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['distributed',</span> <span class="pre">'elitist']</span></em><a class="headerlink" href="#pyccea.decomposition.RankingFeatureGrouping.methods" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.decomposition.SequentialFeatureGrouping">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.decomposition.</span></span><span class="sig-name descname"><span class="pre">SequentialFeatureGrouping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_subcomps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/static.html#SequentialFeatureGrouping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.SequentialFeatureGrouping" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.decomposition.grouping.FeatureGrouping" title="pyccea.decomposition.grouping.FeatureGrouping"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureGrouping</span></code></a></p>
+<p>Decompose the problem (a collection of features) sequentially.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.decomposition.SequentialFeatureGrouping.decompose" title="pyccea.decomposition.SequentialFeatureGrouping.decompose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompose</span></code></a>(X)</p></td>
+<td><p>Divide an n-dimensional problem into m subproblems.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.decomposition.SequentialFeatureGrouping.decompose">
+<span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/static.html#SequentialFeatureGrouping.decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.SequentialFeatureGrouping.decompose" title="Link to this definition"></a></dt>
+<dd><p>Divide an n-dimensional problem into m subproblems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">np.ndarray</span></dt><dd><p>n-dimensional input data.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>subcomponents</strong><span class="classifier">list</span></dt><dd><p>Subcomponents, where each subcomponent is an array that can be accessed by indexing
+the list.</p>
+</dd>
+<dt><strong>feature_idxs</strong><span class="classifier">np.ndarray</span></dt><dd><p>List of feature indexes starting from 0 to n_features-1.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <section id="submodules">
 <h2><span class="section-number">3.3.1. </span>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="pyccea-decomposition-clustering-module">
-<h2><span class="section-number">3.3.2. </span>pyccea.decomposition.clustering module<a class="headerlink" href="#pyccea-decomposition-clustering-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.decomposition.clustering">
+<span id="pyccea-decomposition-clustering-module"></span><h2><span class="section-number">3.3.2. </span>pyccea.decomposition.clustering module<a class="headerlink" href="#module-pyccea.decomposition.clustering" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.decomposition.clustering.ClusteringFeatureGrouping">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.decomposition.clustering.</span></span><span class="sig-name descname"><span class="pre">ClusteringFeatureGrouping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_subcomps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clusters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">array([],</span> <span class="pre">dtype=float64)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/clustering.html#ClusteringFeatureGrouping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.clustering.ClusteringFeatureGrouping" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.decomposition.grouping.FeatureGrouping" title="pyccea.decomposition.grouping.FeatureGrouping"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureGrouping</span></code></a></p>
+<p>Decompose the problem (a collection of features) according to a clustering.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.decomposition.clustering.ClusteringFeatureGrouping.decompose" title="pyccea.decomposition.clustering.ClusteringFeatureGrouping.decompose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompose</span></code></a>(X[, feature_idxs])</p></td>
+<td><p>Divide an n-dimensional problem into m subproblems.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.decomposition.clustering.ClusteringFeatureGrouping.decompose">
+<span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_idxs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/clustering.html#ClusteringFeatureGrouping.decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.clustering.ClusteringFeatureGrouping.decompose" title="Link to this definition"></a></dt>
+<dd><p>Divide an n-dimensional problem into m subproblems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X: np.ndarray</strong></dt><dd><p>n-dimensional input data.</p>
+</dd>
+<dt><strong>feature_idxs: np.ndarray, default None</strong></dt><dd><p>Feature indexes sorted according to clustering. It is passed as a parameter if it has
+been previously generated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>subcomponents: list</dt><dd><p>Subcomponents, where each subcomponent is an array that can be accessed by indexing
+the list.</p>
+</dd>
+<dt>feature_idxs: np.ndarray, default None</dt><dd><p>Feature indexes sorted according to clustering. For example, if the first
+subpopulation has size x, the first x elements of this list will be the features of
+the first subcomponent and so on.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-decomposition-dummy-module">
-<h2><span class="section-number">3.3.3. </span>pyccea.decomposition.dummy module<a class="headerlink" href="#pyccea-decomposition-dummy-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.decomposition.dummy">
+<span id="pyccea-decomposition-dummy-module"></span><h2><span class="section-number">3.3.3. </span>pyccea.decomposition.dummy module<a class="headerlink" href="#module-pyccea.decomposition.dummy" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.decomposition.dummy.DummyFeatureGrouping">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.decomposition.dummy.</span></span><span class="sig-name descname"><span class="pre">DummyFeatureGrouping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_subcomps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_idxs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/dummy.html#DummyFeatureGrouping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.dummy.DummyFeatureGrouping" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.decomposition.grouping.FeatureGrouping" title="pyccea.decomposition.grouping.FeatureGrouping"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureGrouping</span></code></a></p>
+<p>Decompose the problem (a collection of features) according to preset indexes.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.decomposition.dummy.DummyFeatureGrouping.decompose" title="pyccea.decomposition.dummy.DummyFeatureGrouping.decompose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompose</span></code></a>(X)</p></td>
+<td><p>Divide an n-dimensional problem into m subproblems.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.decomposition.dummy.DummyFeatureGrouping.decompose">
+<span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/dummy.html#DummyFeatureGrouping.decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.dummy.DummyFeatureGrouping.decompose" title="Link to this definition"></a></dt>
+<dd><p>Divide an n-dimensional problem into m subproblems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X: np.ndarray</strong></dt><dd><p>n-dimensional input data.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>subcomponents</strong><span class="classifier">list</span></dt><dd><p>Subcomponents, where each subcomponent is an array that can be accessed by indexing
+the list.</p>
+</dd>
+<dt><strong>feature_idxs</strong><span class="classifier">np.ndarray, default None</span></dt><dd><p>Indexes of features sorted according to a predetermined method.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-decomposition-grouping-module">
-<h2><span class="section-number">3.3.4. </span>pyccea.decomposition.grouping module<a class="headerlink" href="#pyccea-decomposition-grouping-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.decomposition.grouping">
+<span id="pyccea-decomposition-grouping-module"></span><h2><span class="section-number">3.3.4. </span>pyccea.decomposition.grouping module<a class="headerlink" href="#module-pyccea.decomposition.grouping" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.decomposition.grouping.FeatureGrouping">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.decomposition.grouping.</span></span><span class="sig-name descname"><span class="pre">FeatureGrouping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_subcomps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/grouping.html#FeatureGrouping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.grouping.FeatureGrouping" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>An abstract class for a feature grouping approach.</p>
+</dd></dl>
+
 </section>
-<section id="pyccea-decomposition-random-module">
-<h2><span class="section-number">3.3.5. </span>pyccea.decomposition.random module<a class="headerlink" href="#pyccea-decomposition-random-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.decomposition.random">
+<span id="pyccea-decomposition-random-module"></span><h2><span class="section-number">3.3.5. </span>pyccea.decomposition.random module<a class="headerlink" href="#module-pyccea.decomposition.random" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.decomposition.random.RandomFeatureGrouping">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.decomposition.random.</span></span><span class="sig-name descname"><span class="pre">RandomFeatureGrouping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_subcomps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/random.html#RandomFeatureGrouping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.random.RandomFeatureGrouping" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.decomposition.grouping.FeatureGrouping" title="pyccea.decomposition.grouping.FeatureGrouping"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureGrouping</span></code></a></p>
+<p>Decompose the problem (a collection of features) randomly.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.decomposition.random.RandomFeatureGrouping.decompose" title="pyccea.decomposition.random.RandomFeatureGrouping.decompose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompose</span></code></a>(X[, feature_idxs])</p></td>
+<td><p>Divide an n-dimensional problem into m subproblems.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.decomposition.random.RandomFeatureGrouping.decompose">
+<span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_idxs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="../_modules/pyccea/decomposition/random.html#RandomFeatureGrouping.decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.random.RandomFeatureGrouping.decompose" title="Link to this definition"></a></dt>
+<dd><p>Divide an n-dimensional problem into m subproblems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X: np.ndarray</strong></dt><dd><p>n-dimensional input data.</p>
+</dd>
+<dt><strong>feature_idxs: np.ndarray, default None</strong></dt><dd><p>Shuffled list of feature indexes. It is passed as a parameter if it has been
+previously generated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>subcomponents: list</dt><dd><p>Subcomponents, where each subcomponent is an array that can be accessed by indexing
+the list.</p>
+</dd>
+<dt>feature_idxs: np.ndarray</dt><dd><p>Shuffled list of feature indexes.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-decomposition-ranking-module">
-<h2><span class="section-number">3.3.6. </span>pyccea.decomposition.ranking module<a class="headerlink" href="#pyccea-decomposition-ranking-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.decomposition.ranking">
+<span id="pyccea-decomposition-ranking-module"></span><h2><span class="section-number">3.3.6. </span>pyccea.decomposition.ranking module<a class="headerlink" href="#module-pyccea.decomposition.ranking" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.decomposition.ranking.RankingFeatureGrouping">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.decomposition.ranking.</span></span><span class="sig-name descname"><span class="pre">RankingFeatureGrouping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_subcomps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">array([],</span> <span class="pre">dtype=float64)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ascending</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/ranking.html#RankingFeatureGrouping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.ranking.RankingFeatureGrouping" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.decomposition.grouping.FeatureGrouping" title="pyccea.decomposition.grouping.FeatureGrouping"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureGrouping</span></code></a></p>
+<p>Decompose the problem (a collection of features) according to a score-based method.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.decomposition.ranking.RankingFeatureGrouping.decompose" title="pyccea.decomposition.ranking.RankingFeatureGrouping.decompose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompose</span></code></a>(X[, feature_idxs])</p></td>
+<td><p>Divide an n-dimensional problem into m subproblems.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.decomposition.ranking.RankingFeatureGrouping.decompose">
+<span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_idxs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/ranking.html#RankingFeatureGrouping.decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.ranking.RankingFeatureGrouping.decompose" title="Link to this definition"></a></dt>
+<dd><p>Divide an n-dimensional problem into m subproblems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X: np.ndarray</strong></dt><dd><p>n-dimensional input data.</p>
+</dd>
+<dt><strong>feature_idxs: np.ndarray, default None</strong></dt><dd><p>Indexes of features sorted according to the score. It is passed as a parameter if it
+has been previously calculated.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>subcomponents: list</dt><dd><p>Subcomponents, where each subcomponent is an array that can be accessed by indexing
+the list.</p>
+</dd>
+<dt>feature_idxs: np.ndarray, default None</dt><dd><p>Indexes of features sorted according to the score.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.decomposition.ranking.RankingFeatureGrouping.methods">
+<span class="sig-name descname"><span class="pre">methods</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['distributed',</span> <span class="pre">'elitist']</span></em><a class="headerlink" href="#pyccea.decomposition.ranking.RankingFeatureGrouping.methods" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-decomposition-static-module">
-<h2><span class="section-number">3.3.7. </span>pyccea.decomposition.static module<a class="headerlink" href="#pyccea-decomposition-static-module" title="Link to this heading"></a></h2>
-</section>
-<section id="module-contents">
-<h2><span class="section-number">3.3.8. </span>Module contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<section id="module-pyccea.decomposition.static">
+<span id="pyccea-decomposition-static-module"></span><h2><span class="section-number">3.3.7. </span>pyccea.decomposition.static module<a class="headerlink" href="#module-pyccea.decomposition.static" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.decomposition.static.SequentialFeatureGrouping">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.decomposition.static.</span></span><span class="sig-name descname"><span class="pre">SequentialFeatureGrouping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_subcomps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomp_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/static.html#SequentialFeatureGrouping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.static.SequentialFeatureGrouping" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.decomposition.grouping.FeatureGrouping" title="pyccea.decomposition.grouping.FeatureGrouping"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureGrouping</span></code></a></p>
+<p>Decompose the problem (a collection of features) sequentially.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.decomposition.static.SequentialFeatureGrouping.decompose" title="pyccea.decomposition.static.SequentialFeatureGrouping.decompose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">decompose</span></code></a>(X)</p></td>
+<td><p>Divide an n-dimensional problem into m subproblems.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.decomposition.static.SequentialFeatureGrouping.decompose">
+<span class="sig-name descname"><span class="pre">decompose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/decomposition/static.html#SequentialFeatureGrouping.decompose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.decomposition.static.SequentialFeatureGrouping.decompose" title="Link to this definition"></a></dt>
+<dd><p>Divide an n-dimensional problem into m subproblems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X</strong><span class="classifier">np.ndarray</span></dt><dd><p>n-dimensional input data.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>subcomponents</strong><span class="classifier">list</span></dt><dd><p>Subcomponents, where each subcomponent is an array that can be accessed by indexing
+the list.</p>
+</dd>
+<dt><strong>feature_idxs</strong><span class="classifier">np.ndarray</span></dt><dd><p>List of feature indexes starting from 0 to n_features-1.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 

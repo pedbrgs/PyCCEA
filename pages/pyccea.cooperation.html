@@ -50,9 +50,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">1. Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">2. Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">3. API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html#module-pyccea.evaluation">4. Module Details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">5. Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="citation.html">6. Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">4. Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">5. Citation</a></li>
 </ul>
 
         </div>
@@ -80,25 +79,390 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyccea-cooperation-package">
-<h1><span class="section-number">3.2. </span>pyccea.cooperation package<a class="headerlink" href="#pyccea-cooperation-package" title="Link to this heading"></a></h1>
+  <section id="module-pyccea.cooperation">
+<span id="pyccea-cooperation-package"></span><h1><span class="section-number">3.2. </span>pyccea.cooperation package<a class="headerlink" href="#module-pyccea.cooperation" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.cooperation.Collaboration">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.cooperation.</span></span><span class="sig-name descname"><span class="pre">Collaboration</span></span><a class="reference internal" href="../_modules/pyccea/cooperation/collaboration.html#Collaboration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.Collaboration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>An abstract class for a collaborative method between individuals from different subpopulations</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.cooperation.Collaboration.build_context_vector" title="pyccea.cooperation.Collaboration.build_context_vector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_context_vector</span></code></a>(collaborators)</p></td>
+<td><p>Build a context vector, i.e., a complete problem solution composed of representative solutions from each subpopulation.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.cooperation.Collaboration.build_context_vector">
+<span class="sig-name descname"><span class="pre">build_context_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collaborators</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/cooperation/collaboration.html#Collaboration.build_context_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.Collaboration.build_context_vector" title="Link to this definition"></a></dt>
+<dd><p>Build a context vector, i.e., a complete problem solution composed of representative
+solutions from each subpopulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>collaborators: list</strong></dt><dd><p>A single individual from each subpopulation that will collaborate with an individual.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>context_vector: np.ndarray</dt><dd><p>Complete problem solution composed of one individual from each subpopulation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.cooperation.SingleBestCollaboration">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.cooperation.</span></span><span class="sig-name descname"><span class="pre">SingleBestCollaboration</span></span><a class="reference internal" href="../_modules/pyccea/cooperation/best.html#SingleBestCollaboration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.SingleBestCollaboration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.cooperation.collaboration.Collaboration" title="pyccea.cooperation.collaboration.Collaboration"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collaboration</span></code></a></p>
+<p>Set the best individual from each subpopulation as a collaborator to any individual.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_context_vector</span></code>(collaborators)</p></td>
+<td><p>Build a context vector, i.e., a complete problem solution composed of representative solutions from each subpopulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyccea.cooperation.SingleBestCollaboration.get_collaborators" title="pyccea.cooperation.SingleBestCollaboration.get_collaborators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_collaborators</span></code></a>(subpop_idx, indiv_idx, ...)</p></td>
+<td><p>Set the best individual from each subpopulation as a collaborator to the individual given as a parameter.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.cooperation.SingleBestCollaboration.get_collaborators">
+<span class="sig-name descname"><span class="pre">get_collaborators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indiv_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_subpops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_best</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/cooperation/best.html#SingleBestCollaboration.get_collaborators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.SingleBestCollaboration.get_collaborators" title="Link to this definition"></a></dt>
+<dd><p>Set the best individual from each subpopulation as a collaborator to the individual
+given as a parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subpop_idx</strong><span class="classifier">int</span></dt><dd><p>Index of the subpopulation to which the individual belongs.</p>
+</dd>
+<dt><strong>indiv_idx</strong><span class="classifier">int</span></dt><dd><p>Index of the individual in its respective subpopulation. The vector that represents
+the individual is obtained from the <cite>current_subpops</cite>, where the individuals were
+evolved and not evaluated.</p>
+</dd>
+<dt><strong>current_subpops</strong><span class="classifier">list</span></dt><dd><p>Individuals from all subpopulations of the current generation (will be evaluated).</p>
+</dd>
+<dt><strong>current_best</strong><span class="classifier">dict</span></dt><dd><p>Current best individual of each subpopulation and its respective evaluation.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>collaborators</strong><span class="classifier">list</span></dt><dd><p>A single individual from each subpopulation that will collaborate with the individual
+given as a parameter.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.cooperation.SingleEliteCollaboration">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.cooperation.</span></span><span class="sig-name descname"><span class="pre">SingleEliteCollaboration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/cooperation/elite.html#SingleEliteCollaboration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.SingleEliteCollaboration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.cooperation.collaboration.Collaboration" title="pyccea.cooperation.collaboration.Collaboration"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collaboration</span></code></a></p>
+<p>Randomly selects the collaborator from among the best k individuals in the subpopulation.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_context_vector</span></code>(collaborators)</p></td>
+<td><p>Build a context vector, i.e., a complete problem solution composed of representative solutions from each subpopulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyccea.cooperation.SingleEliteCollaboration.get_collaborators" title="pyccea.cooperation.SingleEliteCollaboration.get_collaborators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_collaborators</span></code></a>(subpop_idx, indiv_idx, ...)</p></td>
+<td><p>Set the collaborators of the individual given as a parameter as random individuals among the k best individuals in each subpopulation in the previous generation.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.cooperation.SingleEliteCollaboration.get_collaborators">
+<span class="sig-name descname"><span class="pre">get_collaborators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indiv_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_subpops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_subpops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/cooperation/elite.html#SingleEliteCollaboration.get_collaborators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.SingleEliteCollaboration.get_collaborators" title="Link to this definition"></a></dt>
+<dd><p>Set the collaborators of the individual given as a parameter as random individuals
+among the k best individuals in each subpopulation in the previous generation.</p>
+<p>In the scenario of n subpopulations, the elite collaboration method involves choosing n
+collaborators, with one selected from each subpopulation. Notably, the individual
+becomes their own collaborator within their specific subpopulation, while the remaining
+collaborators are chosen from the top k individuals in each respective subpopulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subpop_idx</strong><span class="classifier">int</span></dt><dd><p>Index of the subpopulation to which the individual belongs.</p>
+</dd>
+<dt><strong>indiv_idx</strong><span class="classifier">int</span></dt><dd><p>Index of the individual in its respective subpopulation. The vector that represents
+the individual is obtained from the <cite>current_subpops</cite>, where the individuals were
+evolved and not evaluated.</p>
+</dd>
+<dt><strong>previous_subpops</strong><span class="classifier">list</span></dt><dd><p>Individuals from all subpopulations in the previous generation (already evaluated).</p>
+</dd>
+<dt><strong>current_subpops</strong><span class="classifier">list</span></dt><dd><p>Individuals from all subpopulations of the current generation (will be evaluated).</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">list</span></dt><dd><p>Evaluation of the individuals in all subpopulations.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>collaborators</strong><span class="classifier">list</span></dt><dd><p>A single individual from each subpopulation that will collaborate with the individual
+given as a parameter.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.cooperation.SingleRandomCollaboration">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.cooperation.</span></span><span class="sig-name descname"><span class="pre">SingleRandomCollaboration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/cooperation/random.html#SingleRandomCollaboration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.SingleRandomCollaboration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.cooperation.collaboration.Collaboration" title="pyccea.cooperation.collaboration.Collaboration"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collaboration</span></code></a></p>
+<p>Set a random individual from each subpopulation as a collaborator to an individual.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_context_vector</span></code>(collaborators)</p></td>
+<td><p>Build a context vector, i.e., a complete problem solution composed of representative solutions from each subpopulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyccea.cooperation.SingleRandomCollaboration.get_collaborators" title="pyccea.cooperation.SingleRandomCollaboration.get_collaborators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_collaborators</span></code></a>(subpop_idx, indiv_idx, ...)</p></td>
+<td><p>Randomly find a single collaborator from each subpopulation in the previous generation for the individual in the current generation given as a parameter.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.cooperation.SingleRandomCollaboration.get_collaborators">
+<span class="sig-name descname"><span class="pre">get_collaborators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indiv_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_subpops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_subpops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/cooperation/random.html#SingleRandomCollaboration.get_collaborators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.SingleRandomCollaboration.get_collaborators" title="Link to this definition"></a></dt>
+<dd><p>Randomly find a single collaborator from each subpopulation in the previous generation
+for the individual in the current generation given as a parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subpop_idx</strong><span class="classifier">int</span></dt><dd><p>Index of the subpopulation to which the individual belongs.</p>
+</dd>
+<dt><strong>indiv_idx</strong><span class="classifier">int</span></dt><dd><p>Index of the individual in its respective subpopulation.</p>
+</dd>
+<dt><strong>previous_subpops</strong><span class="classifier">list</span></dt><dd><p>Individuals from all subpopulations in the previous generation (already evaluated).</p>
+</dd>
+<dt><strong>current_subpops</strong><span class="classifier">list</span></dt><dd><p>Individuals from all subpopulations of the current generation (will be evaluated).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>collaborators</strong><span class="classifier">list</span></dt><dd><p>A single individual from each subpopulation that will collaborate with the individual
+given as a parameter.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <section id="submodules">
 <h2><span class="section-number">3.2.1. </span>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="pyccea-cooperation-best-module">
-<h2><span class="section-number">3.2.2. </span>pyccea.cooperation.best module<a class="headerlink" href="#pyccea-cooperation-best-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.cooperation.best">
+<span id="pyccea-cooperation-best-module"></span><h2><span class="section-number">3.2.2. </span>pyccea.cooperation.best module<a class="headerlink" href="#module-pyccea.cooperation.best" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.cooperation.best.SingleBestCollaboration">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.cooperation.best.</span></span><span class="sig-name descname"><span class="pre">SingleBestCollaboration</span></span><a class="reference internal" href="../_modules/pyccea/cooperation/best.html#SingleBestCollaboration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.best.SingleBestCollaboration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.cooperation.collaboration.Collaboration" title="pyccea.cooperation.collaboration.Collaboration"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collaboration</span></code></a></p>
+<p>Set the best individual from each subpopulation as a collaborator to any individual.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_context_vector</span></code>(collaborators)</p></td>
+<td><p>Build a context vector, i.e., a complete problem solution composed of representative solutions from each subpopulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyccea.cooperation.best.SingleBestCollaboration.get_collaborators" title="pyccea.cooperation.best.SingleBestCollaboration.get_collaborators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_collaborators</span></code></a>(subpop_idx, indiv_idx, ...)</p></td>
+<td><p>Set the best individual from each subpopulation as a collaborator to the individual given as a parameter.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.cooperation.best.SingleBestCollaboration.get_collaborators">
+<span class="sig-name descname"><span class="pre">get_collaborators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indiv_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_subpops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_best</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/cooperation/best.html#SingleBestCollaboration.get_collaborators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.best.SingleBestCollaboration.get_collaborators" title="Link to this definition"></a></dt>
+<dd><p>Set the best individual from each subpopulation as a collaborator to the individual
+given as a parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subpop_idx</strong><span class="classifier">int</span></dt><dd><p>Index of the subpopulation to which the individual belongs.</p>
+</dd>
+<dt><strong>indiv_idx</strong><span class="classifier">int</span></dt><dd><p>Index of the individual in its respective subpopulation. The vector that represents
+the individual is obtained from the <cite>current_subpops</cite>, where the individuals were
+evolved and not evaluated.</p>
+</dd>
+<dt><strong>current_subpops</strong><span class="classifier">list</span></dt><dd><p>Individuals from all subpopulations of the current generation (will be evaluated).</p>
+</dd>
+<dt><strong>current_best</strong><span class="classifier">dict</span></dt><dd><p>Current best individual of each subpopulation and its respective evaluation.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>collaborators</strong><span class="classifier">list</span></dt><dd><p>A single individual from each subpopulation that will collaborate with the individual
+given as a parameter.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-cooperation-collaboration-module">
-<h2><span class="section-number">3.2.3. </span>pyccea.cooperation.collaboration module<a class="headerlink" href="#pyccea-cooperation-collaboration-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.cooperation.collaboration">
+<span id="pyccea-cooperation-collaboration-module"></span><h2><span class="section-number">3.2.3. </span>pyccea.cooperation.collaboration module<a class="headerlink" href="#module-pyccea.cooperation.collaboration" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.cooperation.collaboration.Collaboration">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.cooperation.collaboration.</span></span><span class="sig-name descname"><span class="pre">Collaboration</span></span><a class="reference internal" href="../_modules/pyccea/cooperation/collaboration.html#Collaboration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.collaboration.Collaboration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>An abstract class for a collaborative method between individuals from different subpopulations</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.cooperation.collaboration.Collaboration.build_context_vector" title="pyccea.cooperation.collaboration.Collaboration.build_context_vector"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_context_vector</span></code></a>(collaborators)</p></td>
+<td><p>Build a context vector, i.e., a complete problem solution composed of representative solutions from each subpopulation.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.cooperation.collaboration.Collaboration.build_context_vector">
+<span class="sig-name descname"><span class="pre">build_context_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">collaborators</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/cooperation/collaboration.html#Collaboration.build_context_vector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.collaboration.Collaboration.build_context_vector" title="Link to this definition"></a></dt>
+<dd><p>Build a context vector, i.e., a complete problem solution composed of representative
+solutions from each subpopulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>collaborators: list</strong></dt><dd><p>A single individual from each subpopulation that will collaborate with an individual.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>context_vector: np.ndarray</dt><dd><p>Complete problem solution composed of one individual from each subpopulation.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-cooperation-elite-module">
-<h2><span class="section-number">3.2.4. </span>pyccea.cooperation.elite module<a class="headerlink" href="#pyccea-cooperation-elite-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.cooperation.elite">
+<span id="pyccea-cooperation-elite-module"></span><h2><span class="section-number">3.2.4. </span>pyccea.cooperation.elite module<a class="headerlink" href="#module-pyccea.cooperation.elite" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.cooperation.elite.SingleEliteCollaboration">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.cooperation.elite.</span></span><span class="sig-name descname"><span class="pre">SingleEliteCollaboration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/cooperation/elite.html#SingleEliteCollaboration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.elite.SingleEliteCollaboration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.cooperation.collaboration.Collaboration" title="pyccea.cooperation.collaboration.Collaboration"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collaboration</span></code></a></p>
+<p>Randomly selects the collaborator from among the best k individuals in the subpopulation.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_context_vector</span></code>(collaborators)</p></td>
+<td><p>Build a context vector, i.e., a complete problem solution composed of representative solutions from each subpopulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyccea.cooperation.elite.SingleEliteCollaboration.get_collaborators" title="pyccea.cooperation.elite.SingleEliteCollaboration.get_collaborators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_collaborators</span></code></a>(subpop_idx, indiv_idx, ...)</p></td>
+<td><p>Set the collaborators of the individual given as a parameter as random individuals among the k best individuals in each subpopulation in the previous generation.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.cooperation.elite.SingleEliteCollaboration.get_collaborators">
+<span class="sig-name descname"><span class="pre">get_collaborators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indiv_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_subpops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_subpops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fitness</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/cooperation/elite.html#SingleEliteCollaboration.get_collaborators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.elite.SingleEliteCollaboration.get_collaborators" title="Link to this definition"></a></dt>
+<dd><p>Set the collaborators of the individual given as a parameter as random individuals
+among the k best individuals in each subpopulation in the previous generation.</p>
+<p>In the scenario of n subpopulations, the elite collaboration method involves choosing n
+collaborators, with one selected from each subpopulation. Notably, the individual
+becomes their own collaborator within their specific subpopulation, while the remaining
+collaborators are chosen from the top k individuals in each respective subpopulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subpop_idx</strong><span class="classifier">int</span></dt><dd><p>Index of the subpopulation to which the individual belongs.</p>
+</dd>
+<dt><strong>indiv_idx</strong><span class="classifier">int</span></dt><dd><p>Index of the individual in its respective subpopulation. The vector that represents
+the individual is obtained from the <cite>current_subpops</cite>, where the individuals were
+evolved and not evaluated.</p>
+</dd>
+<dt><strong>previous_subpops</strong><span class="classifier">list</span></dt><dd><p>Individuals from all subpopulations in the previous generation (already evaluated).</p>
+</dd>
+<dt><strong>current_subpops</strong><span class="classifier">list</span></dt><dd><p>Individuals from all subpopulations of the current generation (will be evaluated).</p>
+</dd>
+<dt><strong>fitness</strong><span class="classifier">list</span></dt><dd><p>Evaluation of the individuals in all subpopulations.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>collaborators</strong><span class="classifier">list</span></dt><dd><p>A single individual from each subpopulation that will collaborate with the individual
+given as a parameter.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-cooperation-random-module">
-<h2><span class="section-number">3.2.5. </span>pyccea.cooperation.random module<a class="headerlink" href="#pyccea-cooperation-random-module" title="Link to this heading"></a></h2>
-</section>
-<section id="module-contents">
-<h2><span class="section-number">3.2.6. </span>Module contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<section id="module-pyccea.cooperation.random">
+<span id="pyccea-cooperation-random-module"></span><h2><span class="section-number">3.2.5. </span>pyccea.cooperation.random module<a class="headerlink" href="#module-pyccea.cooperation.random" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.cooperation.random.SingleRandomCollaboration">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.cooperation.random.</span></span><span class="sig-name descname"><span class="pre">SingleRandomCollaboration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/cooperation/random.html#SingleRandomCollaboration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.random.SingleRandomCollaboration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.cooperation.collaboration.Collaboration" title="pyccea.cooperation.collaboration.Collaboration"><code class="xref py py-class docutils literal notranslate"><span class="pre">Collaboration</span></code></a></p>
+<p>Set a random individual from each subpopulation as a collaborator to an individual.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_context_vector</span></code>(collaborators)</p></td>
+<td><p>Build a context vector, i.e., a complete problem solution composed of representative solutions from each subpopulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyccea.cooperation.random.SingleRandomCollaboration.get_collaborators" title="pyccea.cooperation.random.SingleRandomCollaboration.get_collaborators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_collaborators</span></code></a>(subpop_idx, indiv_idx, ...)</p></td>
+<td><p>Randomly find a single collaborator from each subpopulation in the previous generation for the individual in the current generation given as a parameter.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.cooperation.random.SingleRandomCollaboration.get_collaborators">
+<span class="sig-name descname"><span class="pre">get_collaborators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subpop_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indiv_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_subpops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_subpops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/cooperation/random.html#SingleRandomCollaboration.get_collaborators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.cooperation.random.SingleRandomCollaboration.get_collaborators" title="Link to this definition"></a></dt>
+<dd><p>Randomly find a single collaborator from each subpopulation in the previous generation
+for the individual in the current generation given as a parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subpop_idx</strong><span class="classifier">int</span></dt><dd><p>Index of the subpopulation to which the individual belongs.</p>
+</dd>
+<dt><strong>indiv_idx</strong><span class="classifier">int</span></dt><dd><p>Index of the individual in its respective subpopulation.</p>
+</dd>
+<dt><strong>previous_subpops</strong><span class="classifier">list</span></dt><dd><p>Individuals from all subpopulations in the previous generation (already evaluated).</p>
+</dd>
+<dt><strong>current_subpops</strong><span class="classifier">list</span></dt><dd><p>Individuals from all subpopulations of the current generation (will be evaluated).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>collaborators</strong><span class="classifier">list</span></dt><dd><p>A single individual from each subpopulation that will collaborate with the individual
+given as a parameter.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 

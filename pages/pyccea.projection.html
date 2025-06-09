@@ -50,9 +50,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">1. Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">2. Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">3. API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html#module-pyccea.evaluation">4. Module Details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">5. Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="citation.html">6. Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">4. Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">5. Citation</a></li>
 </ul>
 
         </div>
@@ -80,19 +79,155 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyccea-projection-package">
-<h1><span class="section-number">3.8. </span>pyccea.projection package<a class="headerlink" href="#pyccea-projection-package" title="Link to this heading"></a></h1>
+  <section id="module-pyccea.projection">
+<span id="pyccea-projection-package"></span><h1><span class="section-number">3.8. </span>pyccea.projection package<a class="headerlink" href="#module-pyccea.projection" title="Link to this heading"></a></h1>
 <section id="submodules">
 <h2><span class="section-number">3.8.1. </span>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="pyccea-projection-cipls-module">
-<h2><span class="section-number">3.8.2. </span>pyccea.projection.cipls module<a class="headerlink" href="#pyccea-projection-cipls-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.projection.cipls">
+<span id="pyccea-projection-cipls-module"></span><h2><span class="section-number">3.8.2. </span>pyccea.projection.cipls module<a class="headerlink" href="#module-pyccea.projection.cipls" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.projection.cipls.CIPLS">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.projection.cipls.</span></span><span class="sig-name descname"><span class="pre">CIPLS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/projection/cipls.html#CIPLS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.projection.cipls.CIPLS" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseEstimator</span></code></p>
+<p>Covariance-free Partial Least Squares (CIPLS).</p>
+<p>Jordao, Artur, et al. “Covariance-free partial least squares: An incremental dimensionality
+reduction method.” Proceedings of the IEEE/CVF Winter Conference on Applications of Computer
+Vision (2021).
+Source: <a class="reference external" href="https://github.com/arturjordao/IncrementalDimensionalityReduction">https://github.com/arturjordao/IncrementalDimensionalityReduction</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n: int</strong></dt><dd><p>Number of iterations. It starts at 0 and incrementally goes up to the number of samples
+(n_samples).</p>
+</dd>
+<dt><strong>n_features: int</strong></dt><dd><p>Number of variables.</p>
+</dd>
+<dt><strong>x_weights_: np.ndarray (n_features, n_components)</strong></dt><dd><p>Projection matrix.</p>
+</dd>
+<dt><strong>x_scores_: np.ndarray (n_samples, n_components)</strong></dt><dd><p>The transformed training samples (latent components).</p>
+</dd>
+<dt><strong>x_loadings_: np.ndarray (n_features, n_components)</strong></dt><dd><p>The loadings of X.</p>
+</dd>
+<dt><strong>y_loadings_: np.ndarray (n_targets, n_components)</strong></dt><dd><p>The loadings of Y, where n_targets is the number of response variables.</p>
+</dd>
+<dt><strong>x_rotations_: np.ndarray (n_components, n_features)</strong></dt><dd><p>Transposed and non-normalized projection matrix.</p>
+</dd>
+<dt><strong>sum_x: np.ndarray (n_features,)</strong></dt><dd><p>The sum of each feature individually across all training samples.</p>
+</dd>
+<dt><strong>sum_y: np.ndarray (1,)</strong></dt><dd><p>The sum of targets across all training samples.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.projection.cipls.CIPLS.fit" title="pyccea.projection.cipls.CIPLS.fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit</span></code></a>(X, Y)</p></td>
+<td><p>Fit model to data</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_metadata_routing</span></code>()</p></td>
+<td><p>Get metadata routing of this object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_params</span></code>([deep])</p></td>
+<td><p>Get parameters for this estimator.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyccea.projection.cipls.CIPLS.normalize" title="pyccea.projection.cipls.CIPLS.normalize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize</span></code></a>(x)</p></td>
+<td><p>Scale input vectors individually to unit norm (vector length).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_params</span></code>(**params)</p></td>
+<td><p>Set the parameters of this estimator.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyccea.projection.cipls.CIPLS.transform" title="pyccea.projection.cipls.CIPLS.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a>(X[, Y])</p></td>
+<td><p>Apply the dimension reduction learned on the training data.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.projection.cipls.CIPLS.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/projection/cipls.html#CIPLS.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.projection.cipls.CIPLS.fit" title="Link to this definition"></a></dt>
+<dd><p>Fit model to data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X: np.ndarray (n_samples, n_features)</strong></dt><dd><p>Training data.</p>
+</dd>
+<dt><strong>Y: np.ndarray (n_samples,) or (n_samples, n_targets)</strong></dt><dd><p>Target data.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.projection.cipls.CIPLS.normalize">
+<span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/projection/cipls.html#CIPLS.normalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.projection.cipls.CIPLS.normalize" title="Link to this definition"></a></dt>
+<dd><p>Scale input vectors individually to unit norm (vector length).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.projection.cipls.CIPLS.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/projection/cipls.html#CIPLS.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.projection.cipls.CIPLS.transform" title="Link to this definition"></a></dt>
+<dd><p>Apply the dimension reduction learned on the training data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>X: np.ndarray (n_samples, n_features)</strong></dt><dd><p>Training data.</p>
+</dd>
+<dt><strong>Y: np.ndarray (n_samples,) or (n_samples, n_targets), default None</strong></dt><dd><p>Target data.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-projection-vip-module">
-<h2><span class="section-number">3.8.3. </span>pyccea.projection.vip module<a class="headerlink" href="#pyccea-projection-vip-module" title="Link to this heading"></a></h2>
-</section>
-<section id="module-pyccea.projection">
-<span id="module-contents"></span><h2><span class="section-number">3.8.4. </span>Module contents<a class="headerlink" href="#module-pyccea.projection" title="Link to this heading"></a></h2>
+<section id="module-pyccea.projection.vip">
+<span id="pyccea-projection-vip-module"></span><h2><span class="section-number">3.8.3. </span>pyccea.projection.vip module<a class="headerlink" href="#module-pyccea.projection.vip" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.projection.vip.VIP">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.projection.vip.</span></span><span class="sig-name descname"><span class="pre">VIP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/projection/vip.html#VIP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.projection.vip.VIP" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Variable Importance in Projection (VIP).</p>
+<p>Mehmood, Tahir, et al. “A review of variable selection methods in partial least squares
+regression.” Chemometrics and intelligent laboratory systems 118 (2012): 62-69.
+Source: <a class="reference external" href="https://github.com/scikit-learn/scikit-learn/issues/7050">https://github.com/scikit-learn/scikit-learn/issues/7050</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n_features</strong><span class="classifier">int</span></dt><dd><p>Number of variables.</p>
+</dd>
+<dt><strong>n_components</strong><span class="classifier">int</span></dt><dd><p>Number of components.</p>
+</dd>
+<dt><strong>x_rotations_</strong><span class="classifier">np.ndarray (n_features, n_components)</span></dt><dd><p>Projection matrix used to transform X.</p>
+</dd>
+<dt><strong>x_scores_</strong><span class="classifier">np.ndarray (n_samples, n_components)</span></dt><dd><p>The transformed training samples (latent components).</p>
+</dd>
+<dt><strong>y_loadings_</strong><span class="classifier">np.ndarray (n_targets, n_components)</span></dt><dd><p>The loadings of Y.</p>
+</dd>
+<dt><strong>importances</strong><span class="classifier">np.ndarray (n_features,)</span></dt><dd><p>Importance of each feature based on its contribution to yield the latent space.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.projection.vip.VIP.compute" title="pyccea.projection.vip.VIP.compute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute</span></code></a>()</p></td>
+<td><p>Calculate feature importances.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.projection.vip.VIP.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/projection/vip.html#VIP.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.projection.vip.VIP.compute" title="Link to this definition"></a></dt>
+<dd><p>Calculate feature importances.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 

@@ -1,6 +1,11 @@
 pyccea.utils package
 ====================
 
+.. automodule:: pyccea.utils
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 Submodules
 ----------
 
@@ -48,14 +53,6 @@ pyccea.utils.stats module
 -------------------------
 
 .. automodule:: pyccea.utils.stats
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-Module contents
----------------
-
-.. automodule:: pyccea.utils
    :members:
    :show-inheritance:
    :undoc-members:

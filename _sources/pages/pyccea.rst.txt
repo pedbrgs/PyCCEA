@@ -1,6 +1,11 @@
 pyccea package
 ==============
 
+.. automodule:: pyccea
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 Subpackages
 -----------
 
@@ -16,11 +21,3 @@ Subpackages
    pyccea.optimizers
    pyccea.projection
    pyccea.utils
-
-Module contents
----------------
-
-.. automodule:: pyccea
-   :members:
-   :show-inheritance:
-   :undoc-members:

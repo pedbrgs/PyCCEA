@@ -1,0 +1,236 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyccea.fitness.distance &mdash; PyCCEA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=a8bcbd07" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/installation.html">1. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/quickstart.html">2. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/api.html">3. API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/contributing.html">4. Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/citation.html">5. Citation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PyCCEA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyccea.fitness.distance</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyccea.fitness.distance</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..evaluation.wrapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">WrapperEvaluation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..fitness.function</span><span class="w"> </span><span class="kn">import</span> <span class="n">WrapperFitnessFunction</span>
+
+
+<div class="viewcode-block" id="DistanceBasedFitness">
+<a class="viewcode-back" href="../../../pages/pyccea.fitness.html#pyccea.fitness.DistanceBasedFitness">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DistanceBasedFitness</span><span class="p">(</span><span class="n">WrapperFitnessFunction</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Objective function that maximizes balanced accuracy based on a k-nearest neighbors classifier.</span>
+
+<span class="sd">    The fitness function is designed as a three-objective optimization, aimed at achieving a</span>
+<span class="sd">    balance between maximizing balanced accuracy while simultaneously minimizing the average</span>
+<span class="sd">    distance between instances sharing the same label and maximizing the average distance between</span>
+<span class="sd">    instances with different labels.</span>
+
+<span class="sd">    Firouznia, Marjan, Pietro Ruiu, and Giuseppe A. Trunfio. &quot;Adaptive cooperative coevolutionary</span>
+<span class="sd">    differential evolution for parallel feature selection in high-dimensional datasets.&quot;</span>
+<span class="sd">    The Journal of Supercomputing (2023): 1-30.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    w1: float</span>
+<span class="sd">        Predictive performance weight.</span>
+<span class="sd">    w2: float</span>
+<span class="sd">        Weight of the complement of the average distance between instances and their neighbors</span>
+<span class="sd">        with the same class.</span>
+<span class="sd">    w3: float</span>
+<span class="sd">        Weight of the average distance between instances and their neighbors of different classes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">:</span> <span class="n">WrapperEvaluation</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">evaluator</span><span class="p">)</span>
+        <span class="c1"># Check the number of weights</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DistanceBasedFitness</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; fitness function has only three components. &quot;</span>
+                <span class="s2">&quot;Therefore, it requires only three weights.&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># Check the sum of the weights</span>
+        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The sum of weights is </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span><span class="si">}</span><span class="s2"> but must be 1.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w1</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w3</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_distances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the average distances between instances and their neighbors with the same class</span>
+<span class="sd">        and their neighbors with different class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">avg_distances_same_label</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">avg_distances_diff_label</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="c1"># If no feature is selected, no estimator has been trained</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">estimators</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+
+        <span class="c1"># For all estimator</span>
+        <span class="k">for</span> <span class="n">estimator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">estimators</span><span class="p">:</span>
+            <span class="c1"># Get indices and distances between neighbors</span>
+            <span class="n">distances</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">(</span>
+                <span class="n">X</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span>
+                <span class="n">n_neighbors</span><span class="o">=</span><span class="n">estimator</span><span class="o">.</span><span class="n">n_neighbors</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="c1"># Neighbors other than the i-th instance itself</span>
+                <span class="n">return_distance</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">sum_distances_same_label</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">sum_distances_diff_label</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">n_neighbors_same_label</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">n_neighbors_diff_label</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="c1"># For all training instance</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">train_size</span><span class="p">):</span>
+                <span class="c1"># Neighbors with the same label</span>
+                <span class="n">same_label_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">y_train</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">y_train</span><span class="p">[</span><span class="n">i</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">sum_ith_distance_same_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">distances</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">same_label_indices</span><span class="p">])</span>
+                <span class="n">n_neighbors_same_label</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">same_label_indices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># Neighbors other than the i-th instance itself</span>
+                <span class="n">sum_distances_same_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sum_ith_distance_same_label</span><span class="p">)</span>
+                <span class="c1"># Neighbors with different labels</span>
+                <span class="n">diff_label_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">y_train</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">!=</span> <span class="n">data</span><span class="o">.</span><span class="n">y_train</span><span class="p">[</span><span class="n">i</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">sum_ith_distance_diff_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">distances</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">diff_label_indices</span><span class="p">])</span>
+                <span class="n">n_neighbors_diff_label</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">diff_label_indices</span><span class="p">)</span>
+                <span class="n">sum_distances_diff_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sum_ith_distance_diff_label</span><span class="p">)</span>
+            <span class="c1"># Average distances for each estimator</span>
+            <span class="n">avg_distances_same_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sum_distances_same_label</span><span class="p">)</span><span class="o">/</span><span class="n">n_neighbors_same_label</span><span class="p">)</span>
+            <span class="n">avg_distances_diff_label</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sum_distances_diff_label</span><span class="p">)</span><span class="o">/</span><span class="n">n_neighbors_diff_label</span><span class="p">)</span>
+        <span class="c1"># Mean average distances calculated across all estimators</span>
+        <span class="n">mean_avg_distance_same_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">avg_distances_same_label</span><span class="p">)</span>
+        <span class="n">mean_avg_distance_diff_label</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">avg_distances_diff_label</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">mean_avg_distance_same_label</span><span class="p">,</span> <span class="n">mean_avg_distance_diff_label</span>
+
+<div class="viewcode-block" id="DistanceBasedFitness.evaluate">
+<a class="viewcode-back" href="../../../pages/pyccea.fitness.html#pyccea.fitness.DistanceBasedFitness.evaluate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context_vector</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate the given context vector using the fitness function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        context_vector: np.ndarray</span>
+<span class="sd">            Solution of the complete problem.</span>
+<span class="sd">        data: DataLoader</span>
+<span class="sd">            Container with process data and training and test sets.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fitness: float</span>
+<span class="sd">            Quality of the context vector.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sqrt_n_selected_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">context_vector</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+        <span class="n">evaluations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_predictive_performance</span><span class="p">(</span><span class="n">context_vector</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">evaluation</span> <span class="o">=</span> <span class="n">evaluations</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">eval_function</span><span class="p">]</span>
+        <span class="n">mean_avg_distance_same_label</span><span class="p">,</span> <span class="n">mean_avg_distance_diff_label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_distances</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="c1"># Since we are maximizing:</span>
+        <span class="c1"># - For regression: invert the evaluation (lower error is better)</span>
+        <span class="c1"># - For classification: use evaluation directly (higher accuracy is better)</span>
+        <span class="n">sign</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">task</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">fitness</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">sign</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">w1</span> <span class="o">*</span> <span class="n">evaluation</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">*</span> <span class="p">(</span><span class="n">mean_avg_distance_diff_label</span><span class="o">/</span><span class="n">sqrt_n_selected_features</span><span class="p">)</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w3</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">mean_avg_distance_same_label</span><span class="o">/</span><span class="n">sqrt_n_selected_features</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fitness</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, pedbrgs.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

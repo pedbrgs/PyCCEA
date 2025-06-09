@@ -50,9 +50,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">1. Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">2. Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">3. API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html#module-pyccea.evaluation">4. Module Details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">5. Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="citation.html">6. Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">4. Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">5. Citation</a></li>
 </ul>
 
         </div>
@@ -80,16 +79,84 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyccea-evaluation-package">
-<h1><span class="section-number">3.4. </span>pyccea.evaluation package<a class="headerlink" href="#pyccea-evaluation-package" title="Link to this heading"></a></h1>
+  <section id="module-pyccea.evaluation">
+<span id="pyccea-evaluation-package"></span><h1><span class="section-number">3.4. </span>pyccea.evaluation package<a class="headerlink" href="#module-pyccea.evaluation" title="Link to this heading"></a></h1>
 <section id="submodules">
 <h2><span class="section-number">3.4.1. </span>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="pyccea-evaluation-wrapper-module">
-<h2><span class="section-number">3.4.2. </span>pyccea.evaluation.wrapper module<a class="headerlink" href="#pyccea-evaluation-wrapper-module" title="Link to this heading"></a></h2>
-</section>
-<section id="module-pyccea.evaluation">
-<span id="module-contents"></span><h2><span class="section-number">3.4.3. </span>Module contents<a class="headerlink" href="#module-pyccea.evaluation" title="Link to this heading"></a></h2>
+<section id="module-pyccea.evaluation.wrapper">
+<span id="pyccea-evaluation-wrapper-module"></span><h2><span class="section-number">3.4.2. </span>pyccea.evaluation.wrapper module<a class="headerlink" href="#module-pyccea.evaluation.wrapper" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.evaluation.wrapper.WrapperEvaluation">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.evaluation.wrapper.</span></span><span class="sig-name descname"><span class="pre">WrapperEvaluation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_classes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/evaluation/wrapper.html#WrapperEvaluation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.evaluation.wrapper.WrapperEvaluation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Evaluate selected features based on the predictive performance of a machine learning model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>model_evaluator</strong><span class="classifier">object of one of the metrics classes</span></dt><dd><p>Responsible for computing performance metrics to evaluate models.</p>
+</dd>
+<dt><strong>base_model</strong><span class="classifier">sklearn model object</span></dt><dd><p>Model that has not been fitted. Works as a template to avoid multiple model
+initializations. As each model evaluates a subset of features (individual), the base model
+is copied and fitted for each individual.</p>
+</dd>
+<dt><strong>model</strong><span class="classifier">sklearn model object</span></dt><dd><p>Model that has been fitted to evaluate the current individual.</p>
+</dd>
+<dt><strong>estimators</strong><span class="classifier">list of sklearn model objects</span></dt><dd><p>Estimators used in the current evaluation. It is one when ‘eval_mode’ is set to “hold_out”
+and k when ‘eval_mode’ is set to “k_fold” or “leave_one_out”.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.evaluation.wrapper.WrapperEvaluation.evaluate" title="pyccea.evaluation.wrapper.WrapperEvaluation.evaluate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate</span></code></a>(solution, data)</p></td>
+<td><p>Evaluate an individual represented by a complete solution through the predictive performance of a machine learning model.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.evaluation.wrapper.WrapperEvaluation.eval_modes">
+<span class="sig-name descname"><span class="pre">eval_modes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['hold_out',</span> <span class="pre">'k_fold',</span> <span class="pre">'leave_one_out']</span></em><a class="headerlink" href="#pyccea.evaluation.wrapper.WrapperEvaluation.eval_modes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.evaluation.wrapper.WrapperEvaluation.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/pyccea/evaluation/wrapper.html#WrapperEvaluation.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.evaluation.wrapper.WrapperEvaluation.evaluate" title="Link to this definition"></a></dt>
+<dd><p>Evaluate an individual represented by a complete solution through the predictive
+performance of a machine learning model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>solution</strong><span class="classifier">np.ndarray</span></dt><dd><p>Solution represented by a binary n-dimensional array, where n is the number of
+features.</p>
+</dd>
+<dt><strong>data</strong><span class="classifier">DataLoader</span></dt><dd><p>Container with process data and training and test sets.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>: dict</dt><dd><p>Evaluation metrics.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.evaluation.wrapper.WrapperEvaluation.metrics">
+<span class="sig-name descname"><span class="pre">metrics</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'classification':</span> <span class="pre">&lt;class</span> <span class="pre">'pyccea.utils.metrics.ClassificationMetrics'&gt;,</span> <span class="pre">'regression':</span> <span class="pre">&lt;class</span> <span class="pre">'pyccea.utils.metrics.RegressionMetrics'&gt;}</span></em><a class="headerlink" href="#pyccea.evaluation.wrapper.WrapperEvaluation.metrics" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.evaluation.wrapper.WrapperEvaluation.models">
+<span class="sig-name descname"><span class="pre">models</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'classification':</span> <span class="pre">&lt;class</span> <span class="pre">'pyccea.utils.models.ClassificationModel'&gt;,</span> <span class="pre">'regression':</span> <span class="pre">&lt;class</span> <span class="pre">'pyccea.utils.models.RegressionModel'&gt;}</span></em><a class="headerlink" href="#pyccea.evaluation.wrapper.WrapperEvaluation.models" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 

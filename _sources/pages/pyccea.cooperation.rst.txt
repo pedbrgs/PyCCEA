@@ -1,6 +1,11 @@
 pyccea.cooperation package
 ==========================
 
+.. automodule:: pyccea.cooperation
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 Submodules
 ----------
 
@@ -32,14 +37,6 @@ pyccea.cooperation.random module
 --------------------------------
 
 .. automodule:: pyccea.cooperation.random
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-Module contents
----------------
-
-.. automodule:: pyccea.cooperation
    :members:
    :show-inheritance:
    :undoc-members:

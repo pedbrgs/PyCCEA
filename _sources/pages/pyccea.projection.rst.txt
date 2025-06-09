@@ -1,6 +1,11 @@
 pyccea.projection package
 =========================
 
+.. automodule:: pyccea.projection
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 Submodules
 ----------
 
@@ -16,14 +21,6 @@ pyccea.projection.vip module
 ----------------------------
 
 .. automodule:: pyccea.projection.vip
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-Module contents
----------------
-
-.. automodule:: pyccea.projection
    :members:
    :show-inheritance:
    :undoc-members:

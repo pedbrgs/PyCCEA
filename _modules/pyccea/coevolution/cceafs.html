@@ -1,0 +1,264 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyccea.coevolution.cceafs &mdash; PyCCEA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=a8bcbd07" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/installation.html">1. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/quickstart.html">2. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/api.html">3. API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/contributing.html">4. Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/citation.html">5. Citation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PyCCEA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyccea.coevolution.cceafs</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyccea.coevolution.cceafs</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..coevolution.ccga</span><span class="w"> </span><span class="kn">import</span> <span class="n">CCGA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..decomposition.static</span><span class="w"> </span><span class="kn">import</span> <span class="n">SequentialFeatureGrouping</span>
+
+
+<div class="viewcode-block" id="CCEAFS">
+<a class="viewcode-back" href="../../../pages/pyccea.coevolution.html#pyccea.coevolution.CCEAFS">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CCEAFS</span><span class="p">(</span><span class="n">CCGA</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Cooperative Co-Evolutionary-Based Feature Selection (CCEAFS).</span>
+
+<span class="sd">    Rashid, A. N. M., et al. &quot;A novel penalty-based wrapper objective function for feature</span>
+<span class="sd">    selection in Big Data using cooperative co-evolution.&quot; IEEE Access 8 (2020): 150113-150129.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_decomposer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate feature grouping method.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decomposer</span> <span class="o">=</span> <span class="n">SequentialFeatureGrouping</span><span class="p">(</span>
+            <span class="n">n_subcomps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="p">,</span>
+            <span class="n">subcomp_sizes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subcomp_sizes</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="CCEAFS.optimize">
+<a class="viewcode-back" href="../../../pages/pyccea.coevolution.html#pyccea.coevolution.CCEAFS.optimize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Solve the feature selection problem through optimization.&quot;&quot;&quot;</span>
+        <span class="c1"># Decompose problem</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_problem_decomposition</span><span class="p">()</span>
+        <span class="c1"># Initialize subpopulations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_subpopulations</span><span class="p">()</span>
+        <span class="c1"># Instantiate optimizers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_optimizers</span><span class="p">()</span>
+
+        <span class="c1"># Get the best individual and context vector from each subpopulation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_individuals</span><span class="p">(</span>
+            <span class="n">subpops</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subpops</span><span class="p">,</span>
+            <span class="n">fitness</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span>
+            <span class="n">context_vectors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span>
+        <span class="p">)</span>
+        <span class="c1"># Select the globally best context vector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_global_best</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="c1"># Save the order of features considered in the random feature grouping</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">best_feature_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_idxs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Set the number of generations counter</span>
+        <span class="n">n_gen</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># Number of generations that the best fitness has not improved</span>
+        <span class="n">stagnation_counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># Initialize the optimization progress bar</span>
+        <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;coevolution&quot;</span><span class="p">][</span><span class="s2">&quot;max_gen&quot;</span><span class="p">],</span>
+                            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Generations&quot;</span><span class="p">,</span>
+                            <span class="n">leave</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># Iterate up to the maximum number of generations</span>
+        <span class="k">while</span> <span class="n">n_gen</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;coevolution&quot;</span><span class="p">][</span><span class="s2">&quot;max_gen&quot;</span><span class="p">]:</span>
+            <span class="c1"># Append current best fitness</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">convergence_curve</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span><span class="p">)</span>
+
+            <span class="c1"># Evolve each subpopulation using a genetic algorithm</span>
+            <span class="n">current_subpops</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="p">):</span>
+                <span class="n">current_subpop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">evolve</span><span class="p">(</span>
+                    <span class="n">subpop</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subpops</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="n">fitness</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">current_subpops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_subpop</span><span class="p">)</span>
+
+            <span class="c1"># Evaluate each individual of the evolved subpopulations</span>
+            <span class="n">current_fitness</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">current_context_vectors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="p">):</span>
+                <span class="n">current_fitness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">())</span>
+                <span class="n">current_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">())</span>
+                <span class="c1"># Use best individuals from the previous generation (`self.current_best`) as</span>
+                <span class="c1"># collaborators for each individual in the current generation after evolve</span>
+                <span class="c1"># (`current_subpops`)</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                    <span class="n">collaborators</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_collaborator</span><span class="o">.</span><span class="n">get_collaborators</span><span class="p">(</span>
+                        <span class="n">subpop_idx</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+                        <span class="n">indiv_idx</span><span class="o">=</span><span class="n">j</span><span class="p">,</span>
+                        <span class="n">current_subpops</span><span class="o">=</span><span class="n">current_subpops</span><span class="p">,</span>
+                        <span class="n">current_best</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_best</span>
+                    <span class="p">)</span>
+                    <span class="n">context_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_collaborator</span><span class="o">.</span><span class="n">build_context_vector</span><span class="p">(</span><span class="n">collaborators</span><span class="p">)</span>
+                    <span class="c1"># Update the context vector</span>
+                    <span class="n">current_context_vectors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+                    <span class="c1"># Update fitness</span>
+                    <span class="n">current_fitness</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context_vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+            <span class="c1"># Update subpopulations, context vectors and evaluations</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subpops</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_subpops</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_fitness</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_context_vectors</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">current_subpops</span><span class="p">,</span> <span class="n">current_fitness</span><span class="p">,</span> <span class="n">current_context_vectors</span>
+            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+
+            <span class="c1"># Get the best individual and context vector from each subpopulation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_individuals</span><span class="p">(</span>
+                <span class="n">subpops</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subpops</span><span class="p">,</span>
+                <span class="n">fitness</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span>
+                <span class="n">context_vectors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Select the globally best context vector</span>
+            <span class="n">best_context_vector</span><span class="p">,</span> <span class="n">best_fitness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_global_best</span><span class="p">()</span>
+            <span class="c1"># Update best context vector</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">&lt;</span> <span class="n">best_fitness</span><span class="p">:</span>
+                <span class="c1"># Reset stagnation counter because best fitness has improved</span>
+                <span class="n">stagnation_counter</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="c1"># Enable logger if specified</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="k">else</span> <span class="kc">True</span>
+                <span class="c1"># Objective weight</span>
+                <span class="n">w1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;evaluation&quot;</span><span class="p">][</span><span class="s2">&quot;weights&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># Penalty weight</span>
+                <span class="n">w2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;evaluation&quot;</span><span class="p">][</span><span class="s2">&quot;weights&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="c1"># Current fitness, performance evaluation and penalty</span>
+                <span class="n">current_best_fitness</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="n">current_penalty</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">n_features</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="n">current_eval</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">+</span> <span class="n">w2</span><span class="o">*</span><span class="n">current_penalty</span><span class="p">)</span><span class="o">/</span><span class="n">w1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="c1"># New fitness, performance evaluation and penalty</span>
+                <span class="n">new_best_fitness</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">best_fitness</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="n">new_penalty</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">n_features</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="n">new_eval</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">best_fitness</span> <span class="o">+</span> <span class="n">w2</span><span class="o">*</span><span class="n">new_penalty</span><span class="p">)</span><span class="o">/</span><span class="n">w1</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="c1"># Show improvement</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Update fitness from </span><span class="si">{</span><span class="n">current_best_fitness</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_best_fitness</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Update predictive performance from </span><span class="si">{</span><span class="n">current_eval</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_eval</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Update penalty from </span><span class="si">{</span><span class="n">current_penalty</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_penalty</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="c1"># Update best context vector</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span> <span class="o">=</span> <span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+                <span class="c1"># Update best fitness</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">=</span> <span class="n">best_fitness</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Increase stagnation counter because best fitness has not improved</span>
+                <span class="n">stagnation_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c1"># Checks whether the optimization has been stagnant for a long time</span>
+                <span class="k">if</span> <span class="n">stagnation_counter</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;coevolution&quot;</span><span class="p">][</span><span class="s2">&quot;max_gen_without_improvement&quot;</span><span class="p">]:</span>
+                    <span class="c1"># Enable logger</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Early stopping because fitness has been stagnant for &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stagnation_counter</span><span class="si">}</span><span class="s2"> generations in a row.&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="c1"># Increase number of generations</span>
+            <span class="n">n_gen</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># Update progress bar</span>
+            <span class="n">progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># Close progress bar after optimization</span>
+        <span class="n">progress_bar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, pedbrgs.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

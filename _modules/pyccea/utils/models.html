@@ -1,0 +1,482 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pyccea.utils.models &mdash; PyCCEA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=a8bcbd07" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/installation.html">1. Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/quickstart.html">2. Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/api.html">3. API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/contributing.html">4. Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/citation.html">5. Citation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">PyCCEA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">pyccea.utils.models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for pyccea.utils.models</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.svm</span><span class="w"> </span><span class="kn">import</span> <span class="n">SVC</span><span class="p">,</span> <span class="n">SVR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.neighbors</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">UndefinedMetricWarning</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomizedSearchCV</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.naive_bayes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComplementNB</span><span class="p">,</span> <span class="n">GaussianNB</span><span class="p">,</span> <span class="n">MultinomialNB</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="n">RandomForestRegressor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogisticRegression</span><span class="p">,</span> <span class="n">LinearRegression</span><span class="p">,</span> <span class="n">Ridge</span><span class="p">,</span> <span class="n">Lasso</span><span class="p">,</span> <span class="n">ElasticNet</span>
+
+
+<div class="viewcode-block" id="RegressionModel">
+<a class="viewcode-back" href="../../../pages/pyccea.utils.html#pyccea.utils.models.RegressionModel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RegressionModel</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a regression model, adjust its hyperparameters and get the best model.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator : sklearn model object</span>
+<span class="sd">        Trained model. In case optimize is True, it is the model that was chosen by the Randomized</span>
+<span class="sd">        Search, i.e., estimator which gave the best result on the validation data.</span>
+<span class="sd">    hyperparams : dict</span>
+<span class="sd">        Hyperparameters of the model. In case optimize is True, it is the best hyperparameters</span>
+<span class="sd">        used to fit the machine learning model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">models</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;linear&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">LinearRegression</span><span class="p">,</span> <span class="p">{}),</span>
+        <span class="s2">&quot;ridge&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Ridge</span><span class="p">,</span> <span class="p">{}),</span>
+        <span class="s2">&quot;lasso&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">Lasso</span><span class="p">,</span> <span class="p">{}),</span>
+        <span class="s2">&quot;elastic_net&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">ElasticNet</span><span class="p">,</span> <span class="p">{}),</span>
+        <span class="s2">&quot;random_forest&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">RandomForestRegressor</span><span class="p">,</span> <span class="p">{}),</span>
+        <span class="s2">&quot;support_vector_machine&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">SVR</span><span class="p">,</span> <span class="p">{}),</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the regression model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_type : str</span>
+<span class="sd">            Name of the machine learning model that will be fitted for a regression task.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if the chosen regression model is available</span>
+        <span class="k">if</span> <span class="n">model_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">RegressionModel</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Model type &#39;</span><span class="si">{</span><span class="n">model_type</span><span class="si">}</span><span class="s2">&#39; was not found. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;The available models are </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">RegressionModel</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># Initialize regression model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="n">model_type</span>
+        <span class="n">model_class</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">RegressionModel</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">model_class</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1"># Initialize logger with info level</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+        <span class="c1"># Suppress warnings</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_model_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                         <span class="n">X_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                         <span class="n">y_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                         <span class="n">n_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+                         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">kfolds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Optimize the hyperparameters of the model and return the best model found.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X_train: np.ndarray</span>
+<span class="sd">            Train input data.</span>
+<span class="sd">        y_train: np.ndarray</span>
+<span class="sd">            Train output data.</span>
+<span class="sd">        n_iter: int, default 100</span>
+<span class="sd">            Number of hyperparameter settings that are sampled. It trades off runtime and quality</span>
+<span class="sd">            of the solution.</span>
+<span class="sd">        seed: int, default None</span>
+<span class="sd">            Controls the shuffling applied for subsampling the data.</span>
+<span class="sd">        kfolds: int, default 5</span>
+<span class="sd">            Number of folds in the k-fold cross validation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        estimator: sklearn model object</span>
+<span class="sd">            Trained model. It is the model that was chosen by the Randomized Search, i.e., estimator</span>
+<span class="sd">            which gave the best result on the validation data.</span>
+<span class="sd">        hyperparams: dict</span>
+<span class="sd">            Hyperparameters of the model. It is the best hyperparameters used to fit the machine</span>
+<span class="sd">            learning model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Grid of possible hyperparameter values</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;ridge&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;lasso&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;random_forest&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">201</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                <span class="s2">&quot;max_features&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;sqrt&quot;</span><span class="p">,</span> <span class="s2">&quot;log2&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                <span class="s2">&quot;min_samples_split&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span>
+                <span class="s2">&quot;min_samples_leaf&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+                <span class="s2">&quot;bootstrap&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;support_vector_machine&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">13</span><span class="p">),</span>
+                <span class="s2">&quot;epsilon&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span>
+                <span class="s2">&quot;kernel&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="s2">&quot;poly&quot;</span><span class="p">,</span> <span class="s2">&quot;rbf&quot;</span><span class="p">,</span> <span class="s2">&quot;sigmoid&quot;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;elastic_net&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">13</span><span class="p">),</span>
+                <span class="s2">&quot;l1_ratio&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;fit_intercept&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+            <span class="p">}</span>
+
+        <span class="c1"># Scoring metric used for regression tasks</span>
+        <span class="n">scoring</span> <span class="o">=</span> <span class="s2">&quot;neg_mean_squared_error&quot;</span>
+
+        <span class="c1"># Tuning hyperparameters with Randomized Search with Cross Validation</span>
+        <span class="n">search</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span>
+                                    <span class="n">param_distributions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span>
+                                    <span class="n">n_iter</span><span class="o">=</span><span class="n">n_iter</span><span class="p">,</span>
+                                    <span class="n">cv</span><span class="o">=</span><span class="n">kfolds</span><span class="p">,</span>
+                                    <span class="n">random_state</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                                    <span class="n">scoring</span><span class="o">=</span><span class="n">scoring</span><span class="p">,</span>
+                                    <span class="n">refit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Tuning hyperparameters ...&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="c1"># NOTE: Suppress DeprecationWarning from scikit-learn Ridge regression</span>
+            <span class="c1"># when calling scipy.linalg.solve() with deprecated &#39;sym_pos&#39; argument.</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;The &#39;sym_pos&#39; keyword is deprecated&quot;</span><span class="p">)</span>
+            <span class="n">search</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="c1"># Get best model and its respective hyperparameters</span>
+        <span class="n">estimator</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">best_estimator_</span>
+        <span class="n">hyperparams</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">best_params_</span>
+
+        <span class="k">return</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">hyperparams</span> 
+
+<div class="viewcode-block" id="RegressionModel.train">
+<a class="viewcode-back" href="../../../pages/pyccea.utils.html#pyccea.utils.models.RegressionModel.train">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+              <span class="n">X_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+              <span class="n">y_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+              <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="n">kfolds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+              <span class="n">n_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+              <span class="n">optimize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+              <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and train a regression model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X_train: np.ndarray</span>
+<span class="sd">            Train input data.</span>
+<span class="sd">        y_train: np.ndarray</span>
+<span class="sd">            Train output data.   </span>
+<span class="sd">        seed: int, default None</span>
+<span class="sd">            Controls the shuffling applied for subsampling the data.</span>
+<span class="sd">        kfolds: int, default 10</span>
+<span class="sd">            Number of folds in the k-fold cross validation.</span>
+<span class="sd">        n_iter: int, default 100</span>
+<span class="sd">            Number of hyperparameter settings that are sampled. It trades off runtime and quality</span>
+<span class="sd">            of the solution.</span>
+<span class="sd">        optimize: bool, default False</span>
+<span class="sd">            If True, optimize the hyperparameters of the model and return the best model.</span>
+<span class="sd">        verbose: bool, default False</span>
+<span class="sd">            If True, show logs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">optimize</span><span class="p">:</span>
+            <span class="c1"># Best results before tuning</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hyperparams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_selection</span><span class="p">(</span><span class="n">X_train</span><span class="o">=</span><span class="n">X_train</span><span class="p">,</span>
+                                                                     <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span>
+                                                                     <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                                                                     <span class="n">kfolds</span><span class="o">=</span><span class="n">kfolds</span><span class="p">,</span>
+                                                                     <span class="n">n_iter</span><span class="o">=</span><span class="n">n_iter</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Fitting model ...&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hyperparams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Hyperparameters: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">hyperparams</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ClassificationModel">
+<a class="viewcode-back" href="../../../pages/pyccea.utils.html#pyccea.utils.models.ClassificationModel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ClassificationModel</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a classification model, adjust its hyperparameters and get the best model.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    estimator : sklearn model object</span>
+<span class="sd">        Trained model. In case optimize is True, it is the model that was chosen by the Randomized</span>
+<span class="sd">        Search, i.e., estimator which gave the best result on the validation data.</span>
+<span class="sd">    hyperparams : dict</span>
+<span class="sd">        Hyperparameters of the model. In case optimize is True, it is the best hyperparameters</span>
+<span class="sd">        used to fit the machine learning model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">models</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;complement_naive_bayes&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">ComplementNB</span><span class="p">,</span> <span class="p">{}),</span>
+        <span class="s2">&quot;gaussian_naive_bayes&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">GaussianNB</span><span class="p">,</span> <span class="p">{}),</span>
+        <span class="s2">&quot;k_nearest_neighbors&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">KNeighborsClassifier</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;n_neighbors&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span>
+        <span class="s2">&quot;logistic_regression&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">LogisticRegression</span><span class="p">,</span> <span class="p">{}),</span>
+        <span class="s2">&quot;multinomial_naive_bayes&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">MultinomialNB</span><span class="p">,</span> <span class="p">{}),</span>
+        <span class="s2">&quot;random_forest&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">RandomForestClassifier</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;n_jobs&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">}),</span>
+        <span class="s2">&quot;support_vector_machine&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">SVC</span><span class="p">,</span> <span class="p">{}),</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the classification model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_type : str</span>
+<span class="sd">            Name of the machine learning model that will be fitted for a classification task.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if the chosen classification model is available</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">model_type</span> <span class="ow">in</span> <span class="n">ClassificationModel</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Model type &#39;</span><span class="si">{</span><span class="n">model_type</span><span class="si">}</span><span class="s2">&#39; was not found. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;The available models are </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ClassificationModel</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># Initialize classification model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">=</span> <span class="n">model_type</span>
+        <span class="n">model_class</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">ClassificationModel</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">model_type</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span> <span class="o">=</span> <span class="n">model_class</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1"># Initialize logger with info level</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+        <span class="c1"># Supress divide-by-zero warnings</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">UndefinedMetricWarning</span><span class="p">)</span>
+        <span class="c1"># Supress future warnings</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_model_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                         <span class="n">X_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                         <span class="n">y_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                         <span class="n">n_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+                         <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">kfolds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Optimize the hyperparameters of the model and return the best model found.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X_train: np.ndarray</span>
+<span class="sd">            Train input data.</span>
+<span class="sd">        y_train: np.ndarray</span>
+<span class="sd">            Train output data.</span>
+<span class="sd">        n_iter: int, default 100</span>
+<span class="sd">            Number of hyperparameter settings that are sampled. It trades off runtime and quality</span>
+<span class="sd">            of the solution.</span>
+<span class="sd">        seed: int, default None</span>
+<span class="sd">            Controls the shuffling applied for subsampling the data.</span>
+<span class="sd">        kfolds: int, default 5</span>
+<span class="sd">            Number of folds in the k-fold cross validation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        estimator: sklearn model object</span>
+<span class="sd">            Trained model. It is the model that was chosen by the Randomized Search, i.e., estimator</span>
+<span class="sd">            which gave the best result on the validation data.</span>
+<span class="sd">        hyperparams: dict</span>
+<span class="sd">            Hyperparameters of the model. It is the best hyperparameters used to fit the machine</span>
+<span class="sd">            learning model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Grid of possible hyperparameter values</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;support_vector_machine&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;kernel&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="s2">&quot;poly&quot;</span><span class="p">,</span> <span class="s2">&quot;rbf&quot;</span><span class="p">,</span> <span class="s2">&quot;sigmoid&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;degree&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                <span class="s2">&quot;gamma&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="s2">&quot;auto&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;class_weight&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;random_forest&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;n_estimators&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+                <span class="s2">&quot;criterion&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;gini&quot;</span><span class="p">,</span> <span class="s2">&quot;entropy&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;min_samples_split&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+                <span class="s2">&quot;min_samples_leaf&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+                <span class="s2">&quot;max_features&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;sqrt&quot;</span><span class="p">,</span> <span class="s2">&quot;log2&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                <span class="s2">&quot;class_weight&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;balanced_subsample&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
+                <span class="s2">&quot;ccp_alpha&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span>
+                <span class="s2">&quot;max_samples&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;complement_naive_bayes&quot;</span><span class="p">,</span> <span class="s2">&quot;multinomial_naive_bayes&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span>
+                <span class="s2">&quot;fit_prior&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;gaussian_naive_bayes&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;var_smoothing&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">9</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_type</span> <span class="o">==</span> <span class="s2">&quot;k_nearest_neighbors&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;n_neighbors&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">}</span>
+
+        <span class="c1"># Scoring metric used according to the classification task</span>
+        <span class="n">scoring</span> <span class="o">=</span> <span class="s2">&quot;f1_macro&quot;</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="s2">&quot;f1&quot;</span>
+
+        <span class="c1"># Tuning hyperparameters with Randomized Search with Cross Validation</span>
+        <span class="n">search</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span>
+                                    <span class="n">param_distributions</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">,</span>
+                                    <span class="n">n_iter</span><span class="o">=</span><span class="n">n_iter</span><span class="p">,</span>
+                                    <span class="n">cv</span><span class="o">=</span><span class="n">kfolds</span><span class="p">,</span>
+                                    <span class="n">random_state</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                                    <span class="n">scoring</span><span class="o">=</span><span class="n">scoring</span><span class="p">,</span>
+                                    <span class="n">refit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Tuning hyperparameters ...&quot;</span><span class="p">)</span>
+        <span class="n">search</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+        <span class="c1"># Get best model and its respective hyperparameters</span>
+        <span class="n">estimator</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">best_estimator_</span>
+        <span class="n">hyperparams</span> <span class="o">=</span> <span class="n">search</span><span class="o">.</span><span class="n">best_params_</span>
+
+        <span class="k">return</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">hyperparams</span> 
+
+<div class="viewcode-block" id="ClassificationModel.train">
+<a class="viewcode-back" href="../../../pages/pyccea.utils.html#pyccea.utils.models.ClassificationModel.train">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+              <span class="n">X_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+              <span class="n">y_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+              <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="n">kfolds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+              <span class="n">n_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+              <span class="n">optimize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+              <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build and train a classification model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X_train: np.ndarray</span>
+<span class="sd">            Train input data.</span>
+<span class="sd">        y_train: np.ndarray</span>
+<span class="sd">            Train output data.   </span>
+<span class="sd">        seed: int, default None</span>
+<span class="sd">            Controls the shuffling applied for subsampling the data.</span>
+<span class="sd">        kfolds: int, default 10</span>
+<span class="sd">            Number of folds in the k-fold cross validation.</span>
+<span class="sd">        n_iter: int, default 100</span>
+<span class="sd">            Number of hyperparameter settings that are sampled. It trades off runtime and quality</span>
+<span class="sd">            of the solution.</span>
+<span class="sd">        optimize: bool, default False</span>
+<span class="sd">            If True, optimize the hyperparameters of the model and return the best model.</span>
+<span class="sd">        verbose: bool, default False</span>
+<span class="sd">            If True, show logs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span> <span class="k">if</span> <span class="n">verbose</span> <span class="k">else</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">optimize</span><span class="p">:</span>
+            <span class="c1"># Best results before tuning</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hyperparams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_selection</span><span class="p">(</span><span class="n">X_train</span><span class="o">=</span><span class="n">X_train</span><span class="p">,</span>
+                                                                     <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span>
+                                                                     <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+                                                                     <span class="n">kfolds</span><span class="o">=</span><span class="n">kfolds</span><span class="p">,</span>
+                                                                     <span class="n">n_iter</span><span class="o">=</span><span class="n">n_iter</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Fitting model ...&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hyperparams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">get_params</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Hyperparameters: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">hyperparams</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, pedbrgs.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

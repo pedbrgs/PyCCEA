@@ -50,9 +50,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">1. Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">2. Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">3. API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html#module-pyccea.evaluation">4. Module Details</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">5. Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="citation.html">6. Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">4. Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">5. Citation</a></li>
 </ul>
 
         </div>
@@ -80,40 +79,508 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="pyccea-coevolution-package">
-<h1><span class="section-number">3.1. </span>pyccea.coevolution package<a class="headerlink" href="#pyccea-coevolution-package" title="Link to this heading"></a></h1>
+  <section id="module-pyccea.coevolution">
+<span id="pyccea-coevolution-package"></span><h1><span class="section-number">3.1. </span>pyccea.coevolution package<a class="headerlink" href="#module-pyccea.coevolution" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCEAFS">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.</span></span><span class="sig-name descname"><span class="pre">CCEAFS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/cceafs.html#CCEAFS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCEAFS" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary-Based Feature Selection (CCEAFS).</p>
+<p>Rashid, A. N. M., et al. “A novel penalty-based wrapper objective function for feature
+selection in Big Data using cooperative co-evolution.” IEEE Access 8 (2020): 150113-150129.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.CCEAFS.optimize" title="pyccea.coevolution.CCEAFS.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCEAFS.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/cceafs.html#CCEAFS.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCEAFS.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCFC">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.</span></span><span class="sig-name descname"><span class="pre">CCFC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccfc.html#CCFC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCFC" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary Algorithm with Feature Clustering.</p>
+<p>Decomposition strategy proposed on:
+Li, Haoran, et al. “MLFS-CCDE: multi-objective large-scale feature selection by cooperative
+coevolutionary differential evolution.” Memetic Computing 13 (2021): 1-18.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.CCFC.optimize" title="pyccea.coevolution.CCFC.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCFC.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccfc.html#CCFC.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCFC.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCFSRFG1">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.</span></span><span class="sig-name descname"><span class="pre">CCFSRFG1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccfsrfg1.html#CCFSRFG1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCFSRFG1" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary-Based Feature Selection with Random Feature Grouping 1.</p>
+<p>Rashid, A. N. M., et al. “Cooperative co-evolution for feature selection in Big Data with
+random feature grouping.” Journal of Big Data 7.1 (2020): 1-42.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.CCFSRFG1.optimize" title="pyccea.coevolution.CCFSRFG1.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCFSRFG1.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccfsrfg1.html#CCFSRFG1.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCFSRFG1.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCFSRFG2">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.</span></span><span class="sig-name descname"><span class="pre">CCFSRFG2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccfsrfg2.html#CCFSRFG2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCFSRFG2" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary-Based Feature Selection with Random Feature Grouping 2.</p>
+<p>Rashid, A. N. M., et al. “Cooperative co-evolution for feature selection in Big Data with
+random feature grouping.” Journal of Big Data 7.1 (2020): 1-42.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>best_feature_idxs</strong><span class="classifier">np.ndarray</span></dt><dd><p>List of feature indices corresponding to the best decomposition.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.CCFSRFG2.optimize" title="pyccea.coevolution.CCFSRFG2.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCFSRFG2.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccfsrfg2.html#CCFSRFG2.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCFSRFG2.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCILFG">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.</span></span><span class="sig-name descname"><span class="pre">CCILFG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccilfg.html#CCILFG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCILFG" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary Algorithm with Interaction Learning Feature Grouping (CCILFG).</p>
+<p>Decomposition strategy proposed on:
+Hou, Yaqing, et al. “A correlation-guided cooperative coevolutionary method for feature
+selection via interaction learning-based space division.” Swarm and Evolutionary
+Computation 93 (2025): 101846.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.CCILFG.optimize" title="pyccea.coevolution.CCILFG.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCILFG.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/pyccea/coevolution/ccilfg.html#CCILFG.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCILFG.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCPSTFG">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.</span></span><span class="sig-name descname"><span class="pre">CCPSTFG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccpstfg.html#CCPSTFG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCPSTFG" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary Algorithm with Projection-based Self-Tuning Feature Grouping (CCPSTFG).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n_components</strong><span class="classifier">int</span></dt><dd><p>Number of components to keep after dimensionality reduction.</p>
+</dd>
+<dt><strong>method</strong><span class="classifier">str</span></dt><dd><p>Projection-based decomposition method. It can be ‘clustering’, ‘elitist’ and ‘distributed’.</p>
+</dd>
+<dt><strong>vip_threshold</strong><span class="classifier">float</span></dt><dd><p>All features whose importance is less than or equal to this threshold will be removed.</p>
+</dd>
+<dt><strong>removed_features</strong><span class="classifier">np.ndarray</span></dt><dd><p>Indexes of features that were removed due to their low importance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.CCPSTFG.optimize" title="pyccea.coevolution.CCPSTFG.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCPSTFG.CLUSTERING_METHODS">
+<span class="sig-name descname"><span class="pre">CLUSTERING_METHODS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'agglomerative_clustering':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.cluster._agglomerative.AgglomerativeClustering'&gt;,</span> <span class="pre">{'linkage':</span> <span class="pre">'ward',</span> <span class="pre">'metric':</span> <span class="pre">'euclidean'}),</span> <span class="pre">'k_means':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.cluster._kmeans.KMeans'&gt;,</span> <span class="pre">{})}</span></em><a class="headerlink" href="#pyccea.coevolution.CCPSTFG.CLUSTERING_METHODS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCPSTFG.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/pyccea/coevolution/ccpstfg.html#CCPSTFG.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCPSTFG.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCSUFG">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.</span></span><span class="sig-name descname"><span class="pre">CCSUFG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccsufg.html#CCSUFG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCSUFG" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary Algorithm with Symmetric Uncertainty Feature Grouping (CCSUFG).</p>
+<p>Symmetric Uncertainty computation based on:
+Li, Jundong, et al. “Feature selection: A data perspective.” ACM Computing Surveys (CSUR) 50.6
+(2017): 1-45.</p>
+<p>Decomposition strategy proposed on:
+Song, Xian-Fang, et al. “Variable-size cooperative coevolutionary particle swarm optimization
+for feature selection on high-dimensional data.” IEEE Transactions on Evolutionary Computation 
+24.5 (2020): 882-895.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.CCSUFG.optimize" title="pyccea.coevolution.CCSUFG.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.CCSUFG.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/pyccea/coevolution/ccsufg.html#CCSUFG.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.CCSUFG.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
 <section id="submodules">
 <h2><span class="section-number">3.1.1. </span>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
 </section>
-<section id="pyccea-coevolution-ccea-module">
-<h2><span class="section-number">3.1.2. </span>pyccea.coevolution.ccea module<a class="headerlink" href="#pyccea-coevolution-ccea-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.coevolution.ccea">
+<span id="pyccea-coevolution-ccea-module"></span><h2><span class="section-number">3.1.2. </span>pyccea.coevolution.ccea module<a class="headerlink" href="#module-pyccea.coevolution.ccea" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccea.CCEA">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.ccea.</span></span><span class="sig-name descname"><span class="pre">CCEA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccea.html#CCEA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccea.CCEA" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>An abstract class for a Cooperative Co-Evolutionary-Based Feature Selection Algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subpop_sizes: list</strong></dt><dd><p>Subpopulation sizes, that is, the number of individuals in each subpopulation.</p>
+</dd>
+<dt><strong>decomposer: object of one of the decomposition classes</strong></dt><dd><p>Responsible for decompose the problem into smaller subproblems.</p>
+</dd>
+<dt><strong>collaborator: object of one of the collaboration classes.</strong></dt><dd><p>Responsible for selecting collaborators for individuals.</p>
+</dd>
+<dt><strong>fitness_function: object of one of the fitness classes.</strong></dt><dd><p>Responsible for evaluating individuals, that is, subsets of features.</p>
+</dd>
+<dt><strong>initializer: object of one of the subpopulation initializers</strong></dt><dd><p>Responsible for initializing all individuals of all subpopulations.</p>
+</dd>
+<dt><strong>optimizers: list of objects of optimizer classes</strong></dt><dd><p>Responsible for evolving each of the subpopulations individually.</p>
+</dd>
+<dt><strong>subpops: list</strong></dt><dd><p>Individuals from all subpopulations. Each individual is represented by a binary
+n-dimensional array, where n is the number of features. If there is a 1 in the i-th
+position of the array, it indicates that the i-th feature should be considered and if
+there is a 0, it indicates that the feature should not be considered.</p>
+</dd>
+<dt><strong>fitness: list</strong></dt><dd><p>Evaluation of all context vectors from all subpopulations.</p>
+</dd>
+<dt><strong>context_vectors: list</strong></dt><dd><p>Complete problem solutions.</p>
+</dd>
+<dt><strong>convergence_curve: list</strong></dt><dd><p>Best global fitness in each generation.</p>
+</dd>
+<dt><strong>current_best: dict</strong></dt><dd><p>Current best individual of each subpopulation and its respective evaluation.</p>
+</dd>
+<dt><strong>best_context_vector: np.ndarray</strong></dt><dd><p>Best solution of the complete problem.</p>
+</dd>
+<dt><strong>best_fitness: float</strong></dt><dd><p>Evaluation of the best solution of the complete problem.</p>
+</dd>
+<dt><strong>feature_idxs</strong><span class="classifier">np.ndarray</span></dt><dd><p>List of feature indexes.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.ccea.CCEA.optimize" title="pyccea.coevolution.ccea.CCEA.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccea.CCEA.optimize">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccea.html#CCEA.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccea.CCEA.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-coevolution-cceafs-module">
-<h2><span class="section-number">3.1.3. </span>pyccea.coevolution.cceafs module<a class="headerlink" href="#pyccea-coevolution-cceafs-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.coevolution.cceafs">
+<span id="pyccea-coevolution-cceafs-module"></span><h2><span class="section-number">3.1.3. </span>pyccea.coevolution.cceafs module<a class="headerlink" href="#module-pyccea.coevolution.cceafs" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.cceafs.CCEAFS">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.cceafs.</span></span><span class="sig-name descname"><span class="pre">CCEAFS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/cceafs.html#CCEAFS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.cceafs.CCEAFS" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary-Based Feature Selection (CCEAFS).</p>
+<p>Rashid, A. N. M., et al. “A novel penalty-based wrapper objective function for feature
+selection in Big Data using cooperative co-evolution.” IEEE Access 8 (2020): 150113-150129.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.cceafs.CCEAFS.optimize" title="pyccea.coevolution.cceafs.CCEAFS.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.cceafs.CCEAFS.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/cceafs.html#CCEAFS.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.cceafs.CCEAFS.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-coevolution-ccfc-module">
-<h2><span class="section-number">3.1.4. </span>pyccea.coevolution.ccfc module<a class="headerlink" href="#pyccea-coevolution-ccfc-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.coevolution.ccfc">
+<span id="pyccea-coevolution-ccfc-module"></span><h2><span class="section-number">3.1.4. </span>pyccea.coevolution.ccfc module<a class="headerlink" href="#module-pyccea.coevolution.ccfc" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccfc.CCFC">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.ccfc.</span></span><span class="sig-name descname"><span class="pre">CCFC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccfc.html#CCFC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccfc.CCFC" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary Algorithm with Feature Clustering.</p>
+<p>Decomposition strategy proposed on:
+Li, Haoran, et al. “MLFS-CCDE: multi-objective large-scale feature selection by cooperative
+coevolutionary differential evolution.” Memetic Computing 13 (2021): 1-18.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.ccfc.CCFC.optimize" title="pyccea.coevolution.ccfc.CCFC.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccfc.CCFC.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccfc.html#CCFC.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccfc.CCFC.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-coevolution-ccfsrfg1-module">
-<h2><span class="section-number">3.1.5. </span>pyccea.coevolution.ccfsrfg1 module<a class="headerlink" href="#pyccea-coevolution-ccfsrfg1-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.coevolution.ccfsrfg1">
+<span id="pyccea-coevolution-ccfsrfg1-module"></span><h2><span class="section-number">3.1.5. </span>pyccea.coevolution.ccfsrfg1 module<a class="headerlink" href="#module-pyccea.coevolution.ccfsrfg1" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccfsrfg1.CCFSRFG1">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.ccfsrfg1.</span></span><span class="sig-name descname"><span class="pre">CCFSRFG1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccfsrfg1.html#CCFSRFG1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccfsrfg1.CCFSRFG1" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary-Based Feature Selection with Random Feature Grouping 1.</p>
+<p>Rashid, A. N. M., et al. “Cooperative co-evolution for feature selection in Big Data with
+random feature grouping.” Journal of Big Data 7.1 (2020): 1-42.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.ccfsrfg1.CCFSRFG1.optimize" title="pyccea.coevolution.ccfsrfg1.CCFSRFG1.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccfsrfg1.CCFSRFG1.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccfsrfg1.html#CCFSRFG1.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccfsrfg1.CCFSRFG1.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-coevolution-ccfsrfg2-module">
-<h2><span class="section-number">3.1.6. </span>pyccea.coevolution.ccfsrfg2 module<a class="headerlink" href="#pyccea-coevolution-ccfsrfg2-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.coevolution.ccfsrfg2">
+<span id="pyccea-coevolution-ccfsrfg2-module"></span><h2><span class="section-number">3.1.6. </span>pyccea.coevolution.ccfsrfg2 module<a class="headerlink" href="#module-pyccea.coevolution.ccfsrfg2" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccfsrfg2.CCFSRFG2">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.ccfsrfg2.</span></span><span class="sig-name descname"><span class="pre">CCFSRFG2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccfsrfg2.html#CCFSRFG2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccfsrfg2.CCFSRFG2" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary-Based Feature Selection with Random Feature Grouping 2.</p>
+<p>Rashid, A. N. M., et al. “Cooperative co-evolution for feature selection in Big Data with
+random feature grouping.” Journal of Big Data 7.1 (2020): 1-42.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>best_feature_idxs</strong><span class="classifier">np.ndarray</span></dt><dd><p>List of feature indices corresponding to the best decomposition.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.ccfsrfg2.CCFSRFG2.optimize" title="pyccea.coevolution.ccfsrfg2.CCFSRFG2.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccfsrfg2.CCFSRFG2.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccfsrfg2.html#CCFSRFG2.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccfsrfg2.CCFSRFG2.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-coevolution-ccga-module">
-<h2><span class="section-number">3.1.7. </span>pyccea.coevolution.ccga module<a class="headerlink" href="#pyccea-coevolution-ccga-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.coevolution.ccga">
+<span id="pyccea-coevolution-ccga-module"></span><h2><span class="section-number">3.1.7. </span>pyccea.coevolution.ccga module<a class="headerlink" href="#module-pyccea.coevolution.ccga" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccga.CCGA">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.ccga.</span></span><span class="sig-name descname"><span class="pre">CCGA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccga.html#CCGA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccga.CCGA" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccea.CCEA" title="pyccea.coevolution.ccea.CCEA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCEA</span></code></a></p>
+<p>Cooperative Co-Evolutionary Genetic Algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>subcomp_sizes</strong><span class="classifier">list</span></dt><dd><p>Number of features in each subcomponent.</p>
+</dd>
+<dt><strong>feature_idxs</strong><span class="classifier">np.ndarray</span></dt><dd><p>Shuffled list of feature indexes.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </section>
-<section id="pyccea-coevolution-ccilfg-module">
-<h2><span class="section-number">3.1.8. </span>pyccea.coevolution.ccilfg module<a class="headerlink" href="#pyccea-coevolution-ccilfg-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.coevolution.ccilfg">
+<span id="pyccea-coevolution-ccilfg-module"></span><h2><span class="section-number">3.1.8. </span>pyccea.coevolution.ccilfg module<a class="headerlink" href="#module-pyccea.coevolution.ccilfg" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccilfg.CCILFG">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.ccilfg.</span></span><span class="sig-name descname"><span class="pre">CCILFG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccilfg.html#CCILFG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccilfg.CCILFG" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary Algorithm with Interaction Learning Feature Grouping (CCILFG).</p>
+<p>Decomposition strategy proposed on:
+Hou, Yaqing, et al. “A correlation-guided cooperative coevolutionary method for feature
+selection via interaction learning-based space division.” Swarm and Evolutionary
+Computation 93 (2025): 101846.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.ccilfg.CCILFG.optimize" title="pyccea.coevolution.ccilfg.CCILFG.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccilfg.CCILFG.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/pyccea/coevolution/ccilfg.html#CCILFG.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccilfg.CCILFG.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-coevolution-ccpstfg-module">
-<h2><span class="section-number">3.1.9. </span>pyccea.coevolution.ccpstfg module<a class="headerlink" href="#pyccea-coevolution-ccpstfg-module" title="Link to this heading"></a></h2>
+<section id="module-pyccea.coevolution.ccpstfg">
+<span id="pyccea-coevolution-ccpstfg-module"></span><h2><span class="section-number">3.1.9. </span>pyccea.coevolution.ccpstfg module<a class="headerlink" href="#module-pyccea.coevolution.ccpstfg" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccpstfg.CCPSTFG">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.ccpstfg.</span></span><span class="sig-name descname"><span class="pre">CCPSTFG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccpstfg.html#CCPSTFG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccpstfg.CCPSTFG" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary Algorithm with Projection-based Self-Tuning Feature Grouping (CCPSTFG).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>n_components</strong><span class="classifier">int</span></dt><dd><p>Number of components to keep after dimensionality reduction.</p>
+</dd>
+<dt><strong>method</strong><span class="classifier">str</span></dt><dd><p>Projection-based decomposition method. It can be ‘clustering’, ‘elitist’ and ‘distributed’.</p>
+</dd>
+<dt><strong>vip_threshold</strong><span class="classifier">float</span></dt><dd><p>All features whose importance is less than or equal to this threshold will be removed.</p>
+</dd>
+<dt><strong>removed_features</strong><span class="classifier">np.ndarray</span></dt><dd><p>Indexes of features that were removed due to their low importance.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.ccpstfg.CCPSTFG.optimize" title="pyccea.coevolution.ccpstfg.CCPSTFG.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccpstfg.CCPSTFG.CLUSTERING_METHODS">
+<span class="sig-name descname"><span class="pre">CLUSTERING_METHODS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'agglomerative_clustering':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.cluster._agglomerative.AgglomerativeClustering'&gt;,</span> <span class="pre">{'linkage':</span> <span class="pre">'ward',</span> <span class="pre">'metric':</span> <span class="pre">'euclidean'}),</span> <span class="pre">'k_means':</span> <span class="pre">(&lt;class</span> <span class="pre">'sklearn.cluster._kmeans.KMeans'&gt;,</span> <span class="pre">{})}</span></em><a class="headerlink" href="#pyccea.coevolution.ccpstfg.CCPSTFG.CLUSTERING_METHODS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccpstfg.CCPSTFG.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/pyccea/coevolution/ccpstfg.html#CCPSTFG.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccpstfg.CCPSTFG.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="pyccea-coevolution-ccsufg-module">
-<h2><span class="section-number">3.1.10. </span>pyccea.coevolution.ccsufg module<a class="headerlink" href="#pyccea-coevolution-ccsufg-module" title="Link to this heading"></a></h2>
-</section>
-<section id="module-contents">
-<h2><span class="section-number">3.1.11. </span>Module contents<a class="headerlink" href="#module-contents" title="Link to this heading"></a></h2>
+<section id="module-pyccea.coevolution.ccsufg">
+<span id="pyccea-coevolution-ccsufg-module"></span><h2><span class="section-number">3.1.10. </span>pyccea.coevolution.ccsufg module<a class="headerlink" href="#module-pyccea.coevolution.ccsufg" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccsufg.CCSUFG">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyccea.coevolution.ccsufg.</span></span><span class="sig-name descname"><span class="pre">CCSUFG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><span class="pre">DataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyccea/coevolution/ccsufg.html#CCSUFG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccsufg.CCSUFG" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pyccea.coevolution.ccga.CCGA" title="pyccea.coevolution.ccga.CCGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">CCGA</span></code></a></p>
+<p>Cooperative Co-Evolutionary Algorithm with Symmetric Uncertainty Feature Grouping (CCSUFG).</p>
+<p>Symmetric Uncertainty computation based on:
+Li, Jundong, et al. “Feature selection: A data perspective.” ACM Computing Surveys (CSUR) 50.6
+(2017): 1-45.</p>
+<p>Decomposition strategy proposed on:
+Song, Xian-Fang, et al. “Variable-size cooperative coevolutionary particle swarm optimization
+for feature selection on high-dimensional data.” IEEE Transactions on Evolutionary Computation 
+24.5 (2020): 882-895.</p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyccea.coevolution.ccsufg.CCSUFG.optimize" title="pyccea.coevolution.ccsufg.CCSUFG.optimize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize</span></code></a>()</p></td>
+<td><p>Solve the feature selection problem through optimization.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyccea.coevolution.ccsufg.CCSUFG.optimize">
+<span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/pyccea/coevolution/ccsufg.html#CCSUFG.optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyccea.coevolution.ccsufg.CCSUFG.optimize" title="Link to this definition"></a></dt>
+<dd><p>Solve the feature selection problem through optimization.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 </section>
 

@@ -1,6 +1,11 @@
 pyccea.fitness package
 ======================
 
+.. automodule:: pyccea.fitness
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
 Submodules
 ----------
 
@@ -24,14 +29,6 @@ pyccea.fitness.penalty module
 -----------------------------
 
 .. automodule:: pyccea.fitness.penalty
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-Module contents
----------------
-
-.. automodule:: pyccea.fitness
    :members:
    :show-inheritance:
    :undoc-members:
