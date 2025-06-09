@@ -33,14 +33,20 @@ jobs:
       - name: "Check commit message and bump version (patch) if prefix 'release: ' is present"
         id: bump_version
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-            LAST_TAG=$(git describe --tags --abbrev=0)
-            LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
-            echo "Last commit message: $LAST_COMMIT_MSG"
-            if [[ "$LAST_COMMIT_MSG" == release:* ]]; then
-            # Generate changelog BEFORE bump
-            git log $LAST_TAG..HEAD --pretty=format:"* %s (%an)" > CHANGELOG.md
+          git fetch --tags
+          LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Last commit message: $LAST_COMMIT_MSG"
+
+          if [[ "$LAST_COMMIT_MSG" == release:* ]]; then
+            # Generate changelog
+            LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+            if [ -n "$LAST_TAG" ]; then
+              git log "$LAST_TAG"..HEAD --pretty=format:"* %s (%an)" > CHANGELOG.md
+            else
+              git log --pretty=format:"* %s (%an)" > CHANGELOG.md
+            fi
             git add CHANGELOG.md
             git commit -m "docs: update changelog [skip ci]"
 
@@ -51,22 +57,22 @@ jobs:
             git add pyproject.toml
             git commit -m "ci: bump version [skip ci]"
 
+            # Create and push tag
             NEW_VERSION=$(poetry version -s)
             git tag "v$NEW_VERSION"
-
-            # Push all changes + tags
-            git push origin main --tags
             git push origin main
+            git push origin "v$NEW_VERSION"
 
             echo "version_bumped=true" >> $GITHUB_OUTPUT
-            else
+            echo "version_tag=v$NEW_VERSION" >> $GITHUB_OUTPUT
+          else
             echo "version_bumped=false" >> $GITHUB_OUTPUT
-            fi
+          fi
 
       - name: Publish to PyPI
         if: steps.bump_version.outputs.version_bumped == 'true'
         env:
-            POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_API_TOKEN }}
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_API_TOKEN }}
         run: |
-            poetry config pypi-token.pypi $POETRY_PYPI_TOKEN_PYPI
-            poetry publish --no-interaction --build
+          poetry config pypi-token.pypi $POETRY_PYPI_TOKEN_PYPI
+          poetry publish --no-interaction --build
