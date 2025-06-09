@@ -11,33 +11,54 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Check commit message for release prefix
+        id: check_release
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Commit message: $COMMIT_MSG"
+          if [[ "$COMMIT_MSG" != release:* ]]; then
+            echo "This commit is not a release. Skipping documentation build."
+            echo "release=false" >> $GITHUB_OUTPUT
+            exit 0
+          else
+            echo "release=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Set up Python
+        if: steps.check_release.outputs.release == 'true'
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
       - name: Install dependencies
+        if: steps.check_release.outputs.release == 'true'
         run: |
           pip install sphinx sphinx_rtd_theme numpydoc
 
       - name: Clean build
+        if: steps.check_release.outputs.release == 'true'
         run: rm -rf docs/_build
 
       - name: Install your package
+        if: steps.check_release.outputs.release == 'true'
         run: pip install -e .
 
       - name: Generate .rst files
+        if: steps.check_release.outputs.release == 'true'
         run: sphinx-apidoc -o docs/source/pages pyccea --module-first
 
       - name: Build autosummary .rst files
+        if: steps.check_release.outputs.release == 'true'
         run: |
-            sphinx-autogen -o docs/source/pages docs/source/pages/*.rst
+          sphinx-autogen -o docs/source/pages docs/source/pages/*.rst
 
       - name: Build Sphinx docs
+        if: steps.check_release.outputs.release == 'true'
         run: |
           sphinx-build -E -b html docs/source docs/_build/html
 
       - name: Deploy to GitHub Pages
+        if: steps.check_release.outputs.release == 'true'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
