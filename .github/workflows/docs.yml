@@ -29,6 +29,10 @@ jobs:
       - name: Generate .rst files
         run: sphinx-apidoc -o docs/source/pages pyccea --module-first
 
+      - name: Build autosummary .rst files
+        run: |
+            sphinx-autogen -o docs/source/pages docs/source/pages/*.rst
+
       - name: Build Sphinx docs
         run: |
           sphinx-build -E -b html docs/source docs/_build/html
