@@ -2,8 +2,15 @@
     <img width="150" src="./docs/figures/logo.png" alt="PyCCEA logo">
 <p>
 
+[![PyPI](https://img.shields.io/pypi/v/pyccea.svg)](https://pypi.org/project/pyccea/)
 [![codecov](https://codecov.io/gh/pedbrgs/PyCCEA/branch/main/graph/badge.svg?token=4X58GY16J4)](https://codecov.io/gh/pedbrgs/PyCCEA)
 [![status](https://joss.theoj.org/papers/dd1af373a617c14953d289c085c38d8f/status.svg)](https://joss.theoj.org/papers/dd1af373a617c14953d289c085c38d8f)
+![License](https://img.shields.io/pypi/l/pyccea)
+![Python Versions](https://img.shields.io/pypi/pyversions/pyccea)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/pyccea)
+[![Downloads](https://pepy.tech/badge/pyccea)](https://pepy.tech/project/pyccea)
+
+
 
 ***
 
