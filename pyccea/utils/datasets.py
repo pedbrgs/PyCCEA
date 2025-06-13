@@ -256,7 +256,6 @@ class DataLoader():
         """
         # Setting a default representation for NaN values 
         self.data.replace(to_replace="?", value=np.nan, inplace=True)
-        pd.set_option("future.no_silent_downcasting", True)
         # Remove rows with at least one NaN value
         if dropna:
             # Store the number of rows before dropping NaNs
