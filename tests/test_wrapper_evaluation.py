@@ -58,7 +58,7 @@ def test_hold_out_validation(monkeypatch, classification_data, complete_data_con
     dl.X = dl._get_input()
     dl.y = dl._get_output()
     dl._split()
-    dl._normalize_subsets()
+    dl.X_train, dl.X_test = dl._normalize_subsets(X_train=dl.X_train, X_test=dl.X_test)
     evaluator = WrapperEvaluation(
         task="classification",
         n_classes=2,
@@ -120,8 +120,9 @@ def test_kfold_cross_validation(monkeypatch, classification_data, complete_data_
     dl.X = dl._get_input()
     dl.y = dl._get_output()
     dl._split()
-    dl._normalize_subsets()
     dl._model_selection()
+    if dl.normalize:
+        dl.X_train, dl.X_test = dl._normalize_subsets(X_train=dl.X_train, X_test=dl.X_test)
     evaluator = WrapperEvaluation(
         task="classification",
         n_classes=2,

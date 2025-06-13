@@ -95,26 +95,28 @@ def test_parse_normalization_parameters_method_and_normalize_false(complete_data
         DataLoader("dummy_dataset", complete_data_conf)
 
 
-def test_get_ready_calls_all_methods(mocker, complete_data_conf: dict) -> None:
+def test_get_ready_calls_all_methods(monkeypatch, mocker, complete_data_conf: dict) -> None:
     """Test get_ready method when normalize is True."""
+    complete_data_conf["splitter"]["kfolds"] = 2
+    monkeypatch.setitem(DataLoader.DATASETS, "dummy", {"task": "classification"})
     loader = DataLoader("dummy", complete_data_conf)
 
     # Mock _load to assign synthetic data
     def _mock_load():
         loader.data = pd.DataFrame({
-            0: [1, 2, 3, 4, 5],
-            1: [6, 7, 8, 9, 0],
-            2: [0, 1, 0, 1, 1],
-            3: ["train", "train", "train", "test", "test"]
+            "0": [1, 2, 3, 4, 5, 6],
+            "1": [6, 7, 8, 9, 0, 1],
+            "label": [0, 1, 0, 1, 0, 1],
+            "subset": ["train", "train", "train", "train", "test", "test"]
         })
 
     mocker.patch.object(loader, "_load", side_effect=_mock_load)
 
     # Mock the other methods just to track their calls
-    mocker.patch.object(loader, "_preprocess")
-    mocker.patch.object(loader, "_split")
-    mocker.patch.object(loader, "_normalize_subsets")
-    mocker.patch.object(loader, "_model_selection")
+    mocker.spy(loader, "_preprocess")
+    mocker.spy(loader, "_split")
+    mocker.spy(loader, "_normalize_subsets")
+    mocker.spy(loader, "_model_selection")
 
     # Act
     loader.get_ready()
@@ -123,7 +125,8 @@ def test_get_ready_calls_all_methods(mocker, complete_data_conf: dict) -> None:
     loader._load.assert_called_once()
     loader._preprocess.assert_called_once()
     loader._split.assert_called_once()
-    loader._normalize_subsets.assert_called_once()
+    # Normalize folds for optimization and then training and test sets for final evaluation
+    assert loader._normalize_subsets.call_count == 1 + complete_data_conf["splitter"]["kfolds"]
     loader._model_selection.assert_called_once()
 
 
@@ -307,7 +310,7 @@ def test_min_max_normalization(complete_data_conf: dict) -> None:
     loader.y = loader._get_output()
     loader._split()
 
-    loader._normalize_subsets()
+    loader.X_train, loader.X_test = loader._normalize_subsets(loader.X_train, loader.X_test)
 
     assert np.allclose(loader.X_train, np.array([[0., 0.], [0.5, 0.5], [1., 1.]]))
 
@@ -325,7 +328,7 @@ def test_standard_normalization(complete_data_conf: dict) -> None:
     loader.X = loader._get_input()
     loader.y = loader._get_output()
     loader._split()
-    loader._normalize_subsets()
+    loader.X_train, loader.X_test = loader._normalize_subsets(loader.X_train, loader.X_test)
     # For standard scaler: mean 0, std 1 in training set
     assert np.allclose(loader.X_train.mean(axis=0), np.zeros(loader.X_train.shape[1]))
     assert np.allclose(loader.X_train.std(axis=0), np.ones(loader.X_train.shape[1]))
