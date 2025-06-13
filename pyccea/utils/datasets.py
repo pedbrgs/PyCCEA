@@ -1,10 +1,12 @@
 import os
 import toml
+import copy
 import logging
 import warnings
 import numpy as np
 import pandas as pd
 import importlib.resources
+from typing import Tuple
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn.model_selection import GroupKFold, KFold, LeaveOneOut, StratifiedKFold
@@ -166,7 +168,7 @@ class DataLoader():
         self.normalize = self.conf["normalization"].get("normalize", False)
         self.normalization_method = self.conf["normalization"].get("method")
         if self.normalize:
-            if "method" not in  self.conf["normalization"]:
+            if "method" not in self.conf["normalization"]:
                 raise AssertionError(
                     "The 'method' parameter should be specified in the normalization section of "
                     "the data configuration file when 'normalize' parameter is set to True."
@@ -196,9 +198,13 @@ class DataLoader():
         self._load()
         self._preprocess()
         self._split()
-        if self.normalize:
-            self._normalize_subsets()
         self._model_selection()
+        if self.normalize:
+            self.X_train, self.X_test = self._normalize_subsets(
+                X_train=self.X_train,
+                X_test=self.X_test
+            )
+        logging.info("Data is ready for use.")
 
     def _load(self) -> None:
         """Load dataset according to dataset given as a parameter."""
@@ -249,7 +255,8 @@ class DataLoader():
             Remove rows that contains NaN values.
         """
         # Setting a default representation for NaN values 
-        self.data.replace(to_replace = "?", value=np.nan, inplace=True)
+        self.data.replace(to_replace="?", value=np.nan, inplace=True)
+        pd.set_option("future.no_silent_downcasting", True)
         # Remove rows with at least one NaN value
         if dropna:
             # Store the number of rows before dropping NaNs
@@ -318,16 +325,35 @@ class DataLoader():
         logging.info(f"Training set with {self.train_size} observations.")
         logging.info(f"Test set with {self.test_size} observations.")
 
-    def _normalize_subsets(self) -> None:
-        """Transform features in each subset (training and test) by the normalizer."""
-        logging.info("Normalizing subsets...")
+    def _normalize_subsets(
+            self,
+            X_train: pd.DataFrame,
+            X_test: pd.DataFrame
+        ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        """Normalize feature of subsets.
+
+        Parameters
+        ----------
+        X_train : pd.DataFrame
+            Training input data.
+        X_test : pd.DataFrame
+            Test input data.
+
+        Returns
+        -------
+        X_normalized_train : pd.DataFrame
+            Normalized training input data.
+        X_normalized_test : pd.DataFrame
+            Normalized test input data.
+        """
         # Normalization across instances should be done after splitting the data between training
         # and test set to avoid leakage
-        self.normalizer.fit(X=self.X_train)
-        self.X_train = self.normalizer.transform(X=self.X_train)
+        normalizer = copy.deepcopy(self.normalizer)
+        X_normalized_train = normalizer.fit_transform(X=X_train)
         # When normalizing the test set, it should apply the normalization parameters previously
         # obtained from the training set as-is
-        self.X_test = self.normalizer.transform(X=self.X_test)
+        X_normalized_test = normalizer.transform(X=X_test)
+        return X_normalized_train, X_normalized_test
 
     def _model_selection(self) -> None:
         """Prepare data according to the specified splitter type."""
@@ -341,8 +367,15 @@ class DataLoader():
             self.val_indices = []
             split_args = (X, y) if groups is None else (X, y, groups)
             for train_idx, val_idx in splitter.split(*split_args):
-                self.train_folds.append([X[train_idx].copy(), y[train_idx].copy()])
-                self.val_folds.append([X[val_idx].copy(), y[val_idx].copy()])
+                X_train_fold, X_val_fold = X[train_idx].copy(), X[val_idx].copy()
+                y_train_fold, y_val_fold = y[train_idx].copy(), y[val_idx].copy()
+                if self.normalize:
+                    X_train_fold, X_val_fold = self._normalize_subsets(
+                        X_train_fold, X_val_fold
+                    )
+                # Store the train and validation folds
+                self.train_folds.append([X_train_fold, y_train_fold])
+                self.val_folds.append([X_val_fold, y_val_fold])
                 self.train_indices.append(train_idx)
                 self.val_indices.append(val_idx)
 
