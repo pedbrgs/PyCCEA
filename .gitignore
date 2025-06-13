@@ -10,3 +10,4 @@
 *.egg-info
 **/dist/
 **_build/
+docs/source/pages/pyccea*.rst
