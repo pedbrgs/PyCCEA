@@ -1,5 +1,6 @@
 import gc
 import copy
+import time
 import logging
 import numpy as np
 import pandas as pd
@@ -62,7 +63,9 @@ class CCPSTFG(CCGA):
             logging.info(f"User-defined number of subcomponents: {self.n_subcomps}")
         else:
             logging.info("Automatically choosing the number of subcomponents...")
+            start_time = time.time()
             self.n_subcomps = self._get_best_number_of_subcomponents(feature_loadings)
+            self._n_subcomponents_tuning_time = time.time() - start_time
         # Update the subpopulation sizes after update the number of subcomponents
         self.subpop_sizes = [self.subpop_sizes[0]] * self.n_subcomps
 
@@ -228,7 +231,9 @@ class CCPSTFG(CCGA):
         importances : np.ndarray
             Importance of the remaining features.
         """
+        start_time = time.time()
         self.quantile_to_remove = self._get_best_quantile_to_remove(importances)
+        self._quantile_tuning_time = time.time() - start_time
         self.vip_threshold = round(np.quantile(importances, self.quantile_to_remove), 4)
         logging.info(f"Removing features with VIP less than or equal to {self.vip_threshold}...")
         features_to_keep = importances > self.vip_threshold
@@ -286,10 +291,12 @@ class CCPSTFG(CCGA):
             logging.info(f"User-defined number of PLS components: {self.n_components}")
         else:
             logging.info("Automatically choosing the number of PLS components...")
+            start_time = time.time()
             # Get the best number of components to keep after projection using the Elbow method
             self.n_components = self._get_best_number_of_components(
                 projection_class, self.data.X_train, self.data.y_train
             )
+            self._n_components_tuning_time = time.time() - start_time
         # Instantiate projection model object
         projection_model = projection_class(n_components=self.n_components, copy=True)
 
@@ -320,6 +327,11 @@ class CCPSTFG(CCGA):
             )
 
         self.feature_importances = importances.copy()
+        self._tuning_time = (
+            getattr(self, "_n_components_tuning_time", 0)
+            + getattr(self, "_quantile_tuning_time", 0)
+            + getattr(self, "_n_subcomponents_tuning_time", 0)
+        )
 
     def _allocate_subproblem_resources(self) -> None:
         """Allocate resources to subproblems based on feature importances and subcomponent sizes."""
