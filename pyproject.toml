@@ -8,7 +8,7 @@ readme = "README.md"
 homepage = "https://github.com/pedbrgs/PyCCEA"
 
 [tool.poetry.dependencies]
-python = ">=3.10"
+python = ">=3.10,<=3.13"
 imbalanced-learn = "0.13.0"
 kneed = "0.8.5"
 numpy = "2.2.0"
