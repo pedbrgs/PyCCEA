@@ -41,10 +41,12 @@ jobs:
             --cov=pyccea/optimizers \
             --cov=pyccea/decomposition \
             --cov=pyccea/cooperation \
-            --cov=pyccea/initialization
+            --cov=pyccea/initialization \
+            --cov-report=xml
 
       - name: Upload coverage report to Codecov
         if: matrix.python-version == '3.10'
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.xml
