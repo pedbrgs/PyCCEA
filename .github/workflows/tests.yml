@@ -7,8 +7,12 @@ on:
 
 jobs:
   test:
-    name: Run tests and collect coverage
+    name: Run tests on Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.10, 3.11, 3.12, 3.13]
 
     steps:
       - name: Checkout repository
@@ -17,15 +21,20 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          poetry install --no-interaction --no-root
 
       - name: Run tests with coverage
         run: |
-          pytest \
+          poetry run pytest \
             --cov=pyccea/utils \
             --cov=pyccea/fitness \
             --cov=pyccea/evaluation \
@@ -35,6 +44,7 @@ jobs:
             --cov=pyccea/initialization
 
       - name: Upload coverage report to Codecov
+        if: matrix.python-version == '3.10'
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
