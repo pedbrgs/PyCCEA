@@ -8,7 +8,7 @@
   <title>pyccea.utils.datasets &mdash; PyCCEA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=a8bcbd07" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ab21f1d8" />
 
   
     <link rel="shortcut icon" href="../../../_static/favicon.png"/>
@@ -44,11 +44,12 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../pages/installation.html">1. Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../pages/quickstart.html">2. Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../pages/api.html">3. API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../pages/contributing.html">4. Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../pages/citation.html">5. Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/citation.html">Citation</a></li>
 </ul>
 
         </div>
@@ -78,11 +79,13 @@
   <h1>Source code for pyccea.utils.datasets</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">toml</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">importlib.resources</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinMaxScaler</span><span class="p">,</span> <span class="n">StandardScaler</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">GroupKFold</span><span class="p">,</span> <span class="n">KFold</span><span class="p">,</span> <span class="n">LeaveOneOut</span><span class="p">,</span> <span class="n">StratifiedKFold</span>
@@ -246,7 +249,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;normalization&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;normalize&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">normalization_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;normalization&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;method&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s2">&quot;method&quot;</span> <span class="ow">not</span> <span class="ow">in</span>  <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;normalization&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="s2">&quot;method&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;normalization&quot;</span><span class="p">]:</span>
                 <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
                     <span class="s2">&quot;The &#39;method&#39; parameter should be specified in the normalization section of &quot;</span>
                     <span class="s2">&quot;the data configuration file when &#39;normalize&#39; parameter is set to True.&quot;</span>
@@ -278,9 +281,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model_selection</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_subsets</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_model_selection</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_subsets</span><span class="p">(</span>
+                <span class="n">X_train</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span>
+                <span class="n">X_test</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">X_test</span>
+            <span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Data is ready for use.&quot;</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -332,7 +339,7 @@
 <span class="sd">            Remove rows that contains NaN values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Setting a default representation for NaN values </span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">to_replace</span> <span class="o">=</span> <span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">to_replace</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># Remove rows with at least one NaN value</span>
         <span class="k">if</span> <span class="n">dropna</span><span class="p">:</span>
             <span class="c1"># Store the number of rows before dropping NaNs</span>
@@ -401,16 +408,35 @@
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training set with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">train_size</span><span class="si">}</span><span class="s2"> observations.&quot;</span><span class="p">)</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test set with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> observations.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_normalize_subsets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform features in each subset (training and test) by the normalizer.&quot;&quot;&quot;</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Normalizing subsets...&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_normalize_subsets</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">X_train</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">X_test</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalize feature of subsets.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X_train : pd.DataFrame</span>
+<span class="sd">            Training input data.</span>
+<span class="sd">        X_test : pd.DataFrame</span>
+<span class="sd">            Test input data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        X_normalized_train : pd.DataFrame</span>
+<span class="sd">            Normalized training input data.</span>
+<span class="sd">        X_normalized_test : pd.DataFrame</span>
+<span class="sd">            Normalized test input data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Normalization across instances should be done after splitting the data between training</span>
         <span class="c1"># and test set to avoid leakage</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">)</span>
+        <span class="n">normalizer</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span><span class="p">)</span>
+        <span class="n">X_normalized_train</span> <span class="o">=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_train</span><span class="p">)</span>
         <span class="c1"># When normalizing the test set, it should apply the normalization parameters previously</span>
         <span class="c1"># obtained from the training set as-is</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">X_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">X_test</span><span class="p">)</span>
+        <span class="n">X_normalized_test</span> <span class="o">=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_test</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">X_normalized_train</span><span class="p">,</span> <span class="n">X_normalized_test</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_model_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare data according to the specified splitter type.&quot;&quot;&quot;</span>
@@ -424,8 +450,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">val_indices</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">split_args</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">groups</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">train_idx</span><span class="p">,</span> <span class="n">val_idx</span> <span class="ow">in</span> <span class="n">splitter</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="o">*</span><span class="n">split_args</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">train_folds</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">X</span><span class="p">[</span><span class="n">train_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">y</span><span class="p">[</span><span class="n">train_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()])</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">val_folds</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">X</span><span class="p">[</span><span class="n">val_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">y</span><span class="p">[</span><span class="n">val_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()])</span>
+                <span class="n">X_train_fold</span><span class="p">,</span> <span class="n">X_val_fold</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">train_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">X</span><span class="p">[</span><span class="n">val_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">y_train_fold</span><span class="p">,</span> <span class="n">y_val_fold</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">train_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">y</span><span class="p">[</span><span class="n">val_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">:</span>
+                    <span class="n">X_train_fold</span><span class="p">,</span> <span class="n">X_val_fold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_subsets</span><span class="p">(</span>
+                        <span class="n">X_train_fold</span><span class="p">,</span> <span class="n">X_val_fold</span>
+                    <span class="p">)</span>
+                <span class="c1"># Store the train and validation folds</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">train_folds</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">X_train_fold</span><span class="p">,</span> <span class="n">y_train_fold</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">val_folds</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">X_val_fold</span><span class="p">,</span> <span class="n">y_val_fold</span><span class="p">])</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">train_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">train_idx</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">val_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_idx</span><span class="p">)</span>
 

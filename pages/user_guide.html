@@ -1,0 +1,836 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Guide &mdash; PyCCEA  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=ab21f1d8" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tutorials" href="tutorials.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#feature-selection-problem">Feature selection problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cooperative-co-evolutionary-algorithms">Cooperative co-evolutionary algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#problem-decomposition">Problem decomposition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#subproblem-optimization">Subproblem optimization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#collaboration-selection">Collaboration selection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fitness-evaluation">Fitness evaluation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#termination-criteria">Termination criteria</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-files">Configuration files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#data-loader">Data loader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#algorithm">Algorithm</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#benchmark">Benchmark</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#datasets">Datasets</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#classification">Classification</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#regression">Regression</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#cceas">CCEAs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">Citation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PyCCEA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">User Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/pages/user_guide.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="user-guide">
+<h1>User Guide<a class="headerlink" href="#user-guide" title="Link to this heading"></a></h1>
+<p>This user guide provides a comprehensive overview of how to use <strong>PyCCEA</strong>, a Python package for
+feature selection based on <strong>Cooperative Co-Evolutionary Algorithms (CCEAs)</strong>. It covers both the
+theoretical foundations and practical aspects of the framework, including configuration files,
+algorithm components, benchmark and result reproducibility.</p>
+<p>Whether you’re a researcher aiming to benchmark feature selection algorithms or a practitioner
+optimizing high-dimensional datasets, this guide will walk you through the key concepts, options,
+and implementation details necessary to use PyCCEA effectively.</p>
+<section id="feature-selection-problem">
+<h2>Feature selection problem<a class="headerlink" href="#feature-selection-problem" title="Link to this heading"></a></h2>
+<p>Given an input matrix <span class="math notranslate nohighlight">\(\mathbf{X} \in \mathbb{R}^{m \times n}\)</span>, representing a dataset with
+<span class="math notranslate nohighlight">\(m\)</span> instances and <span class="math notranslate nohighlight">\(n\)</span> features, and an output vector
+<span class="math notranslate nohighlight">\(\mathbf{y} \in \mathbb{B}^{m \times 1}\)</span> containing target labels for each instance, the
+feature selection problem can be formulated as a <strong>combinatorial optimization task</strong>.</p>
+<p>The goal is to identify a subset of features <span class="math notranslate nohighlight">\(S^* \subseteq \mathcal{F}\)</span> that maximizes a
+predefined objective function <span class="math notranslate nohighlight">\(f\)</span>, where <span class="math notranslate nohighlight">\(\mathcal{F} = \{f_1, f_2, \dots, f_n\}\)</span>
+denotes the full feature set.</p>
+<p>The objective function <span class="math notranslate nohighlight">\(f\)</span> evaluates the quality or relevance of selected features,
+typically by measuring the performance of a learning model trained and tested on the selected
+feature subset. The function <span class="math notranslate nohighlight">\(f\)</span> may consider factors such as predictive accuracy,
+model complexity, interpretability, computational efficiency, or domain-specific criteria.
+Additional constraints or regularization terms may also be included to control aspects like the
+number of selected features or redundancy among them.</p>
+<p>An arbitrary solution <span class="math notranslate nohighlight">\(S\)</span> corresponds to a subset of selected feature indices, such that
+<span class="math notranslate nohighlight">\(\|S\| = n_s \leq n\)</span>. For instance, if <span class="math notranslate nohighlight">\(S = \{i, j, k\}\)</span>, it implies that the
+<span class="math notranslate nohighlight">\(i\)</span>-th, <span class="math notranslate nohighlight">\(j\)</span>-th, and <span class="math notranslate nohighlight">\(k\)</span>-th features are selected from the original feature set,
+resulting in a data subset <span class="math notranslate nohighlight">\(\mathbf{X}[:, S] = \mathbf{X}^{'} \in \mathbb{R}^{m \times n_s}\)</span>.</p>
+<p>Formally, the feature selection problem is defined as:</p>
+<div class="math notranslate nohighlight">
+\[S^{*} = \operatorname*{arg\,max}_{S \subseteq \{f_1, f_2, \dots, f_n\}} f(\mathbf{X}^{'}, \mathbf{y})\]</div>
+<p>where <span class="math notranslate nohighlight">\(f(\mathbf{X}^{'}, \mathbf{y})\)</span> represents the fitness value of the selected feature
+subset <span class="math notranslate nohighlight">\(\mathbf{X}^{'} = \mathbf{X}[:, S]\)</span>.</p>
+</section>
+<section id="cooperative-co-evolutionary-algorithms">
+<h2>Cooperative co-evolutionary algorithms<a class="headerlink" href="#cooperative-co-evolutionary-algorithms" title="Link to this heading"></a></h2>
+<p>Cooperative co-evolutionary algorithms (CCEAs) are a class of evolutionary computation techniques
+designed to tackle complex, large-scale optimization problems by decomposing them into smaller,
+more manageable subproblems. Each subproblem is addressed by an independent subpopulation, which
+is evolved by its own dedicated evolutionary algorithm. After an optimization cycle, the
+evaluation of each individual is determined based on their effectiveness in collaborating with
+representative individuals from other subpopulations to collectively compose one or more complete
+solutions (context vectors). This iterative process continues until convergence or a termination
+condition is met, as shown in <a class="reference internal" href="#ccea-framework-figure"><span class="std std-numref">Fig. 1</span></a>.</p>
+<figure class="align-center" id="id1">
+<span id="ccea-framework-figure"></span><a class="reference internal image-reference" href="../_images/CCEA.png"><img alt="CCEA Framework" src="../_images/CCEA.png" style="width: 60%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">A general framework of a Cooperative Co-Evolutionary Algorithm (CCEA).</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="problem-decomposition">
+<h3>Problem decomposition<a class="headerlink" href="#problem-decomposition" title="Link to this heading"></a></h3>
+<p>In feature selection, problem decomposition, also referred to as feature grouping in the
+literature, divides the original feature set <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> into <span class="math notranslate nohighlight">\(s\)</span> subcomponents
+(<span class="math notranslate nohighlight">\(\mathbf{f}_1, \mathbf{f}_2, \mathbf{f}_3, \ldots, \mathbf{f}_{s}\)</span>), where <span class="math notranslate nohighlight">\(s\)</span> is
+considerably smaller than the total number of features <span class="math notranslate nohighlight">\(n\)</span>. Each subcomponent
+<span class="math notranslate nohighlight">\(\mathbf{f}_i\)</span> contains <span class="math notranslate nohighlight">\(n_{f_i}\)</span> features and is associated with a subpopulation
+<span class="math notranslate nohighlight">\(\mathbf{P}_i\)</span> for evolution. The size of <span class="math notranslate nohighlight">\(\mathbf{P}_i\)</span> is <span class="math notranslate nohighlight">\(s_{p_i}\)</span>
+individuals and represents the allocated computational resources or desired diversity for
+exploring the <span class="math notranslate nohighlight">\(i\)</span>-th subcomponent.</p>
+<ul class="simple">
+<li><p><strong>Sequential</strong>: This strategy consists of splitting the feature set <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> into
+<span class="math notranslate nohighlight">\(s\)</span> disjoint subcomponents of equal size <span class="math notranslate nohighlight">\(n_f\)</span>, where
+<span class="math notranslate nohighlight">\(\sum_{i=1}^{s} n_{f_i} = n\)</span> and <span class="math notranslate nohighlight">\(n_{f_i} = n_f \ \forall i \in \{1, 2, \ldots, s\}\)</span>.
+The assignment of features to subcomponents is performed in the same order as they are originally
+arranged, starting from feature 1 to feature <span class="math notranslate nohighlight">\(n\)</span>. This naive strategy offers computational
+efficiency but tends to overlook important feature interactions. For detailed information on
+configuring and using this strategy, refer to the
+<a class="reference internal" href="pyccea.decomposition.html#pyccea.decomposition.SequentialFeatureGrouping" title="pyccea.decomposition.SequentialFeatureGrouping"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.decomposition.SequentialFeatureGrouping</span></code></a> class.</p></li>
+<li><p><strong>Random</strong>: This widely used decomposition strategy addresses the drawback of sequential
+grouping by randomly splitting the feature set <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> into <span class="math notranslate nohighlight">\(s\)</span> disjoint
+subcomponents of equal size <span class="math notranslate nohighlight">\(n_f\)</span>. This approach allows features that interact with each
+other to be placed in the same subcomponent purely by chance, which can improve the overall
+performance of the decomposition. For detailed information on configuring and using this
+strategy, refer to the <a class="reference internal" href="pyccea.decomposition.html#pyccea.decomposition.RandomFeatureGrouping" title="pyccea.decomposition.RandomFeatureGrouping"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.decomposition.RandomFeatureGrouping</span></code></a> class.</p></li>
+<li><p><strong>Ranking-based</strong>: This strategy builds subcomponents according to the importance, correlation,
+or relevance of features to a particular task. It typically assigns scores to all features using
+a predefined metric and then divides the feature set <span class="math notranslate nohighlight">\(\mathcal{F}\)</span> into <span class="math notranslate nohighlight">\(s\)</span> disjoint
+subcomponents of equal size <span class="math notranslate nohighlight">\(n_f\)</span> based on these scores. This allows for the strategic
+planning of feature allocation in alignment with the evolutionary process, such as uniformly
+distributing features from the highest-scoring to the lowest-scoring ones, or distributing
+high-importance features evenly among the subcomponents. For detailed information on configuring
+and using this strategy, refer to the <a class="reference internal" href="pyccea.decomposition.html#pyccea.decomposition.RankingFeatureGrouping" title="pyccea.decomposition.RankingFeatureGrouping"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.decomposition.RankingFeatureGrouping</span></code></a>
+class.</p></li>
+</ul>
+</section>
+<section id="subproblem-optimization">
+<h3>Subproblem optimization<a class="headerlink" href="#subproblem-optimization" title="Link to this heading"></a></h3>
+<p>Each subproblem, derived from the overall problem decomposition, is optimized by a dedicated
+evolutionary algorithm. For each cooperative co-evolutionary cycle, the optimizer evolves its
+respective subpopulation for a single generation. After this evolutionary step, the evolved
+individuals are then passed to the collaboration and evaluation phases to assess their fitness in
+the context of a complete solution. This iterative process aims to improve the “component” of the
+overall solution that each subpopulation represents.</p>
+<p>The following optimizers are available for evolving subpopulations:</p>
+<ul class="simple">
+<li><p><strong>Binary Genetic Algorithm (BGA)</strong>:
+Since the solutions are always represented as binary vectors in the PyCCEA package, this
+optimizer is inherently suitable. It employs standard genetic operators, including
+<strong>single-point crossover</strong> and <strong>bit-flip mutation</strong>. Individuals are selected for reproduction
+using <strong>tournament selection</strong>, and the survivor selection subpopulation update) can be either
+<strong>generational</strong> (replacing all individuals of the subpopulation) or <strong>steady-state</strong>
+(replacing only a few individuals), with the optional application of <strong>elitism</strong> to preserve
+top-performing individuals. For detailed information on its parameters and configuration, refer
+to the <a class="reference internal" href="pyccea.optimizers.html#pyccea.optimizers.BinaryGeneticAlgorithm" title="pyccea.optimizers.BinaryGeneticAlgorithm"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.optimizers.BinaryGeneticAlgorithm</span></code></a> class.</p></li>
+<li><p><strong>Differential Evolution (DE)</strong>:
+Although DE is traditionally designed for continuous-valued optimization problems, PyCCEA adapts
+it to handle binary-valued problems through a conversion mechanism that maps continuous outputs
+to binary solutions. This is accomplished using either Homomorphous Mapping
+(<a class="reference internal" href="pyccea.utils.html#pyccea.utils.mapping.angle_modulation_function" title="pyccea.utils.mapping.angle_modulation_function"><code class="xref py py-func docutils literal notranslate"><span class="pre">angle_modulation_function()</span></code></a>) or a Shifted Heaviside Function
+(<a class="reference internal" href="pyccea.utils.html#pyccea.utils.mapping.shifted_heaviside_function" title="pyccea.utils.mapping.shifted_heaviside_function"><code class="xref py py-func docutils literal notranslate"><span class="pre">shifted_heaviside_function()</span></code></a>). These methods enable DE to
+operate effectively in a binary search space. For details on configuration and parameters,
+see <a class="reference internal" href="pyccea.optimizers.html#pyccea.optimizers.DifferentialEvolution" title="pyccea.optimizers.DifferentialEvolution"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.optimizers.DifferentialEvolution</span></code></a> class.</p></li>
+</ul>
+<p>The <cite>evolve</cite> method within each optimizer is responsible for advancing a given subpopulation by a
+single generation, taking the current subpopulation and their fitness values as input, and
+returning the updated subpopulation for the next cycle.</p>
+</section>
+<section id="collaboration-selection">
+<h3>Collaboration selection<a class="headerlink" href="#collaboration-selection" title="Link to this heading"></a></h3>
+<p>To evaluate an individual from a subpopulation, it must be combined with representatives from the
+other subpopulations to form one or more complete candidate solutions, known as
+<strong>context vectors</strong>. The process of selecting individuals from the other subpopulations, excluding
+the one containing the individual being evaluated, is referred to as <strong>collaboration selection</strong>.</p>
+<p>Common collaboration strategies include:</p>
+<ul class="simple">
+<li><p><strong>Single random</strong>: A single individual is randomly selected from each of the other
+subpopulations. For detailed information, refer to the
+<a class="reference internal" href="pyccea.cooperation.html#pyccea.cooperation.SingleRandomCollaboration" title="pyccea.cooperation.SingleRandomCollaboration"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.cooperation.SingleRandomCollaboration</span></code></a> class.</p></li>
+<li><p><strong>Single best</strong>: The single best-performing individual (based on its last known fitness) is
+selected from each of the other subpopulations. For detailed information, refer to the
+<a class="reference internal" href="pyccea.cooperation.html#pyccea.cooperation.SingleBestCollaboration" title="pyccea.cooperation.SingleBestCollaboration"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.cooperation.SingleBestCollaboration</span></code></a> class.</p></li>
+<li><p><strong>Single elite</strong>: A single individual is randomly chosen from a pre-defined elite set of
+top-performing individuals within each of the other subpopulations. For detailed information,
+refer to the <a class="reference internal" href="pyccea.cooperation.html#pyccea.cooperation.SingleEliteCollaboration" title="pyccea.cooperation.SingleEliteCollaboration"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.cooperation.SingleEliteCollaboration</span></code></a> class.</p></li>
+</ul>
+</section>
+<section id="fitness-evaluation">
+<h3>Fitness evaluation<a class="headerlink" href="#fitness-evaluation" title="Link to this heading"></a></h3>
+<p>Fitness evaluation plays a central role in the feature selection process, as it determines how
+well a candidate solution (i.e., a subset of features) performs. <strong>PyCCEA uses a wrapper-based
+evaluation strategy</strong>, meaning that each feature subset is evaluated by training and testing a
+machine learning model on it. This approach provides highly accurate and task-relevant feedback,
+as it directly measures how well the selected features support the learning task.</p>
+<p>In practice, the fitness of each individual (from a subpopulation) is computed by evaluating its
+<strong>context vector</strong>, a full solution composed of that individual and collaborators from the other
+subpopulations, using the selected model and evaluation metric.</p>
+<p>There are two fitness functions implemented, both supporting multi-objective evaluation by
+combining model performance with structural characteristics of the selected features. Each
+function uses a weighted combination of <span class="math notranslate nohighlight">\(m\)</span> objectives, such that
+<span class="math notranslate nohighlight">\(\sum_{i=1}^{m} w_i = 1\)</span>.</p>
+<ul>
+<li><p><strong>Penalty-based fitness</strong>:
+This fitness function balances model predictive performance with the size of the selected
+feature subset. It penalizes large subsets to encourage more compact solutions.</p>
+<p>The final fitness is calculated as:</p>
+<div class="math notranslate nohighlight">
+\[f = w_1 \cdot \text{score} - w_2 \cdot \frac{|S|}{|\mathcal{F}|},\]</div>
+<p>where <span class="math notranslate nohighlight">\(\text{score}\)</span> is a model evaluation metric (e.g., <span class="math notranslate nohighlight">\(F_1\)</span>-score, balanced
+accuracy), and <span class="math notranslate nohighlight">\(|S|\)</span> is the number of selected features.
+See <a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.SubsetSizePenalty" title="pyccea.fitness.SubsetSizePenalty"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.fitness.SubsetSizePenalty</span></code></a> class for more details.</p>
+</li>
+<li><p><strong>Distance-based fitness</strong>:
+This fitness function combines predictive performance with structural properties of the feature
+space, using a <strong>k-nearest neighbors (k-NN)</strong> model. It optimizes three objectives:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Maximizing predictive performance;</p></li>
+<li><p>Minimizing intra-class distance;</p></li>
+<li><p>Maximizing inter-class distance between instances.</p></li>
+</ol>
+</div></blockquote>
+<p>The fitness is calculated as:</p>
+<div class="math notranslate nohighlight">
+\[f = w_1 \cdot \text{score} +
+    w_2 \cdot \frac{d_{\text{diff}}}{\sqrt{|S|}} +
+    w_3 \cdot \left(1 - \frac{d_{\text{same}}}{\sqrt{|S|}}\right),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\text{score}\)</span> is a model evaluation metric (e.g., <span class="math notranslate nohighlight">\(F_1\)</span>-score, balanced
+accuracy), <span class="math notranslate nohighlight">\(|S|\)</span> is the number of selected features, <span class="math notranslate nohighlight">\(d_{\text{same}}\)</span> is the
+average distance to neighbors with the same label, and <span class="math notranslate nohighlight">\(d_{\text{diff}}\)</span> is the average
+distance to neighbors with different labels. See <a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.DistanceBasedFitness" title="pyccea.fitness.DistanceBasedFitness"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.fitness.DistanceBasedFitness</span></code></a>
+class for more details.</p>
+</li>
+</ul>
+</section>
+<section id="termination-criteria">
+<h3>Termination criteria<a class="headerlink" href="#termination-criteria" title="Link to this heading"></a></h3>
+<p>The feature selection process terminates when one of the following stopping conditions is met:</p>
+<ul class="simple">
+<li><p>A maximum of <strong>10,000 generations</strong> is reached.</p></li>
+<li><p><strong>Early stopping</strong> is triggered after <strong>100 consecutive generations</strong> without improvement in
+the best solution (i.e., stagnation).</p></li>
+</ul>
+<p>These criteria ensure that the optimization process does not run indefinitely and can stop early
+if no progress is being made.</p>
+<p>Both stopping parameters are defined in the <cite>coevolution</cite> section of the CCEA configuration
+<cite>.toml</cite> file and can be customized by the user. Specifically:</p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">max_gen</span></code> controls the maximum number of generations.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">max_gen_without_improvement</span></code> sets the number of stagnant generations allowed before
+early stopping.</p></li>
+</ul>
+<p>Users may adjust these values to suit different problem sizes or computational constraints.</p>
+</section>
+</section>
+<section id="configuration-files">
+<h2>Configuration files<a class="headerlink" href="#configuration-files" title="Link to this heading"></a></h2>
+<p><strong>PyCCEA</strong> uses two main configuration files to manage its operations, each serving a distinct
+purpose: one for data loading and preprocessing, and another for defining the parameters of the
+Cooperative Co-Evolutionary Algorithm (CCEA). Both files are written in the <strong>TOML format</strong>,
+chosen for its straightforward, human-readable syntax that simplifies modification.</p>
+<section id="data-loader">
+<h3>Data loader<a class="headerlink" href="#data-loader" title="Link to this heading"></a></h3>
+<p>This configuration file specifies the parameters that control how your dataset is loaded, split, and
+preprocessed. An example is provided below:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[general]</span>
+<span class="n">splitter_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;k_fold&quot;</span>
+<span class="n">verbose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">seed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">42</span>
+
+<span class="k">[splitter]</span>
+<span class="n">preset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="n">kfolds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span>
+<span class="n">stratified</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">test_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.2</span>
+
+<span class="k">[normalization]</span>
+<span class="n">normalize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;min_max&quot;</span>
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>[general]</strong></dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">splitter_type</span></code> (string): Defines the strategy for splitting the dataset. Common options
+include <cite>“k_fold”</cite> and <cite>“leave_one_out”</cite>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">verbose</span></code> (boolean): If <code class="docutils literal notranslate"><span class="pre">true</span></code>, enables verbose output during data loading and splitting,
+providing detailed logs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">seed</span></code> (integer, optional): Controls the randomness of the data split, ensuring
+reproducibility. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, a random seed will be used.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>[splitter]</strong></dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">preset</span></code> (boolean): If <code class="docutils literal notranslate"><span class="pre">true</span></code>, the data loader will use pre-defined training and testing
+subsets within your dataset (e.g., indicated by a ‘subset’ column). If <code class="docutils literal notranslate"><span class="pre">false</span></code>, custom
+splitting parameters like <code class="docutils literal notranslate"><span class="pre">kfolds</span></code> or <code class="docutils literal notranslate"><span class="pre">test_ratio</span></code> will be applied.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kfolds</span></code> (integer, optional): Applicable when <code class="docutils literal notranslate"><span class="pre">splitter_type</span></code> is <cite>“k_fold”</cite>. Specifies
+the number of folds for K-Fold cross-validation. This parameter is ignored for
+<cite>“leave_one_out”</cite>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stratified</span></code> (boolean): If <code class="docutils literal notranslate"><span class="pre">true</span></code> and the task is classification, this ensures that each
+fold maintains the same proportion of class labels as the original dataset. This is crucial
+for handling imbalanced datasets. This parameter is only used when <code class="docutils literal notranslate"><span class="pre">splitter_type</span></code> is set
+to <cite>“k_fold”</cite>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">test_ratio</span></code> (float, optional): Defines the proportion of the dataset to be included in
+the test set. This value should be between 0 and 1 (exclusive, e.g., 0 &lt; <code class="docutils literal notranslate"><span class="pre">test_ratio</span></code> &lt; 1)
+. This parameter is used when <code class="docutils literal notranslate"><span class="pre">preset</span></code> is <code class="docutils literal notranslate"><span class="pre">false</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>[normalization]</strong></dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">normalize</span></code> (boolean): If <code class="docutils literal notranslate"><span class="pre">true</span></code>, data normalization will be applied to the training and
+test sets.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">method</span></code> (string): Specifies the normalization method. Supported methods include
+<cite>“min_max”</cite> (Min-Max scaling) and <cite>“standard”</cite> (Z-score normalization). This parameter is
+required if <code class="docutils literal notranslate"><span class="pre">normalize</span></code> is <code class="docutils literal notranslate"><span class="pre">true</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>A preconfigured data loader file is available at <code class="code docutils literal notranslate"><span class="pre">pyccea.parameters.dataloader.toml</span></code>,
+providing a standard setup with predefined training and testing splits. By setting
+<code class="code docutils literal notranslate"><span class="pre">preset</span> <span class="pre">=</span> <span class="pre">true</span></code> in your configuration, you enable consistent data partitions across
+experiments, improving reproducibility and ensuring fair benchmarking. This allows for direct and
+reliable comparisons with other research studies that have used PyCCEA.</p>
+<p>For more comprehensive details on the data loading and preprocessing logic, refer to the
+<a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.utils.datasets.DataLoader</span></code></a> class.</p>
+</section>
+<section id="algorithm">
+<h3>Algorithm<a class="headerlink" href="#algorithm" title="Link to this heading"></a></h3>
+<p>The algorithm configuration file specifies the key parameters that control the cooperative
+co-evolutionary feature selection process, including settings for evolution, model wrapping,
+evaluation, and optimization. Below is an example of a minimal configuration used for a
+classification problem:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[coevolution]</span>
+<span class="n">subpop_sizes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">30</span><span class="p">]</span>
+<span class="n">n_subcomps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span>
+<span class="n">max_gen</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span>
+<span class="n">max_gen_without_improvement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+
+<span class="k">[wrapper]</span>
+<span class="n">task</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;classification&quot;</span>
+<span class="n">model_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;k_nearest_neighbors&quot;</span>
+
+<span class="k">[evaluation]</span>
+<span class="n">fitness_function</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;penalty&quot;</span>
+<span class="n">eval_function</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;balanced_accuracy&quot;</span>
+<span class="n">eval_mode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;k_fold&quot;</span>
+<span class="n">weights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.80</span><span class="p">,</span><span class="w"> </span><span class="mf">0.20</span><span class="p">]</span>
+
+<span class="k">[optimizer]</span>
+<span class="n">selection_method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;generational&quot;</span>
+<span class="n">mutation_rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05</span>
+<span class="n">crossover_rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.00</span>
+<span class="n">tournament_sample_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">elite_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<p><strong>[coevolution]</strong></p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">subpop_sizes</span></code>: A list defining the number of individuals in each subpopulation. If only
+one value is provided, it will be replicated for all subcomponents.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">n_subcomps</span></code>: The number of subcomponents into which the feature set is divided.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">max_gen</span></code>: Maximum number of generations before stopping.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">max_gen_without_improvement</span></code>: Triggers early stopping if no fitness improvement is
+observed over this number of consecutive generations.</p></li>
+</ul>
+<p><strong>[wrapper]</strong></p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">task</span></code>: Type of learning task. Currently supports <strong>classification</strong> and <strong>regression</strong>.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">model_type</span></code>: Specifies the machine learning algorithm.</p></li>
+</ul>
+<p><strong>[evaluation]</strong></p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">fitness_function</span></code>: Strategy used to score individuals. <code class="code docutils literal notranslate"><span class="pre">&quot;penalty&quot;</span></code> typically
+balances evaluation metric and solution size (i.e., number of selected features).</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">eval_function</span></code>: Metric used to evaluate model performance.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">eval_mode</span></code>: Evaluation method.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">weights</span></code>: Weighting for multi-objective evaluation. The first value corresponds to the
+weight for the primary evaluation metric (e.g., balanced accuracy). The second value corresponds
+to the weight for the solution size.</p></li>
+</ul>
+<p><strong>[optimizer]</strong></p>
+<ul class="simple">
+<li><p><code class="code docutils literal notranslate"><span class="pre">selection_method</span></code>: Type of generation scheme.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">mutation_rate</span></code>: Probability of gene mutation.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">crossover_rate</span></code>: Probability of performing crossover between individuals.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">tournament_sample_size</span></code>: Size of the group used in tournament selection.</p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">elite_size</span></code>: Number of top individuals retained unchanged between generations.</p></li>
+</ul>
+<p>All parameters are customizable by editing the configuration file. This modular design enables
+users to easily experiment with different models, optimizers, and evaluation metrics. For a full
+list of supported values for each field, refer to the <a class="reference internal" href="api.html#api-reference"><span class="std std-ref">API reference</span></a>.
+Several pre-configured TOML files are also available in the <code class="code docutils literal notranslate"><span class="pre">pyccea.parameters</span></code> module,
+covering various CCEA variants. These files serve as convenient starting points and ensure
+consistency across experiments.</p>
+</section>
+</section>
+<section id="benchmark">
+<h2>Benchmark<a class="headerlink" href="#benchmark" title="Link to this heading"></a></h2>
+<p>The benchmarking suite in PyCCEA integrates a collection of cooperative co-evolutionary algorithms
+with diverse datasets, offering a unified and standardized framework for systematic
+experimentation. It facilitates consistent evaluation and comparison of CCEA performance
+across multiple feature selection problems, promoting research advancement, method validation, and
+fair, reproducible performance assessment.</p>
+<section id="datasets">
+<h3>Datasets<a class="headerlink" href="#datasets" title="Link to this heading"></a></h3>
+<p>PyCCEA offers a diverse collection of datasets, drawn primarily from the <a class="reference external" href="https://archive.ics.uci.edu/">UCI Machine Learning
+Repository</a> and other established public repositories. These
+datasets are fully integrated into the framework to support consistent evaluation and fair
+comparison of cooperative co-evolutionary algorithms for feature selection. To promote
+comprehensive testing, the suite includes datasets for both <strong>classification</strong> and <strong>regression</strong>
+tasks. Key characteristics of each dataset are summarized below, helping users assess their
+complexity and relevance to various experimental scenarios.</p>
+<section id="classification">
+<h4>Classification<a class="headerlink" href="#classification" title="Link to this heading"></a></h4>
+<p>The classification datasets vary in sample size, dimensionality, number of target classes, and
+imbalance ratio, covering domains such as medical diagnosis, sensor activity, gene expression, and
+more. This diversity provides a robust basis for evaluating both performance and scalability.</p>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-number">Table 1 </span><span class="caption-text">Classification datasets.</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 23.5%" />
+<col style="width: 17.6%" />
+<col style="width: 17.6%" />
+<col style="width: 17.6%" />
+<col style="width: 23.5%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Dataset</p></th>
+<th class="head"><p># instances</p></th>
+<th class="head"><p># features</p></th>
+<th class="head"><p># classes</p></th>
+<th class="head"><p>Imbalance ratio</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>11_tumor</p></td>
+<td><p>174</p></td>
+<td><p>12533</p></td>
+<td><p>11</p></td>
+<td><p>4.5</p></td>
+</tr>
+<tr class="row-odd"><td><p>9_tumor</p></td>
+<td><p>60</p></td>
+<td><p>5726</p></td>
+<td><p>9</p></td>
+<td><p>4.5</p></td>
+</tr>
+<tr class="row-even"><td><p>brain_tumor_1</p></td>
+<td><p>90</p></td>
+<td><p>5920</p></td>
+<td><p>5</p></td>
+<td><p>15.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>brain_tumor_2</p></td>
+<td><p>50</p></td>
+<td><p>10367</p></td>
+<td><p>4</p></td>
+<td><p>2.14</p></td>
+</tr>
+<tr class="row-even"><td><p>cbd</p></td>
+<td><p>208</p></td>
+<td><p>60</p></td>
+<td><p>2</p></td>
+<td><p>1.14</p></td>
+</tr>
+<tr class="row-odd"><td><p>dermatology</p></td>
+<td><p>366</p></td>
+<td><p>34</p></td>
+<td><p>6</p></td>
+<td><p>5.6</p></td>
+</tr>
+<tr class="row-even"><td><p>divorce</p></td>
+<td><p>170</p></td>
+<td><p>54</p></td>
+<td><p>2</p></td>
+<td><p>1.02</p></td>
+</tr>
+<tr class="row-odd"><td><p>dlbcl</p></td>
+<td><p>77</p></td>
+<td><p>5469</p></td>
+<td><p>2</p></td>
+<td><p>3.05</p></td>
+</tr>
+<tr class="row-even"><td><p>dorothea</p></td>
+<td><p>1150</p></td>
+<td><p>100000</p></td>
+<td><p>2</p></td>
+<td><p>9.27</p></td>
+</tr>
+<tr class="row-odd"><td><p>gfe</p></td>
+<td><p>1062</p></td>
+<td><p>301</p></td>
+<td><p>2</p></td>
+<td><p>1.57</p></td>
+</tr>
+<tr class="row-even"><td><p>hapt</p></td>
+<td><p>1200</p></td>
+<td><p>561</p></td>
+<td><p>12</p></td>
+<td><p>67.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>har</p></td>
+<td><p>900</p></td>
+<td><p>561</p></td>
+<td><p>6</p></td>
+<td><p>1.4</p></td>
+</tr>
+<tr class="row-even"><td><p>isolet5</p></td>
+<td><p>1040</p></td>
+<td><p>617</p></td>
+<td><p>26</p></td>
+<td><p>1.45</p></td>
+</tr>
+<tr class="row-odd"><td><p>leukemia_1</p></td>
+<td><p>72</p></td>
+<td><p>5327</p></td>
+<td><p>3</p></td>
+<td><p>4.22</p></td>
+</tr>
+<tr class="row-even"><td><p>leukemia_2</p></td>
+<td><p>72</p></td>
+<td><p>7129</p></td>
+<td><p>4</p></td>
+<td><p>9.5</p></td>
+</tr>
+<tr class="row-odd"><td><p>leukemia_3</p></td>
+<td><p>72</p></td>
+<td><p>11225</p></td>
+<td><p>3</p></td>
+<td><p>1.4</p></td>
+</tr>
+<tr class="row-even"><td><p>libras</p></td>
+<td><p>360</p></td>
+<td><p>90</p></td>
+<td><p>15</p></td>
+<td><p>1.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>lsvt</p></td>
+<td><p>126</p></td>
+<td><p>310</p></td>
+<td><p>2</p></td>
+<td><p>2.0</p></td>
+</tr>
+<tr class="row-even"><td><p>lungc</p></td>
+<td><p>203</p></td>
+<td><p>12600</p></td>
+<td><p>5</p></td>
+<td><p>23.17</p></td>
+</tr>
+<tr class="row-odd"><td><p>madelon_valid</p></td>
+<td><p>600</p></td>
+<td><p>500</p></td>
+<td><p>2</p></td>
+<td><p>1.0</p></td>
+</tr>
+<tr class="row-even"><td><p>mfd</p></td>
+<td><p>1000</p></td>
+<td><p>649</p></td>
+<td><p>10</p></td>
+<td><p>1.33</p></td>
+</tr>
+<tr class="row-odd"><td><p>orh</p></td>
+<td><p>1000</p></td>
+<td><p>64</p></td>
+<td><p>10</p></td>
+<td><p>1.24</p></td>
+</tr>
+<tr class="row-even"><td><p>prostate_tumor_1</p></td>
+<td><p>102</p></td>
+<td><p>5966</p></td>
+<td><p>2</p></td>
+<td><p>1.04</p></td>
+</tr>
+<tr class="row-odd"><td><p>qsar_toxicity</p></td>
+<td><p>8992</p></td>
+<td><p>1024</p></td>
+<td><p>2</p></td>
+<td><p>11.13</p></td>
+</tr>
+<tr class="row-even"><td><p>scadi</p></td>
+<td><p>70</p></td>
+<td><p>205</p></td>
+<td><p>7</p></td>
+<td><p>29.0</p></td>
+</tr>
+<tr class="row-odd"><td><p>shd</p></td>
+<td><p>675</p></td>
+<td><p>256</p></td>
+<td><p>10</p></td>
+<td><p>1.41</p></td>
+</tr>
+<tr class="row-even"><td><p>uji_indoor</p></td>
+<td><p>930</p></td>
+<td><p>522</p></td>
+<td><p>3</p></td>
+<td><p>2.04</p></td>
+</tr>
+<tr class="row-odd"><td><p>wdbc</p></td>
+<td><p>569</p></td>
+<td><p>30</p></td>
+<td><p>2</p></td>
+<td><p>1.68</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="regression">
+<h4>Regression<a class="headerlink" href="#regression" title="Link to this heading"></a></h4>
+<p>The regression datasets are lower in dimensionality and serve to test capability of CCEAs on
+continuous target variables. These datasets are useful for evaluating the generalization of
+fitness functions under regression-specific evaluation metrics.</p>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-number">Table 2 </span><span class="caption-text">Regression datasets.</span><a class="headerlink" href="#id3" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Dataset</p></th>
+<th class="head"><p># instances</p></th>
+<th class="head"><p># features</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>itt_f</p></td>
+<td><p>1020</p></td>
+<td><p>43</p></td>
+</tr>
+<tr class="row-odd"><td><p>itt_m</p></td>
+<td><p>1020</p></td>
+<td><p>43</p></td>
+</tr>
+</tbody>
+</table>
+<p>To use any of the datasets listed above, simply pass its name (as shown in the “Dataset” column)
+to the <code class="code docutils literal notranslate"><span class="pre">dataset</span></code> parameter of the <a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader" title="pyccea.utils.datasets.DataLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.utils.datasets.DataLoader</span></code></a> class.
+For example, <code class="code docutils literal notranslate"><span class="pre">DataLoader(dataset=&quot;leukemia_2&quot;,</span> <span class="pre">conf=...)</span></code> will automatically load and
+preprocess the Leukemia 2 dataset according to the data loader configuration file.</p>
+</section>
+</section>
+<section id="cceas">
+<h3>CCEAs<a class="headerlink" href="#cceas" title="Link to this heading"></a></h3>
+<p>The PyCCEA package implements a family of modular CCEAs, where all algorithms share a common
+evolutionary structure and differ only in how they decompose the feature space. Below is a list of
+the available CCEA variants, highlighting the decomposition strategy used and how it operates.</p>
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-number">Table 3 </span><span class="caption-text"><strong>Available cooperative co-evolutionary algorithms for feature selection.</strong></span><a class="headerlink" href="#id4" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 17.1%" />
+<col style="width: 32.9%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>CCEA</strong></p></th>
+<th class="head"><p><strong>Decomposition strategy</strong></p></th>
+<th class="head"><p><strong>Description</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CCEAFS</p></td>
+<td><p>Sequential</p></td>
+<td><p>Sequentially decomposes features into <span class="math notranslate nohighlight">\(s\)</span> subcomponents of equal size <span class="math notranslate nohighlight">\(n_f\)</span>
+(uniform subcomponents), starting from the first indexed feature up to the <span class="math notranslate nohighlight">\(n\)</span>-th
+indexed feature.</p></td>
+</tr>
+<tr class="row-odd"><td><p>CCFSRFG-1</p></td>
+<td><p>Random</p></td>
+<td><p>Randomly decomposes the features into <span class="math notranslate nohighlight">\(s\)</span> uniform subcomponents of size <span class="math notranslate nohighlight">\(n_f\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p>CCSUFG</p></td>
+<td><p>Symmetric Uncertainty</p></td>
+<td><p>Evaluates feature importance using symmetric uncertainty of a feature with the class label
+(SU<sub>c</sub>), removes weakly relevant features (those with SU<sub>c</sub> values ≤ 0.10 of
+the <span class="math notranslate nohighlight">\(\max\)</span> SU<sub>c</sub>), sorts the remaining ones by importance, and uniformly
+divides them into <span class="math notranslate nohighlight">\(s\)</span> uniform subcomponents of size <span class="math notranslate nohighlight">\(n_f\)</span>, starting with the
+most important feature.</p></td>
+</tr>
+<tr class="row-odd"><td><p>CCFC</p></td>
+<td><p>Clustering</p></td>
+<td><p>Clusters features into <span class="math notranslate nohighlight">\(s\)</span> groups using <em>k</em>-means, where each group represents a
+subcomponent. The size of each subcomponent <span class="math notranslate nohighlight">\(n_{f_{i}}\)</span> varies and is determined by
+the clustering algorithm.</p></td>
+</tr>
+<tr class="row-even"><td><p>CCILFG</p></td>
+<td><p>Interaction Learning</p></td>
+<td><p>Groups features initially into two sets: promising features (<span class="math notranslate nohighlight">\(\mathcal{F}_p\)</span>) and
+remaining features (<span class="math notranslate nohighlight">\(\mathcal{F}_r\)</span>), based on the knee point determined by the
+symmetric uncertainty with respect to class labels (SU<sub>c</sub>). Then, it uses symmetric
+uncertainty between features (SU<sub>f</sub>) to identify neighbors for each feature.
+Finally, it decomposes features into 3 non-uniform subcomponents - boundary, high
+correlation, and low correlation - based on the group of their neighbors.</p></td>
+</tr>
+<tr class="row-odd"><td><p>CCPSTFG</p></td>
+<td><p>Projection-based self-tuning</p></td>
+<td><p>Reduces the feature space by projecting high-dimensional data into a more discriminative
+representation, filtering irrelevant features, and clustering the remainder into
+subcomponents. This adaptive strategy constructs robust subproblems with minimal manual
+tuning. Both the number of subcomponents <span class="math notranslate nohighlight">\(s\)</span> and the size of each <span class="math notranslate nohighlight">\(n_{f_i}\)</span> are
+selected automatically via lightweight parameter tuning mechanisms.</p></td>
+</tr>
+</tbody>
+</table>
+<p>While the decomposition strategy varies, all algorithms implemented in PyCCEA rely on the same
+core components during the cooperative co-evolutionary process. The following table summarizes
+the core components and their corresponding strategies:</p>
+<table class="docutils align-default" id="id5">
+<caption><span class="caption-number">Table 4 </span><span class="caption-text"><strong>Components of the baseline cooperative co-evolutionary algorithms.</strong></span><a class="headerlink" href="#id5" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 42.9%" />
+<col style="width: 57.1%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p><strong>Component</strong></p></th>
+<th class="head"><p><strong>Strategy</strong></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Subproblem optimizer</p></td>
+<td><p>Binary genetic algorithm</p></td>
+</tr>
+<tr class="row-odd"><td><p>Collaboration selection</p></td>
+<td><p>Best collaborator</p></td>
+</tr>
+<tr class="row-even"><td><p>Fitness assignment</p></td>
+<td><p>Single complete solution</p></td>
+</tr>
+<tr class="row-odd"><td><p>Subproblem resource allocation</p></td>
+<td><p>Round-Robin strategy</p></td>
+</tr>
+</tbody>
+</table>
+<p>For more details on each CCEA, refer to the <a class="reference internal" href="pyccea.coevolution.html#module-pyccea.coevolution" title="pyccea.coevolution"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.coevolution</span></code></a> module.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorials.html" class="btn btn-neutral float-right" title="Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, pedbrgs.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

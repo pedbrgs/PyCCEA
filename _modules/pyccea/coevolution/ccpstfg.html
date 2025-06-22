@@ -8,7 +8,7 @@
   <title>pyccea.coevolution.ccpstfg &mdash; PyCCEA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=a8bcbd07" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ab21f1d8" />
 
   
     <link rel="shortcut icon" href="../../../_static/favicon.png"/>
@@ -44,11 +44,12 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../pages/installation.html">1. Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../pages/quickstart.html">2. Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../pages/api.html">3. API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../pages/contributing.html">4. Contributing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../pages/citation.html">5. Citation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/user_guide.html">User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/tutorials.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pages/citation.html">Citation</a></li>
 </ul>
 
         </div>
@@ -78,6 +79,7 @@
   <h1>Source code for pyccea.coevolution.ccpstfg</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -142,7 +144,9 @@
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;User-defined number of subcomponents: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Automatically choosing the number of subcomponents...&quot;</span><span class="p">)</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_number_of_subcomponents</span><span class="p">(</span><span class="n">feature_loadings</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_subcomponents_tuning_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
         <span class="c1"># Update the subpopulation sizes after update the number of subcomponents</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span>
 
@@ -308,7 +312,9 @@
 <span class="sd">        importances : np.ndarray</span>
 <span class="sd">            Importance of the remaining features.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">quantile_to_remove</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_quantile_to_remove</span><span class="p">(</span><span class="n">importances</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_quantile_tuning_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vip_threshold</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">importances</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantile_to_remove</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removing features with VIP less than or equal to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">vip_threshold</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
         <span class="n">features_to_keep</span> <span class="o">=</span> <span class="n">importances</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">vip_threshold</span>
@@ -366,10 +372,12 @@
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;User-defined number of PLS components: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Automatically choosing the number of PLS components...&quot;</span><span class="p">)</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="c1"># Get the best number of components to keep after projection using the Elbow method</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_number_of_components</span><span class="p">(</span>
                 <span class="n">projection_class</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">y_train</span>
             <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_components_tuning_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
         <span class="c1"># Instantiate projection model object</span>
         <span class="n">projection_model</span> <span class="o">=</span> <span class="n">projection_class</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -400,6 +408,11 @@
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">feature_importances</span> <span class="o">=</span> <span class="n">importances</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tuning_time</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_n_components_tuning_time&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="o">+</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_quantile_tuning_time&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="o">+</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_n_subcomponents_tuning_time&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_allocate_subproblem_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Allocate resources to subproblems based on feature importances and subcomponent sizes.&quot;&quot;&quot;</span>
