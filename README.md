@@ -76,7 +76,7 @@ The best feature subset found is stored in the attribute `best_context_vector`, 
 
 ## :books: Documentation
 
-Full documentation, including a quickstart tutorial, API reference, and contribution guidelines, is available at [**PyCCEA docs**](https://pedbrgs.github.io/PyCCEA/).
+Full documentation, including a comprehensive user guide, step-by-step tutorials, an API reference, and contribution guidelines, is available at [**PyCCEA docs**](https://pedbrgs.github.io/PyCCEA/).
 
 ## :scroll: Citation info
 
