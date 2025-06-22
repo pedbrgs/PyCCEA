@@ -10,10 +10,17 @@ extensions = [
     "sphinx.ext.autodoc",
     "numpydoc",
     "sphinx.ext.viewcode",
-    'sphinx.ext.autosummary',
+    "sphinx.ext.autosummary",
+    "sphinx.ext.napoleon",
 ]
 
 autosummary_generate = True
+autodoc_default_options = {
+    'members': True,
+    'undoc-members': True,
+    'show-inheritance': True,
+}
+numfig = True
 
 
 templates_path = ["_templates"]

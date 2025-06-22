@@ -6,3 +6,10 @@
 div.body, .document, .section {
     text-align: justify;
 }
+.rst-content table td {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+    hyphens: auto;
+}
