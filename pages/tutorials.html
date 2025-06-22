@@ -21,7 +21,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="1. Quickstart" href="examples/quickstart.html" />
+    <link rel="next" title="API Reference" href="api.html" />
     <link rel="prev" title="User Guide" href="user_guide.html" /> 
 </head>
 
@@ -50,7 +50,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user_guide.html">User Guide</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examples/quickstart.html">1. Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-use-a-baseline-ccea">How to use a baseline CCEA?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-customize-a-ccea">How to customize a CCEA?</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
@@ -84,14 +85,300 @@
              
   <section id="tutorials">
 <h1>Tutorials<a class="headerlink" href="#tutorials" title="Link to this heading"></a></h1>
-<p>Here are some tutorials on how to use and customize cooperative co-evolutionary algorithms for
-feature selection using the PyCCEA package.</p>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="examples/quickstart.html">1. Quickstart</a></li>
+<p>This section provides step-by-step tutorials on how to use and customize cooperative
+co-evolutionary algorithms for feature selection using the PyCCEA package.</p>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#how-to-use-a-baseline-ccea" id="id1">How to use a baseline CCEA?</a></p></li>
+<li><p><a class="reference internal" href="#how-to-customize-a-ccea" id="id2">How to customize a CCEA?</a></p></li>
 </ul>
+</nav>
+<section id="how-to-use-a-baseline-ccea">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">How to use a baseline CCEA?</a><a class="headerlink" href="#how-to-use-a-baseline-ccea" title="Link to this heading"></a></h2>
+<p>This tutorial demonstrates how to use the <code class="docutils literal notranslate"><span class="pre">CCFSRFG1</span></code> algorithm — a cooperative co-evolutionary
+algorithm (CCEA) variant with random feature grouping — to perform feature selection on the
+Wisconsin Diagnostic Breast Cancer (WDBC) dataset.</p>
+<p>In this example, you will:</p>
+<ul class="simple">
+<li><p>Load the dataset using the <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code>.</p></li>
+<li><p>Load the dataset and algorithm configuration files.</p></li>
+<li><p>Run the optimization process.</p></li>
+</ul>
+<p>We start by importing the necessary modules and classes:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">toml</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.resources</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyccea.coevolution</span><span class="w"> </span><span class="kn">import</span> <span class="n">CCFSRFG1</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyccea.utils.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+</pre></div>
 </div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">toml</span></code> is used to parse configuration files.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">importlib.resources</span></code> helps access files inside a package.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CCFSRFG1</span></code> is the cooperative co-evolution algorithm you’ll run.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DataLoader</span></code> is a utility to prepare the dataset.</p></li>
+</ul>
+<p>Next, we load the configuration for the dataset from a <cite>.toml</cite> file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">open_text</span><span class="p">(</span><span class="s2">&quot;pyccea.parameters&quot;</span><span class="p">,</span> <span class="s2">&quot;dataloader.toml&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">toml_file</span><span class="p">:</span>
+    <span class="n">data_conf</span> <span class="o">=</span> <span class="n">toml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">toml_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This code looks for the file <code class="docutils literal notranslate"><span class="pre">dataloader.toml</span></code> inside the <code class="docutils literal notranslate"><span class="pre">pyccea.parameters</span></code> package and loads
+its content into a dictionary.</p>
+<p>We then create and prepare the dataset using the <code class="docutils literal notranslate"><span class="pre">DataLoader</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;wdbc&quot;</span><span class="p">,</span> <span class="n">conf</span><span class="o">=</span><span class="n">data_conf</span><span class="p">)</span>
+<span class="n">dataloader</span><span class="o">.</span><span class="n">get_ready</span><span class="p">()</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">dataset=&quot;wdbc&quot;</span></code> specifies the dataset to use (WDBC in this case).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">conf=data_conf</span></code> passes the parameters we just loaded.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_ready()</span></code> performs any necessary preprocessing and splits the data.</p></li>
+</ul>
+<p>We now load the configuration for the CCFSRFG1 algorithm:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">open_text</span><span class="p">(</span><span class="s2">&quot;pyccea.parameters&quot;</span><span class="p">,</span> <span class="s2">&quot;ccfsrfg.toml&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">toml_file</span><span class="p">:</span>
+    <span class="n">ccea_conf</span> <span class="o">=</span> <span class="n">toml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">toml_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This step reads the <code class="docutils literal notranslate"><span class="pre">ccfsrfg.toml</span></code> file and loads the algorithm’s hyperparameters into a
+dictionary.</p>
+<p>Now we’re ready to run the algorithm:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ccea</span> <span class="o">=</span> <span class="n">CCFSRFG1</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">dataloader</span><span class="p">,</span> <span class="n">conf</span><span class="o">=</span><span class="n">ccea_conf</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">ccea</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CCFSRFG1(...)</span></code> initializes the algorithm with data and configuration.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optimize()</span></code> starts the evolutionary process for feature selection.</p></li>
+</ul>
+<p>Once the optimization is complete, the best feature subset is stored in the <code class="docutils literal notranslate"><span class="pre">best_context_vector</span></code>
+attribute of the <code class="docutils literal notranslate"><span class="pre">CCFSRFG1</span></code> object, a binary vector where:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>1</cite> indicates that a feature is selected.</p></li>
+<li><p><cite>0</cite> indicates that a feature is excluded.</p></li>
+</ul>
+</div></blockquote>
+<p>Some CCEAs, like <code class="docutils literal notranslate"><span class="pre">CCFSRFG1</span></code>, may reorder the features during the decomposition phase. In these
+cases, you must map the selected features back to their original names using the reordered
+indices.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get original feature column names</span>
+<span class="n">feature_cols</span> <span class="o">=</span> <span class="n">dataloader</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span>
+<span class="c1"># Reorder the kept features according to the algorithm&#39;s internal feature order</span>
+<span class="n">reordered_features</span> <span class="o">=</span> <span class="n">feature_cols</span><span class="p">[</span><span class="n">ccea</span><span class="o">.</span><span class="n">feature_idxs</span><span class="p">]</span>
+<span class="c1"># Select features where best_context_vector == 1</span>
+<span class="n">selected_features</span> <span class="o">=</span> <span class="n">reordered_features</span><span class="p">[</span><span class="n">ccea</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If you experiment with other CCEAs, such as <code class="docutils literal notranslate"><span class="pre">CCPSTFG</span></code>, be aware that some features may be
+removed before optimization. For those, you might need to filter out removed features before
+reordering:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a set of indices for features that were not removed</span>
+<span class="n">kept_feature_indices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feature_cols</span><span class="p">)))</span> <span class="o">-</span> <span class="n">ccea</span><span class="o">.</span><span class="n">removed_features</span>
+<span class="c1"># Select the original feature names corresponding to the kept indices</span>
+<span class="n">kept_feature_names</span> <span class="o">=</span> <span class="n">feature_cols</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">kept_feature_indices</span><span class="p">)]</span>
+<span class="c1"># Reorder the kept features according to the algorithm&#39;s internal feature order</span>
+<span class="n">reordered_features</span> <span class="o">=</span> <span class="n">kept_feature_names</span><span class="p">[</span><span class="n">ccea</span><span class="o">.</span><span class="n">feature_idxs</span><span class="p">]</span>
+<span class="c1"># Select features where best_context_vector == 1</span>
+<span class="n">selected_features</span> <span class="o">=</span> <span class="n">reordered_features</span><span class="p">[</span><span class="n">ccea</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Feel free to modify the configuration files or try different CCEAs to explore various scenarios.</p>
+</section>
+<section id="how-to-customize-a-ccea">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">How to customize a CCEA?</a><a class="headerlink" href="#how-to-customize-a-ccea" title="Link to this heading"></a></h2>
+<p>You can implement your own cooperative co-evolutionary algorithm in PyCCEA by subclassing the
+<a class="reference internal" href="pyccea.coevolution.html#pyccea.coevolution.ccea.CCEA" title="pyccea.coevolution.ccea.CCEA"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyccea.coevolution.ccea.CCEA</span></code></a> base class and customizing its core components.</p>
+<p>To do so, your new class should implement or override the following methods:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">_init_collaborator()</span></code>: defines how individuals from different subcomponents collaborate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_init_evaluator()</span></code>: specifies how candidate solutions are evaluated.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_init_subpop_initializer()</span></code>: sets up how initial solutions are generated.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_init_optimizers()</span></code>: chooses the evolutionary algorithm used for optimization.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_init_decomposer()</span></code>: defines the decomposition strategy (feature grouping).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">optimize()</span></code>: runs the main optimization loop.</p></li>
+</ul>
+<p>We will use <cite>CCEAFS</cite> (Cooperative Co-Evolutionary-Based Feature Selection) as a concrete example
+to illustrate the necessary steps.</p>
+<ol class="arabic simple">
+<li><p><strong>_init_collaborator</strong></p></li>
+</ol>
+<p>This method instantiates collaboration strategies that define how individuals from different
+subpopulations interact to form a full candidate solution (context vector) during evaluation.
+For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_init_collaborator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate collaboration method.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">best_collaborator</span> <span class="o">=</span> <span class="n">SingleBestCollaboration</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">random_collaborator</span> <span class="o">=</span> <span class="n">SingleRandomCollaboration</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">SingleBestCollaboration()</span></code> typically selects the best individual from each cooperating
+subpopulation, used when evaluating evolved individuals.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SingleRandomCollaboration(seed=self.seed)</span></code> selects random collaborators, useful for
+initialization to encourage diversity.</p></li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p><strong>_init_evaluator</strong></p></li>
+</ol>
+<p>This method sets up the fitness function that evaluates complete candidate solutions and guides
+the evolutionary process. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_init_evaluator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate evaluation method.&quot;&quot;&quot;</span>
+    <span class="n">evaluator</span> <span class="o">=</span> <span class="n">WrapperEvaluation</span><span class="p">(</span>
+        <span class="n">task</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;wrapper&quot;</span><span class="p">][</span><span class="s2">&quot;task&quot;</span><span class="p">],</span>
+        <span class="n">model_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;wrapper&quot;</span><span class="p">][</span><span class="s2">&quot;model_type&quot;</span><span class="p">],</span>
+        <span class="n">eval_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;evaluation&quot;</span><span class="p">][</span><span class="s2">&quot;eval_function&quot;</span><span class="p">],</span>
+        <span class="n">eval_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_mode</span><span class="p">,</span>
+        <span class="n">n_classes</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;n_classes&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span> <span class="o">=</span> <span class="n">SubsetSizePenalty</span><span class="p">(</span>
+        <span class="n">evaluator</span><span class="o">=</span><span class="n">evaluator</span><span class="p">,</span>
+        <span class="n">weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;evaluation&quot;</span><span class="p">][</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">WrapperEvaluation</span></code> typically wraps a model evaluation, while <code class="docutils literal notranslate"><span class="pre">SubsetSizePenalty</span></code> adds a
+penalty term to encourage compact feature subsets.</p>
+<ol class="arabic simple" start="3">
+<li><p><strong>_init_subpop_initializer</strong></p></li>
+</ol>
+<p>This method defines how to generate initial subpopulations of individuals, marking the start of
+co-evolution. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_init_subpop_initializer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate subpopulation initialization method.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">initializer</span> <span class="o">=</span> <span class="n">RandomBinaryInitialization</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">subcomp_sizes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subcomp_sizes</span><span class="p">,</span>
+        <span class="n">subpop_sizes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span><span class="p">,</span>
+        <span class="n">collaborator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">random_collaborator</span><span class="p">,</span>
+        <span class="n">fitness_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">RandomBinaryInitialization</span></code> suggests each individual is a binary vector (e.g., feature
+inclusion/exclusion) initialized randomly.</p>
+<ol class="arabic simple" start="4">
+<li><p><strong>_init_optimizers</strong></p></li>
+</ol>
+<p>This method instantiates evolutionary optimizers to independently evolve each subpopulation.
+For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_init_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate evolutionary algorithms to evolve each subpopulation.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">optimizers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="p">):</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">BinaryGeneticAlgorithm</span><span class="p">(</span>
+            <span class="n">subpop_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+            <span class="n">n_features</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subcomp_sizes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+            <span class="n">conf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conf</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">optimizer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Each subpopulation uses a <code class="docutils literal notranslate"><span class="pre">BinaryGeneticAlgorithm</span></code> tailored for binary representations.</p>
+<ol class="arabic simple" start="5">
+<li><p><strong>_init_decomposer</strong></p></li>
+</ol>
+<p>This method defines how the original problem is split into subproblems (subcomponents),
+each handled by a separate subpopulation. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_init_decomposer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate feature grouping method.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">decomposer</span> <span class="o">=</span> <span class="n">SequentialFeatureGrouping</span><span class="p">(</span>
+        <span class="n">n_subcomps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="p">,</span>
+        <span class="n">subcomp_sizes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subcomp_sizes</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">SequentialFeatureGrouping</span></code> divides features into sequential groups; decomposition strategies
+vary and strongly affect algorithm performance.</p>
+<ol class="arabic simple" start="6">
+<li><p><strong>optimize</strong></p></li>
+</ol>
+<p>This is the main method orchestrating the entire co-evolutionary optimization workflow,
+including decomposition, initialization, evolution, evaluation, and convergence checks.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Solve the feature selection problem through optimization.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_problem_decomposition</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_init_subpopulations</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_init_optimizers</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">current_best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_individuals</span><span class="p">(</span>
+        <span class="n">subpops</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subpops</span><span class="p">,</span>
+        <span class="n">fitness</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span>
+        <span class="n">context_vectors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_global_best</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">best_feature_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_idxs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">n_gen</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">stagnation_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">while</span> <span class="n">n_gen</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;coevolution&quot;</span><span class="p">][</span><span class="s2">&quot;max_gen&quot;</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">convergence_curve</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span><span class="p">)</span>
+
+        <span class="c1"># Evolve subpopulations independently</span>
+        <span class="n">current_subpops</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optimizers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">evolve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subpops</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Evaluate evolved individuals collaboratively</span>
+        <span class="n">current_fitness</span><span class="p">,</span> <span class="n">current_context_vectors</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="p">):</span>
+            <span class="n">current_fitness</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+            <span class="n">current_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                <span class="n">collaborators</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_collaborator</span><span class="o">.</span><span class="n">get_collaborators</span><span class="p">(</span>
+                    <span class="n">subpop_idx</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+                    <span class="n">indiv_idx</span><span class="o">=</span><span class="n">j</span><span class="p">,</span>
+                    <span class="n">current_subpops</span><span class="o">=</span><span class="n">current_subpops</span><span class="p">,</span>
+                    <span class="n">current_best</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_best</span>
+                <span class="p">)</span>
+                <span class="n">context_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_collaborator</span><span class="o">.</span><span class="n">build_context_vector</span><span class="p">(</span><span class="n">collaborators</span><span class="p">)</span>
+                <span class="n">current_context_vectors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+                <span class="n">fitness_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context_vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">current_fitness</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fitness_value</span><span class="p">)</span>
+
+        <span class="c1"># Update subpopulations and fitness</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subpops</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_subpops</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_fitness</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_context_vectors</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_individuals</span><span class="p">(</span>
+            <span class="n">subpops</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subpops</span><span class="p">,</span>
+            <span class="n">fitness</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness</span><span class="p">,</span>
+            <span class="n">context_vectors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span>
+        <span class="p">)</span>
+
+        <span class="n">best_context_vector</span><span class="p">,</span> <span class="n">best_fitness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_global_best</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">&lt;</span> <span class="n">best_fitness</span><span class="p">:</span>
+            <span class="n">stagnation_counter</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span> <span class="o">=</span> <span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">=</span> <span class="n">best_fitness</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stagnation_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">stagnation_counter</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;coevolution&quot;</span><span class="p">][</span><span class="s2">&quot;max_gen_without_improvement&quot;</span><span class="p">]:</span>
+                <span class="k">break</span>
+
+        <span class="n">n_gen</span> <span class="o">+=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">optimize</span></code> method demonstrates the typical CCEA workflow:</p>
+<ul class="simple">
+<li><p><strong>Decomposition and initialization:</strong> Decompose the problem and initialize subpopulations and
+optimizers.</p></li>
+<li><p><strong>Evolution loop:</strong> Repeat for a maximum number of generations or until stagnation.</p></li>
+<li><p><strong>Subpopulation evolution:</strong> Evolve each subpopulation independently.</p></li>
+<li><p><strong>Collaboration and evaluation:</strong> Collaborate across subpopulations to build complete solutions
+and evaluate fitness.</p></li>
+<li><p><strong>Best solution tracking:</strong> Update global best solution and check convergence.</p></li>
+</ul>
+<p>By overriding these key <code class="docutils literal notranslate"><span class="pre">_init_*</span></code> methods and <code class="docutils literal notranslate"><span class="pre">optimize()</span></code>, you can flexibly customize the
+co-evolutionary process to fit your problem domain, defining collaboration, evaluation,
+initialization, optimization, decomposition, and the optimization flow itself.</p>
+</section>
 </section>
 
 
@@ -99,7 +386,7 @@ feature selection using the PyCCEA package.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="user_guide.html" class="btn btn-neutral float-left" title="User Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="examples/quickstart.html" class="btn btn-neutral float-right" title="1. Quickstart" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

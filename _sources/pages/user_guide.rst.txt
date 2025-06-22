@@ -189,6 +189,7 @@ function uses a weighted combination of :math:`m` objectives, such that
 - **Distance-based fitness**:
   This fitness function combines predictive performance with structural properties of the feature
   space, using a **k-nearest neighbors (k-NN)** model. It optimizes three objectives:
+
     1. Maximizing predictive performance;
     2. Minimizing intra-class distance;
     3. Maximizing inter-class distance between instances.
