@@ -116,7 +116,7 @@ class CCPSTFG(CCGA):
             projection_model.fit(X_train_normalized, y_train_encoded)
             # Sum the coefficient of determination of the prediction
             r_squared_values.append(np.sum(projection_model.score(X_train_normalized, y_train_encoded)))
-            del projection_model
+            del projection_model, X_train_normalized, y_train_encoded
             gc.collect()
 
         # Use kneed to find the knee/elbow point
@@ -155,6 +155,8 @@ class CCPSTFG(CCGA):
             cluster_labels = clustering_model.fit_predict(feature_loadings)
             silhouette_avg = silhouette_score(feature_loadings, cluster_labels)
             silhouette_scores.append(silhouette_avg)
+            del clustering_model
+            gc.collect()
 
         silhouette_scores = pd.DataFrame(
             list(zip(n_clusters_range, silhouette_scores)),
@@ -209,6 +211,8 @@ class CCPSTFG(CCGA):
             context_vector = np.ones((data_q.X_train.shape[1],)).astype(bool)
             metrics[quantile] = self.fitness_function.evaluate(context_vector, data_q)
             logging.getLogger().disabled = False
+            del data_q
+            gc.collect()
         # Get the quantile that gives the best fitness value
         metrics = pd.DataFrame(list(metrics.items()), columns=["quantile", "fitness"])
         best_quantile = metrics.loc[metrics["fitness"].idxmax(), "quantile"]
