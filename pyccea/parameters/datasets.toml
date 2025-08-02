@@ -76,6 +76,10 @@ task = "classification"
 file = "libras.parquet"
 task = "classification"
 
+[linear_synthetic]
+file = "linear_synthetic"
+task = "classification"
+
 [lsvt]
 file = "lsvt.parquet"
 task = "classification"
@@ -90,6 +94,10 @@ task = "classification"
 
 [mfd]
 file = "mfd.parquet"
+task = "classification"
+
+[nonlinear_synthetic]
+file = "nonlinear_synthetic"
 task = "classification"
 
 [orh]
