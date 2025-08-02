@@ -197,7 +197,7 @@
             <span class="n">projection_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">y_train_encoded</span><span class="p">)</span>
             <span class="c1"># Sum the coefficient of determination of the prediction</span>
             <span class="n">r_squared_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">projection_model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">y_train_encoded</span><span class="p">)))</span>
-            <span class="k">del</span> <span class="n">projection_model</span>
+            <span class="k">del</span> <span class="n">projection_model</span><span class="p">,</span> <span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">y_train_encoded</span>
             <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
 
         <span class="c1"># Use kneed to find the knee/elbow point</span>
@@ -236,6 +236,8 @@
             <span class="n">cluster_labels</span> <span class="o">=</span> <span class="n">clustering_model</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">feature_loadings</span><span class="p">)</span>
             <span class="n">silhouette_avg</span> <span class="o">=</span> <span class="n">silhouette_score</span><span class="p">(</span><span class="n">feature_loadings</span><span class="p">,</span> <span class="n">cluster_labels</span><span class="p">)</span>
             <span class="n">silhouette_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">silhouette_avg</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">clustering_model</span>
+            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
 
         <span class="n">silhouette_scores</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
             <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">n_clusters_range</span><span class="p">,</span> <span class="n">silhouette_scores</span><span class="p">)),</span>
@@ -290,6 +292,8 @@
             <span class="n">context_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">data_q</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
             <span class="n">metrics</span><span class="p">[</span><span class="n">quantile</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context_vector</span><span class="p">,</span> <span class="n">data_q</span><span class="p">)</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">del</span> <span class="n">data_q</span>
+            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
         <span class="c1"># Get the quantile that gives the best fitness value</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;quantile&quot;</span><span class="p">,</span> <span class="s2">&quot;fitness&quot;</span><span class="p">])</span>
         <span class="n">best_quantile</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;fitness&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">idxmax</span><span class="p">(),</span> <span class="s2">&quot;quantile&quot;</span><span class="p">]</span>

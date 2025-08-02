@@ -497,6 +497,11 @@ more. This diversity provides a robust basis for evaluating both performance and
      - 90
      - 15
      - 1.0
+   * - linear_synthetic
+     - 5000
+     - 1000
+     - 2
+     - 1.0
    * - lsvt
      - 126
      - 310
@@ -517,6 +522,11 @@ more. This diversity provides a robust basis for evaluating both performance and
      - 649
      - 10
      - 1.33
+   * - nonlinear_synthetic
+     - 5000
+     - 1000
+     - 2
+     - 1.0
    * - orh
      - 1000
      - 64
