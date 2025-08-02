@@ -2,7 +2,7 @@ import numpy as np
 
 
 class DifferentialEvolution():
-    """Differential Evolution (AMDE) algorithm (rand/1/exp).
+    """Differential Evolution (DE) algorithm (rand/1/exp).
 
     Storn, Rainer, and Kenneth Price. "Differential Evolution - A Simple and Efficient Heuristic
     for Global Optimization over Continuous Spaces" Journal of global optimization 11 (1997):
