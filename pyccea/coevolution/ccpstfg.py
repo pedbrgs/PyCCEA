@@ -9,12 +9,11 @@ from kneed import KneeLocator
 from ..projection.vip import VIP
 from ..coevolution.ccga import CCGA
 from ..projection.cipls import CIPLS
-from sklearn.metrics import silhouette_score
 from sklearn.cross_decomposition import PLSRegression
 from ..decomposition.ranking import RankingFeatureGrouping
 from sklearn.cluster import KMeans, AgglomerativeClustering
 from ..decomposition.clustering import ClusteringFeatureGrouping
-
+from sklearn.metrics import balanced_accuracy_score, silhouette_score
 
 class CCPSTFG(CCGA):
     """Cooperative Co-Evolutionary Algorithm with Projection-based Self-Tuning Feature Grouping (CCPSTFG).
@@ -104,24 +103,42 @@ class CCPSTFG(CCGA):
         n_components : int
             Best number of components to keep after the decomposition into a latent space.
         """
+        task_type = self.conf["wrapper"]["task"]
         max_n_pls_components = self.conf["decomposition"].get("max_n_pls_components", 30)
+        # Search space
         n_components_range = range(2, min(max_n_pls_components, X_train.shape[1]))
-        logging.info(f"Search space (PLS components): {n_components_range}")
-        r_squared_values = list()
+        logging.info(f"Search space (PLS components for {task_type}): {n_components_range}")
+
+        performance_values = list()
+        X_train_normalized = X_train - X_train.mean(axis=0)
+
+        # Multiclass classification case
+        if (task_type.lower() == "classification") and (len(np.unique(y_train)) > 2):
+                y_train = pd.get_dummies(y_train).astype(int)
 
         for n_components in n_components_range:
+            # Fit projection model
             projection_model = projection_class(n_components=n_components, copy=True)
-            X_train_normalized = X_train - X_train.mean(axis=0)
-            y_train_encoded = pd.get_dummies(y_train).astype(int)
-            projection_model.fit(X_train_normalized, y_train_encoded)
-            # Sum the coefficient of determination of the prediction
-            r_squared_values.append(np.sum(projection_model.score(X_train_normalized, y_train_encoded)))
-            del projection_model, X_train_normalized, y_train_encoded
+            projection_model.fit(X_train_normalized, y_train)
+
+            if task_type.lower() == "regression":
+                r2_score = np.sum(projection_model.score(X_train_normalized, y_train))
+                performance_values.append(r2_score)
+            elif task_type.lower() == "classification":
+                X_projected = projection_model.transform(X_train_normalized)
+                classifier = copy.deepcopy(self.fitness_function.evaluator.base_model)
+                classifier.fit(X_projected, y_train)
+                y_pred = classifier.predict(X_projected)
+                accuracy = balanced_accuracy_score(y_train, y_pred)
+                performance_values.append(accuracy)
+                del classifier, X_projected
+
+            del projection_model
             gc.collect()
 
         # Use kneed to find the knee/elbow point
         kneedle = KneeLocator(
-            n_components_range, r_squared_values, curve="concave", direction="increasing"
+            n_components_range, performance_values, curve="concave", direction="increasing"
         )
         n_components = kneedle.knee
         logging.info(f"Optimized number of PLS components: {n_components}.")
