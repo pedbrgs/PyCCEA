@@ -114,12 +114,14 @@ class CCPSTFG(CCGA):
 
         # Multiclass classification case
         if (task_type.lower() == "classification") and (len(np.unique(y_train)) > 2):
-                y_train = pd.get_dummies(y_train).astype(int)
+            y_train_encoded = pd.get_dummies(y_train).astype(int)
+        else:
+            y_train_encoded = y_train.copy()
 
         for n_components in n_components_range:
             # Fit projection model
             projection_model = projection_class(n_components=n_components, copy=True)
-            projection_model.fit(X_train_normalized, y_train)
+            projection_model.fit(X_train_normalized, y_train_encoded)
 
             if task_type.lower() == "regression":
                 r2_score = np.sum(projection_model.score(X_train_normalized, y_train))
@@ -135,6 +137,13 @@ class CCPSTFG(CCGA):
 
             del projection_model
             gc.collect()
+
+        logging.info(
+            [
+                f"{n_components}: {performance_value:.4f}"
+                for n_components, performance_value in zip(n_components_range, performance_values)
+            ]
+        )
 
         # Use kneed to find the knee/elbow point
         kneedle = KneeLocator(
