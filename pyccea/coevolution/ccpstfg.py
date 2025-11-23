@@ -77,12 +77,7 @@ class CCPSTFG(CCGA):
 
         return feature_clusters
 
-    def _get_best_number_of_components(
-            self,
-            projection_class,
-            X_train: np.ndarray,
-            y_train: np.ndarray
-        ):
+    def _get_best_number_of_components(self, projection_class):
         """Get the best number of components to keep by PLS decomposition.
 
         The number of components will occur at the elbow point where the coefficient of
@@ -93,10 +88,6 @@ class CCPSTFG(CCGA):
         projection_class : sklearn model class
             Partial Least Squares regression class. It can be the traditional version (PLS) or the
             Covariance-free version (CIPLS).
-        X_train : np.ndarray
-            Train input data.
-        y_train : np.ndarray
-            Train output data.
 
         Returns
         -------
@@ -106,36 +97,54 @@ class CCPSTFG(CCGA):
         task_type = self.conf["wrapper"]["task"]
         max_n_pls_components = self.conf["decomposition"].get("max_n_pls_components", 30)
         # Search space
-        n_components_range = range(2, min(max_n_pls_components, X_train.shape[1]))
+        n_components_range = range(2, min(max_n_pls_components, self.data.X_train.shape[1]))
         logging.info(f"Search space (PLS components for {task_type}): {n_components_range}")
 
         performance_values = list()
-        X_train_normalized = X_train - X_train.mean(axis=0)
-
-        # Multiclass classification case
-        if (task_type.lower() == "classification") and (len(np.unique(y_train)) > 2):
-            y_train_encoded = pd.get_dummies(y_train).astype(int)
-        else:
-            y_train_encoded = y_train.copy()
 
         for n_components in n_components_range:
-            # Fit projection model
-            projection_model = projection_class(n_components=n_components, copy=True)
-            projection_model.fit(X_train_normalized, y_train_encoded)
 
-            if task_type.lower() == "regression":
-                r2_score = np.sum(projection_model.score(X_train_normalized, y_train))
-                performance_values.append(r2_score)
-            elif task_type.lower() == "classification":
-                X_projected = projection_model.transform(X_train_normalized)
-                model = copy.deepcopy(self.fitness_function.evaluator.base_model)
-                model.estimator.fit(X_projected, y_train)
-                y_pred = model.estimator.predict(X_projected)
-                accuracy = balanced_accuracy_score(y_train, y_pred)
-                performance_values.append(accuracy)
-                del model, X_projected
+            metric_folds = list()
+            for k in range(self.data.kfolds):
 
-            del projection_model
+                # Retrieve training and validation inputs and outputs
+                X_train_fold, y_train_fold = self.data.train_folds[k][0], self.data.train_folds[k][1]
+                X_val_fold, y_val_fold = self.data.val_folds[k][0], self.data.val_folds[k][1]
+
+                # Apply centering to both training and validation folds
+                X_train_fold_mean = X_train_fold.mean(axis=0)
+                X_train_fold_centered = X_train_fold - X_train_fold_mean
+                X_val_fold_centered = X_val_fold - X_train_fold_mean  # Use train mean on val data
+
+                # Handle multiclass classification target encoding (if needed)
+                if (task_type.lower() == "classification") and (len(np.unique(y_train_fold)) > 2):
+                    y_train_pls = pd.get_dummies(y_train_fold).astype(int)
+                else:
+                    y_train_pls = y_train_fold.copy()
+
+                # Fit projection model
+                projection_model = projection_class(n_components=n_components, copy=True)
+                projection_model.fit(X_train_fold_centered, y_train_pls)
+
+                if task_type.lower() == "regression":
+                    r2_score = projection_model.score(X_val_fold_centered, y_val_fold)
+                    metric_folds.append(r2_score)
+
+                elif task_type.lower() == "classification":
+                    # Transform data to the PLS space
+                    X_train_projected = projection_model.transform(X_train_fold_centered)
+                    X_val_projected = projection_model.transform(X_val_fold_centered)
+                    # Fit classifier on the projected training data
+                    model = copy.deepcopy(self.fitness_function.evaluator.base_model)
+                    model.estimator.fit(X_train_projected, y_train_fold)
+                    # Predict and evaluate on the projected validation data
+                    y_pred_val = model.estimator.predict(X_val_projected)
+                    accuracy = balanced_accuracy_score(y_val_fold, y_pred_val)
+                    metric_folds.append(accuracy)
+                    del model, X_train_projected, X_val_projected, y_pred_val
+
+            performance_values.append(np.mean(metric_folds))
+            del metric_folds
             gc.collect()
 
         logging.info(
@@ -147,7 +156,10 @@ class CCPSTFG(CCGA):
 
         # Use kneed to find the knee/elbow point
         kneedle = KneeLocator(
-            n_components_range, performance_values, curve="concave", direction="increasing"
+            x=n_components_range,
+            y=performance_values,
+            curve="concave",
+            direction="increasing"
         )
         n_components = kneedle.knee
         logging.info(f"Optimized number of PLS components: {n_components}.")
@@ -323,9 +335,7 @@ class CCPSTFG(CCGA):
             logging.info("Automatically choosing the number of PLS components...")
             start_time = time.time()
             # Get the best number of components to keep after projection using the Elbow method
-            self.n_components = self._get_best_number_of_components(
-                projection_class, self.data.X_train, self.data.y_train
-            )
+            self.n_components = self._get_best_number_of_components(projection_class)
             self._n_components_tuning_time = time.time() - start_time
         # Instantiate projection model object
         projection_model = projection_class(n_components=self.n_components, copy=True)
