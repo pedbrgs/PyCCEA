@@ -126,12 +126,12 @@ class CCPSTFG(CCGA):
                 performance_values.append(r2_score)
             elif task_type.lower() == "classification":
                 X_projected = projection_model.transform(X_train_normalized)
-                classifier = copy.deepcopy(self.fitness_function.evaluator.base_model)
-                classifier.fit(X_projected, y_train)
-                y_pred = classifier.predict(X_projected)
+                model = copy.deepcopy(self.fitness_function.evaluator.base_model)
+                model.estimator.fit(X_projected, y_train)
+                y_pred = model.estimator.predict(X_projected)
                 accuracy = balanced_accuracy_score(y_train, y_pred)
                 performance_values.append(accuracy)
-                del classifier, X_projected
+                del model, X_projected
 
             del projection_model
             gc.collect()
