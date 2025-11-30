@@ -12,3 +12,8 @@ stratified = true
 [normalization]
 normalize = true
 method = "min_max"
+
+[preprocessing]
+drop_na = true
+winsorization = true
+quantiles = [0.01, 0.99]

@@ -10,7 +10,8 @@ def complete_data_conf():
     return {
         "general": {"splitter_type": "k_fold", "verbose": True},
         "splitter": {"preset": True, "kfolds": 5, "stratified": True},
-        "normalization": {"normalize": True, "method": "min_max"}
+        "normalization": {"normalize": True, "method": "min_max"},
+        "preprocessing": {"drop_na": True, "winsorization": True, "quantiles": [0.01, 0.99]}
     }
 
 

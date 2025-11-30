@@ -1,15 +1,18 @@
-import os
-import toml
 import copy
+import importlib.resources
 import logging
+import os
 import warnings
+from typing import Tuple
+
 import numpy as np
 import pandas as pd
-import importlib.resources
-from typing import Tuple
-from sklearn.model_selection import train_test_split
+import toml
+from sklearn.model_selection import (GroupKFold, KFold, LeaveOneOut,
+                                     StratifiedKFold, train_test_split)
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
-from sklearn.model_selection import GroupKFold, KFold, LeaveOneOut, StratifiedKFold
+
+from .preprocessing import Winsoriser
 
 
 class DataLoader():
@@ -63,7 +66,7 @@ class DataLoader():
 
     # Class parameters
     SPLITTER_TYPES = ["k_fold", "leave_one_out"]
-    PRIMARY_CONF_KEYS = ["general", "splitter", "normalization"]
+    PRIMARY_CONF_KEYS = ["general", "splitter", "preprocessing", "normalization"]
     NORMALIZATION_METHODS = {"min_max": MinMaxScaler, "standard": StandardScaler}
     with importlib.resources.open_text("pyccea.parameters", "datasets.toml") as toml_file:
         DATASETS = toml.load(toml_file)
@@ -185,11 +188,25 @@ class DataLoader():
                     " of the data configuration file when 'method' parameter is specified."
                 )
 
+    def _parse_preprocessing_parameters(self) -> None:
+        """Parse parameters from the preprocessing section of the data configuration file."""
+        self._dropna = self.conf["preprocessing"].get("drop_na")
+        self.winsorization = self.conf["preprocessing"].get("winsorization", False)
+        if self.winsorization:
+            if "quantiles" not in self.conf["preprocessing"]:
+                raise AssertionError(
+                    "The Winsorization method is enable, but the required 'quantiles' key is"
+                    "missing in the 'preprocessing configuration section."
+                )
+            lower, upper = self.conf["preprocessing"]["quantiles"]
+            self.winsor = Winsoriser(lower=lower, upper=upper)
+
     def _parse_parameters(self) -> None:
         """Parse parameters, validate their values, and assign them to attributes."""
         self._parse_general_parameters()
         self._parse_splitter_parameters()
         self._parse_normalization_parameters()
+        self._parse_preprocessing_parameters()
 
     def get_ready(self) -> None:
         """
@@ -200,6 +217,7 @@ class DataLoader():
         self._split()
         self._model_selection()
         if self.normalize:
+            logging.info("Normalizing train and test subsets...")
             self.X_train, self.X_test = self._normalize_subsets(
                 X_train=self.X_train,
                 X_test=self.X_test
@@ -246,18 +264,13 @@ class DataLoader():
         y = self.data.loc[:, "label"].copy()
         return y
 
-    def _preprocess(self, dropna: bool = True) -> None:
-        """Preprocess the dataset to be used by machine learning models.
-
-        Parameters
-        ----------
-        dropna : bool, default False
-            Remove rows that contains NaN values.
-        """
-        # Setting a default representation for NaN values 
+    def _preprocess(self) -> None:
+        """Preprocess the dataset to be used by machine learning models."""
+        # Setting a default representation for NaN values
+        pd.set_option("future.no_silent_downcasting", True)
         self.data.replace(to_replace="?", value=np.nan, inplace=True)
         # Remove rows with at least one NaN value
-        if dropna:
+        if self._dropna:
             # Store the number of rows before dropping NaNs
             initial_row_count = self.data.shape[0]
             self.data.dropna(inplace=True)
@@ -324,6 +337,36 @@ class DataLoader():
         logging.info(f"Training set with {self.train_size} observations.")
         logging.info(f"Test set with {self.test_size} observations.")
 
+    def _truncate_subsets(
+            self,
+            X_train: pd.DataFrame,
+            X_test: pd.DataFrame
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        """Truncate the outliers.
+
+        Parameters
+        ----------
+        X_train : pd.DataFrame
+            Training input data.
+        X_test : pd.DataFrame
+            Test input data.
+
+        Returns
+        -------
+        X_truncated_train : pd.DataFrame
+            Truncated training input data.
+        X_truncated_test : pd.DataFrame
+            Truncated test input data.
+        """
+        winsor = copy.deepcopy(self.winsor)
+        # Winsorization across instances should be done after splitting the data between training
+        # and test set to avoid leakage
+        X_truncated_train = winsor.fit_transform(X=X_train)
+        # When truncating the test set, it should apply the quantiles parameters previously
+        # obtained from the training set as-is
+        X_truncated_test = winsor.transform(X=X_test)
+        return X_truncated_train, X_truncated_test
+
     def _normalize_subsets(
             self,
             X_train: pd.DataFrame,
@@ -348,6 +391,8 @@ class DataLoader():
         # Normalization across instances should be done after splitting the data between training
         # and test set to avoid leakage
         normalizer = copy.deepcopy(self.normalizer)
+        if self.winsorization:
+            X_train, X_test = self._truncate_subsets(X_train, X_test)
         X_normalized_train = normalizer.fit_transform(X=X_train)
         # When normalizing the test set, it should apply the normalization parameters previously
         # obtained from the training set as-is

@@ -95,6 +95,13 @@ def test_parse_normalization_parameters_method_and_normalize_false(complete_data
         DataLoader("dummy_dataset", complete_data_conf)
 
 
+def test_parse_preprocessing_parameters_quantiles_missing(complete_data_conf: dict) -> None:
+    """Test Dataloader initialization with missing quantiles."""
+    del complete_data_conf["preprocessing"]["quantiles"]
+    with pytest.raises(AssertionError):
+        DataLoader("dummy_dataset", complete_data_conf)
+
+
 def test_get_ready_calls_all_methods(monkeypatch, mocker, complete_data_conf: dict) -> None:
     """Test get_ready method when normalize is True."""
     complete_data_conf["splitter"]["kfolds"] = 2
