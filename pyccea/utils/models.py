@@ -206,7 +206,7 @@ class ClassificationModel():
         "k_nearest_neighbors": (KNeighborsClassifier, {"n_neighbors": 1}),
         "logistic_regression": (LogisticRegression, {}),
         "multinomial_naive_bayes": (MultinomialNB, {}),
-        "random_forest": (RandomForestClassifier, {"n_jobs": -1}),
+        "random_forest": (RandomForestClassifier, {"n_jobs": -1, "class_weight": "balanced"}),
         "support_vector_machine": (SVC, {}),
     }
 
@@ -281,7 +281,7 @@ class ClassificationModel():
                 "min_samples_split": [2, 0.1, 0.2, 0.3, 0.4],
                 "min_samples_leaf": [1, 0.1, 0.2, 0.3, 0.4, 0.5],
                 "max_features": ["sqrt", "log2", None],
-                "class_weight": ["balanced_subsample", None],
+                "class_weight": ["balanced", "balanced_subsample", None],
                 "ccp_alpha": np.arange(0, 0.6, 0.1),
                 "max_samples": np.arange(0.1, 1.0, 0.1)
             }
