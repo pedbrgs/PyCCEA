@@ -161,7 +161,7 @@ class CCPSTFG(CCGA):
             curve="concave",
             direction="increasing"
         )
-        n_components = kneedle.knee
+        n_components = kneedle.knee or n_components_range.start
         logging.info(f"Optimized number of PLS components: {n_components}.")
 
         return n_components
