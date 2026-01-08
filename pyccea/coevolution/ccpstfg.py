@@ -2,18 +2,23 @@ import gc
 import copy
 import time
 import logging
+import fastcluster
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from kneed import KneeLocator
+from sklearn.cluster import KMeans
+from scipy.cluster.hierarchy import fcluster
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.metrics import balanced_accuracy_score, silhouette_score
+
 from ..projection.vip import VIP
 from ..coevolution.ccga import CCGA
 from ..projection.cipls import CIPLS
-from sklearn.cross_decomposition import PLSRegression
+from ..utils.datasets import DataLoader
 from ..decomposition.ranking import RankingFeatureGrouping
-from sklearn.cluster import KMeans, AgglomerativeClustering
 from ..decomposition.clustering import ClusteringFeatureGrouping
-from sklearn.metrics import balanced_accuracy_score, silhouette_score
+
 
 class CCPSTFG(CCGA):
     """Cooperative Co-Evolutionary Algorithm with Projection-based Self-Tuning Feature Grouping (CCPSTFG).
@@ -32,8 +37,20 @@ class CCPSTFG(CCGA):
 
     CLUSTERING_METHODS = {
         "k_means": (KMeans, {}),
-        "agglomerative_clustering": (AgglomerativeClustering, {"linkage": "ward", "metric": "euclidean"})
+        "agglomerative_clustering": (
+            fastcluster.linkage, {"method": "ward", "metric": "euclidean"}
+        )
     }
+
+    def __init__(self, data: DataLoader, conf: dict, verbose: bool = True):
+        """Initialize the CCPSTFG algorithm."""
+        super().__init__(data, conf, verbose)
+        self.clustering_model_type = self.conf["decomposition"].get("clustering_model_type")
+        if self.clustering_model_type not in CCPSTFG.CLUSTERING_METHODS:
+            raise NotImplementedError(
+                f"The clustering model type '{self.clustering_model_type}' is not supported. "
+                f"Supported methods are: {list(CCPSTFG.CLUSTERING_METHODS.keys())}."
+            )
 
     def _feature_clustering(self, projection_model) -> np.ndarray:
         """Cluster the features according to their contribution to the components of the
@@ -57,13 +74,22 @@ class CCPSTFG(CCGA):
         # Get the loadings of features on PLS components
         feature_loadings = abs(projection_model.x_loadings_)
 
+        linkage_matrix = None
+        # Precompute the linkage matrix to avoid redundant distance calculations
+        if self.clustering_model_type == "agglomerative_clustering":
+            logging.info("Computing linkage matrix using fastcluster...")
+            clustering_method, clustering_params = CCPSTFG.CLUSTERING_METHODS[self.clustering_model_type]
+            start_time = time.time()
+            linkage_matrix = clustering_method(feature_loadings, **clustering_params)
+            logging.info(f"Done. Elapsed time: {time.time() - start_time:.2f}s.")
+
         if self.conf["coevolution"].get("n_subcomps"):
             self.n_subcomps = self.conf["coevolution"]["n_subcomps"]
             logging.info(f"User-defined number of subcomponents: {self.n_subcomps}")
         else:
             logging.info("Automatically choosing the number of subcomponents...")
             start_time = time.time()
-            self.n_subcomps = self._get_best_number_of_subcomponents(feature_loadings)
+            self.n_subcomps = self._get_best_number_of_subcomponents(feature_loadings, linkage_matrix)
             self._n_subcomponents_tuning_time = time.time() - start_time
         # Update the subpopulation sizes after update the number of subcomponents
         self.subpop_sizes = [self.subpop_sizes[0]] * self.n_subcomps
@@ -71,9 +97,13 @@ class CCPSTFG(CCGA):
         # Cluster features based on loadings.
         # Loadings indicate how strongly each feature contributes to each component.
         # Features with similar loadings on the same components are likely to be related.
-        clustering_model_class, clustering_params = CCPSTFG.CLUSTERING_METHODS[self.clustering_model_type]
-        clustering_model = clustering_model_class(n_clusters=self.n_subcomps, **clustering_params)
-        feature_clusters = clustering_model.fit_predict(feature_loadings)
+        if self.clustering_model_type == "agglomerative_clustering":
+            # Instead of fit and predict, simply prune the precomputed linkage matrix
+            feature_clusters = fcluster(linkage_matrix, t=self.n_subcomps, criterion="maxclust")
+        else:
+            clustering_method, clustering_params = CCPSTFG.CLUSTERING_METHODS[self.clustering_model_type]
+            clustering_model = clustering_method(n_clusters=self.n_subcomps, **clustering_params)
+            feature_clusters = clustering_model.fit_predict(feature_loadings)
 
         return feature_clusters
 
@@ -166,7 +196,11 @@ class CCPSTFG(CCGA):
 
         return n_components
 
-    def _get_best_number_of_subcomponents(self, feature_loadings: np.ndarray) -> int:
+    def _get_best_number_of_subcomponents(
+            self,
+            feature_loadings: np.ndarray,
+            linkage_matrix: np.ndarray = None
+        ) -> int:
         """Get the best number of subcomponents.
 
         The number of subcomponents (clusters) will be the one that maximizes the silhouette
@@ -176,6 +210,8 @@ class CCPSTFG(CCGA):
         ----------
         feature_loadings : np.ndarray
             The absolute importance of terms to components.
+        linkage_matrix : np.ndarray, optional
+            The linkage matrix used for hierarchical clustering.
 
         Returns
         -------
@@ -183,27 +219,30 @@ class CCPSTFG(CCGA):
             Best number of subcomponents to decompose the original problem.
         """
         max_n_clusters = self.conf["decomposition"].get("max_n_clusters", 10)
-        n_clusters_range = range(2, min(max_n_clusters, feature_loadings.shape[0]))
+        n_features = feature_loadings.shape[0]
+        n_clusters_range = range(2, min(max_n_clusters, n_features))
         logging.info(f"Search space (clusters): {n_clusters_range}")
         silhouette_scores = list()
 
         for n_clusters in n_clusters_range:
-            clustering_model_class, clustering_params = CCPSTFG.CLUSTERING_METHODS[self.clustering_model_type]
-            clustering_model = clustering_model_class(n_clusters=n_clusters, **clustering_params)
-            cluster_labels = clustering_model.fit_predict(feature_loadings)
-            silhouette_avg = silhouette_score(feature_loadings, cluster_labels)
+            if linkage_matrix is not None:
+                cluster_labels = fcluster(linkage_matrix, t=n_clusters, criterion="maxclust")
+            else:
+                clustering_method, clustering_params = CCPSTFG.CLUSTERING_METHODS[self.clustering_model_type]
+                clustering_model = clustering_method(n_clusters=n_clusters, **clustering_params)
+                cluster_labels = clustering_model.fit_predict(feature_loadings)
+                del clustering_model
+                gc.collect()
+            silhouette_avg = silhouette_score(
+                X=feature_loadings,
+                labels=cluster_labels,
+                sample_size=min(n_features, 10000)  # Use sampling to maintain silhouette computation feasible for large datasets
+            )
             silhouette_scores.append(silhouette_avg)
-            del clustering_model
-            gc.collect()
 
-        silhouette_scores = pd.DataFrame(
-            list(zip(n_clusters_range, silhouette_scores)),
-            columns=["n_clusters", "silhouette_score"]
-        )
-
-        n_subcomps = silhouette_scores.loc[
-            silhouette_scores["silhouette_score"].idxmax(), "n_clusters"
-        ]
+        # Get the number of subcomponents that maximizes the silhouette score
+        best_idx = np.argmax(silhouette_scores)
+        n_subcomps = n_clusters_range[best_idx]
         logging.info(f"Optimized number of subcomponents: {n_subcomps}.")
 
         return n_subcomps
@@ -349,7 +388,6 @@ class CCPSTFG(CCGA):
 
         # Instantiate feature grouping
         if self.method == "clustering":
-            self.clustering_model_type = self.conf["decomposition"]["clustering_model_type"]
             logging.info(f"Clustering model type: {self.clustering_model_type}")
             feature_clusters = self._feature_clustering(projection_model=projection_model)
             self.decomposer = ClusteringFeatureGrouping(
