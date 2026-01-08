@@ -44,13 +44,13 @@ class CCPSTFG(CCGA):
 
     def __init__(self, data: DataLoader, conf: dict, verbose: bool = True):
         """Initialize the CCPSTFG algorithm."""
-        super().__init__(data, conf, verbose)
         self.clustering_model_type = self.conf["decomposition"].get("clustering_model_type")
         if self.clustering_model_type not in CCPSTFG.CLUSTERING_METHODS:
             raise NotImplementedError(
                 f"The clustering model type '{self.clustering_model_type}' is not supported. "
                 f"Supported methods are: {list(CCPSTFG.CLUSTERING_METHODS.keys())}."
             )
+        super().__init__(data, conf, verbose)
 
     def _feature_clustering(self, projection_model) -> np.ndarray:
         """Cluster the features according to their contribution to the components of the
