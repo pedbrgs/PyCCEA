@@ -44,7 +44,7 @@ class CCPSTFG(CCGA):
 
     def __init__(self, data: DataLoader, conf: dict, verbose: bool = True):
         """Initialize the CCPSTFG algorithm."""
-        self.clustering_model_type = self.conf["decomposition"].get("clustering_model_type")
+        self.clustering_model_type = conf["decomposition"].get("clustering_model_type")
         if self.clustering_model_type not in CCPSTFG.CLUSTERING_METHODS:
             raise NotImplementedError(
                 f"The clustering model type '{self.clustering_model_type}' is not supported. "
