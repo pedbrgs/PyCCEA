@@ -320,6 +320,7 @@ class CCPSTFG(CCGA):
         features_to_keep = importances > self.vip_threshold
         self.removed_features = np.where(features_to_keep == False)[0]
         logging.info(f"{len(self.removed_features)} features were removed.")
+        logging.info(f"Remaining features: {np.sum(features_to_keep)}.")
 
         # Removing features from subsets and folds
         self.data.X_train = self.data.X_train[:, features_to_keep].copy()

@@ -206,6 +206,7 @@ class CCEA(ABC):
             # Decompose only once to use the same feature indexes on all k-folds
             if k == 0:
                 _, self.feature_idxs = self.decomposer.decompose(X=Xk_train.copy())
+                self.feature_importances = self.feature_importances[self.feature_idxs].copy()
             # Reorder training and validation folds built from the training set according to the
             # shuffling in the feature decomposition
             self.data.train_folds[k][0] = Xk_train[:, self.feature_idxs].copy()

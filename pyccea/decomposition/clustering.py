@@ -3,9 +3,7 @@ from ..decomposition.grouping import FeatureGrouping
 
 
 class ClusteringFeatureGrouping(FeatureGrouping):
-    """
-    Decompose the problem (a collection of features) according to a clustering.
-    """
+    """Decompose the problem (a collection of features) according to a clustering."""
 
     def __init__(self, n_subcomps: int = None, clusters: np.ndarray = np.empty(0),):
         super().__init__(n_subcomps)
@@ -21,8 +19,7 @@ class ClusteringFeatureGrouping(FeatureGrouping):
         self.n_subcomps = n_subcomps
 
     def decompose(self, X: np.ndarray, feature_idxs: np.ndarray = None):
-        """
-        Divide an n-dimensional problem into m subproblems.
+        """Divide an n-dimensional problem into m subproblems.
 
         Parameters
         ----------
@@ -45,11 +42,13 @@ class ClusteringFeatureGrouping(FeatureGrouping):
         if feature_idxs is None:
             feature_idxs = list()
             self.subcomp_sizes = list()
-            for cluster_id in range(self.n_subcomps):
+            unique_clusters = np.unique(self.clusters)
+            for cluster_id in unique_clusters:
                 cluster_features = np.where(self.clusters == cluster_id)[0]
                 self.subcomp_sizes.append(len(cluster_features))
                 feature_idxs.extend(cluster_features)
             feature_idxs = np.array(feature_idxs)
+            self.n_subcomps = len(unique_clusters)
 
         # Shuffle the data features according to the indexes
         X = X[:, feature_idxs].copy()
