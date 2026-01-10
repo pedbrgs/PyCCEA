@@ -122,7 +122,7 @@ class BinaryGeneticAlgorithm():
             selected_idxs[i] = np.where(fitness == best_fitness)[0][0]
 
         # Selected parents
-        parent_a, parent_b = subpop[selected_idxs.astype(int)]
+        parent_a, parent_b = subpop[selected_idxs.astype(np.int8)]
 
         return parent_a, parent_b
 

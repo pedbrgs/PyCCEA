@@ -298,7 +298,7 @@ class DataLoader():
             majority_class = self.y.value_counts().max()
             self.imbalance_ratio = round(majority_class/minority_class, 4)
             # Ensure labels are integer-encoded
-            self.y = self.y.astype(int)
+            self.y = self.y.astype(np.int8)
 
     def _split(self) -> None:
         """Split dataset into training and test sets."""

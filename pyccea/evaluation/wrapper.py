@@ -166,7 +166,7 @@ class WrapperEvaluation():
         if solution.sum() == 0:
             return self.evaluations
         # Boolean array used to filter which features will be used to fit the model
-        solution_mask = solution.astype(bool).copy()
+        solution_mask = solution.astype(bool)
 
         # Hold-out validation
         if self.eval_mode == "hold_out":

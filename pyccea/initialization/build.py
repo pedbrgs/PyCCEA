@@ -129,7 +129,7 @@ class SubpopulationInitialization(ABC):
                 # Evaluate the context vector
                 fitness = self.fitness_function.evaluate(context_vector, self.data)
                 # Store the complete problem solution related to the current individual
-                subpop_context_vectors.append(context_vector.copy())
+                subpop_context_vectors.append(context_vector)
                 # Store evaluation of the current context vector
                 subpop_fitness.append(fitness)
             # Store all complete problem solutions related to the current subpopulation

@@ -68,7 +68,7 @@ class CCPSTFG(CCGA):
             Index of the cluster each feature belongs to.
         """
         X_train_normalized = self.data.X_train - self.data.X_train.mean(axis=0)
-        y_train_encoded = pd.get_dummies(self.data.y_train).astype(int)
+        y_train_encoded = pd.get_dummies(self.data.y_train).astype(np.int8)
         projection_model.fit(X=X_train_normalized, Y=y_train_encoded)
         # Get the loadings of features on PLS components
         feature_loadings = abs(projection_model.x_loadings_)
@@ -147,7 +147,7 @@ class CCPSTFG(CCGA):
 
                 # Handle multiclass classification target encoding (if needed)
                 if (task_type.lower() == "classification") and (len(np.unique(y_train_fold)) > 2):
-                    y_train_pls = pd.get_dummies(y_train_fold).astype(int)
+                    y_train_pls = pd.get_dummies(y_train_fold).astype(np.int8)
                 else:
                     y_train_pls = y_train_fold.copy()
 
@@ -356,7 +356,7 @@ class CCPSTFG(CCGA):
             Importance of each feature based on its contribution to yield the latent space.
         """
         X_train_normalized = self.data.X_train - self.data.X_train.mean(axis=0)
-        y_train_encoded = pd.get_dummies(self.data.y_train).astype(int)
+        y_train_encoded = pd.get_dummies(self.data.y_train).astype(np.int8)
         projection_model.fit(X=X_train_normalized, Y=y_train_encoded)
         vip = VIP(model=projection_model)
         vip.compute()
@@ -438,7 +438,7 @@ class CCPSTFG(CCGA):
         normalized_allocation_factor = allocation_factor / np.sum(allocation_factor)
         # Update the subpopulation sizes based on the normalized allocation factor
         logging.info(f"Subpopulation sizes in Round-Robin strategy: {self.subpop_sizes}")
-        self.subpop_sizes = np.round(normalized_allocation_factor * sum(self.subpop_sizes)).astype(int)
+        self.subpop_sizes = np.round(normalized_allocation_factor * sum(self.subpop_sizes)).astype(np.int8)
         logging.info(f"Subpopulation sizes after resource allocation: {self.subpop_sizes}")
 
     def optimize(self) -> None:
