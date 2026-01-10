@@ -193,11 +193,11 @@ class CCEA(ABC):
         # Number of individuals in each subpopulation is in the list of subcomponent sizes
         self.initializer.evaluate_individuals()
         # Subpopulations
-        self.subpops = copy.deepcopy(self.initializer.subpops)
+        self.subpops = copy.copy(self.initializer.subpops)
         # Context vectors
-        self.context_vectors = copy.deepcopy(self.initializer.context_vectors)
+        self.context_vectors = copy.copy(self.initializer.context_vectors)
         # Evaluations of context vectors
-        self.fitness = copy.deepcopy(self.initializer.fitness)
+        self.fitness = copy.copy(self.initializer.fitness)
 
     def _problem_decomposition(self):
         """Decompose the problem into smaller subproblems."""

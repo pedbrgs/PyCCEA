@@ -67,7 +67,7 @@ class CCPSTFG(CCGA):
         feature_clusters : np.ndarray
             Index of the cluster each feature belongs to.
         """
-        projection_model = copy.deepcopy(projection_model)
+        projection_model = copy.copy(projection_model)
         X_train_normalized = self.data.X_train - self.data.X_train.mean(axis=0)
         y_train_encoded = pd.get_dummies(self.data.y_train).astype(int)
         projection_model.fit(X=X_train_normalized, Y=y_train_encoded)
@@ -165,7 +165,7 @@ class CCPSTFG(CCGA):
                     X_train_projected = projection_model.transform(X_train_fold_centered)
                     X_val_projected = projection_model.transform(X_val_fold_centered)
                     # Fit classifier on the projected training data
-                    model = copy.deepcopy(self.fitness_function.evaluator.base_model)
+                    model = copy.copy(self.fitness_function.evaluator.base_model)
                     model.estimator.fit(X_train_projected, y_train_fold)
                     # Predict and evaluate on the projected validation data
                     y_pred_val = model.estimator.predict(X_val_projected)
@@ -275,7 +275,7 @@ class CCPSTFG(CCGA):
         ).round(2)
         logging.info(f"Search space (quantile): {quantiles}")
         for quantile in quantiles:
-            data_q = copy.deepcopy(self.data)
+            data_q = copy.copy(self.data)
             vip_threshold = round(np.quantile(importances, quantile), 4)
             features_to_keep = importances > vip_threshold
             # Removing features from subsets and folds
@@ -288,7 +288,7 @@ class CCPSTFG(CCGA):
             context_vector = np.ones((data_q.X_train.shape[1],)).astype(bool)
             metrics[quantile] = self.fitness_function.evaluate(context_vector, data_q)
             logging.getLogger().disabled = False
-            del data_q
+            del context_vector, features_to_keep, data_q
             gc.collect()
         # Get the quantile that gives the best fitness value
         metrics = pd.DataFrame(list(metrics.items()), columns=["quantile", "fitness"])
@@ -348,7 +348,7 @@ class CCPSTFG(CCGA):
         importances : np.ndarray (n_features,)
             Importance of each feature based on its contribution to yield the latent space.
         """
-        projection_model = copy.deepcopy(projection_model)
+        projection_model = copy.copy(projection_model)
         X_train_normalized = self.data.X_train - self.data.X_train.mean(axis=0)
         y_train_encoded = pd.get_dummies(self.data.y_train).astype(int)
         projection_model.fit(X=X_train_normalized, Y=y_train_encoded)
@@ -500,13 +500,13 @@ class CCPSTFG(CCGA):
                     )
                     context_vector = self.best_collaborator.build_context_vector(collaborators)
                     # Update the context vector
-                    current_context_vectors[i].append(context_vector.copy())
+                    current_context_vectors[i].append(context_vector)
                     # Update fitness
                     current_fitness[i].append(self.fitness_function.evaluate(context_vector, self.data))
             # Update subpopulations, context vectors and evaluations
-            self.subpops = copy.deepcopy(current_subpops)
-            self.fitness = copy.deepcopy(current_fitness)
-            self.context_vectors = copy.deepcopy(current_context_vectors)
+            self.subpops = current_subpops
+            self.fitness = current_fitness
+            self.context_vectors = current_context_vectors
             del current_subpops, current_fitness, current_context_vectors
             gc.collect()
 
