@@ -119,4 +119,5 @@ class DistanceBasedFitness(WrapperFitnessFunction):
             self.w2 * (mean_avg_distance_diff_label/sqrt_n_selected_features) +
             self.w3 * (1 - (mean_avg_distance_same_label/sqrt_n_selected_features))
         )
+        self.evaluator.estimators.clear()
         return fitness

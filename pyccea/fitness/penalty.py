@@ -59,4 +59,5 @@ class SubsetSizePenalty(WrapperFitnessFunction):
         # - For classification: use evaluation directly (higher accuracy is better)
         sign = -1 if self.evaluator.task == "regression" else 1
         fitness = sign * self.w1 * evaluation - self.w2 * penalty
+        self.evaluator.estimators.clear()
         return fitness
