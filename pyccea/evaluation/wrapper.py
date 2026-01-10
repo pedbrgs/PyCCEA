@@ -92,7 +92,7 @@ class WrapperEvaluation():
         """Evaluate an individual using hold_out validation (train/test)."""
 
         # Get model that has not been previously fitted
-        self.model = copy.deepcopy(self.base_model)
+        self.model = copy.copy(self.base_model)
         # Select subset of features in the training set
         X_train = data.X_train[:, solution_mask].copy()
         y_train = data.y_train.copy()
@@ -101,7 +101,7 @@ class WrapperEvaluation():
         y_test = data.y_test.copy()
         # Train model with the current subset of features
         self.model.train(X_train=X_train, y_train=y_train, optimize=False, verbose=False)
-        self.estimators.append(copy.deepcopy(self.model.estimator))
+        self.estimators.append(self.model.estimator)
         # Evaluate the individual
         self.model_evaluator.compute(
             estimator=self.model.estimator,
@@ -123,10 +123,10 @@ class WrapperEvaluation():
             # Select subset of features in the validation subset
             X_val = X_val[:, solution_mask].copy()
             # Get model that has not been previously fitted
-            self.model = copy.deepcopy(self.base_model)
+            self.model = copy.copy(self.base_model)
             # Train model with the current subset of features
             self.model.train(X_train=X_train, y_train=y_train, optimize=False, verbose=False)
-            self.estimators.append(copy.deepcopy(self.model.estimator))
+            self.estimators.append(copy.copy(self.model.estimator))
             # Evaluate the individual
             self.model_evaluator.compute(
                 estimator=self.model.estimator,

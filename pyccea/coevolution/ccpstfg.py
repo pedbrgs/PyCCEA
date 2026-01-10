@@ -67,7 +67,6 @@ class CCPSTFG(CCGA):
         feature_clusters : np.ndarray
             Index of the cluster each feature belongs to.
         """
-        projection_model = copy.copy(projection_model)
         X_train_normalized = self.data.X_train - self.data.X_train.mean(axis=0)
         y_train_encoded = pd.get_dummies(self.data.y_train).astype(int)
         projection_model.fit(X=X_train_normalized, Y=y_train_encoded)
@@ -275,17 +274,25 @@ class CCPSTFG(CCGA):
         ).round(2)
         logging.info(f"Search space (quantile): {quantiles}")
         for quantile in quantiles:
-            data_q = copy.copy(self.data)
             vip_threshold = round(np.quantile(importances, quantile), 4)
             features_to_keep = importances > vip_threshold
+            data_q = copy.copy(self.data)
+            data_q.train_folds = list()
+            data_q.val_folds = list()
             # Removing features from subsets and folds
-            data_q.X_train = data_q.X_train[:, features_to_keep].copy()
-            data_q.X_test = data_q.X_test[:, features_to_keep].copy()
+            data_q.X_train = self.data.X_train[:, features_to_keep].copy()
+            data_q.X_test = self.data.X_test[:, features_to_keep].copy()
             for k in range(data_q.kfolds):
-                data_q.train_folds[k][0] = data_q.train_folds[k][0][:, features_to_keep].copy()
-                data_q.val_folds[k][0] = data_q.val_folds[k][0][:, features_to_keep].copy()
+                # Select features to keep in each training fold
+                X_tr_fold = self.data.train_folds[k][0][:, features_to_keep]
+                y_tr_fold = self.data.train_folds[k][1]
+                data_q.train_folds.append([X_tr_fold, y_tr_fold])
+                # Select features to keep in each validation fold
+                X_val_fold = self.data.val_folds[k][0][:, features_to_keep]
+                y_val_fold = self.data.val_folds[k][1]
+                data_q.val_folds.append([X_val_fold, y_val_fold])
             # Build context vector with all remaining features
-            context_vector = np.ones((data_q.X_train.shape[1],)).astype(bool)
+            context_vector = np.ones((data_q.X_train.shape[1],), dtype=bool)
             metrics[quantile] = self.fitness_function.evaluate(context_vector, data_q)
             logging.getLogger().disabled = False
             del context_vector, features_to_keep, data_q
@@ -348,7 +355,6 @@ class CCPSTFG(CCGA):
         importances : np.ndarray (n_features,)
             Importance of each feature based on its contribution to yield the latent space.
         """
-        projection_model = copy.copy(projection_model)
         X_train_normalized = self.data.X_train - self.data.X_train.mean(axis=0)
         y_train_encoded = pd.get_dummies(self.data.y_train).astype(int)
         projection_model.fit(X=X_train_normalized, Y=y_train_encoded)

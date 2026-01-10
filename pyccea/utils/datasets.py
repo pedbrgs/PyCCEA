@@ -358,13 +358,12 @@ class DataLoader():
         X_truncated_test : pd.DataFrame
             Truncated test input data.
         """
-        winsor = copy.deepcopy(self.winsor)
         # Winsorization across instances should be done after splitting the data between training
         # and test set to avoid leakage
-        X_truncated_train = winsor.fit_transform(X=X_train)
+        X_truncated_train = self.winsor.fit_transform(X=X_train)
         # When truncating the test set, it should apply the quantiles parameters previously
         # obtained from the training set as-is
-        X_truncated_test = winsor.transform(X=X_test)
+        X_truncated_test = self.winsor.transform(X=X_test)
         return X_truncated_train, X_truncated_test
 
     def _normalize_subsets(
@@ -390,7 +389,7 @@ class DataLoader():
         """
         # Normalization across instances should be done after splitting the data between training
         # and test set to avoid leakage
-        normalizer = copy.deepcopy(self.normalizer)
+        normalizer = copy.copy(self.normalizer)
         if self.winsorization:
             X_train, X_test = self._truncate_subsets(X_train, X_test)
         X_normalized_train = normalizer.fit_transform(X=X_train)
