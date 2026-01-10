@@ -103,7 +103,7 @@ class BinaryGeneticAlgorithm():
     def _tournament_selection(self, subpop: np.ndarray, fitness: list):
         """Tournament selection. """
         # Indexes of selected parents
-        selected_idxs = np.zeros((2,))
+        selected_idxs = np.zeros(2, dtype=np.int32)
 
         for i in range(2):
 
@@ -122,7 +122,7 @@ class BinaryGeneticAlgorithm():
             selected_idxs[i] = np.where(fitness == best_fitness)[0][0]
 
         # Selected parents
-        parent_a, parent_b = subpop[selected_idxs.astype(np.int8)]
+        parent_a, parent_b = subpop[selected_idxs]
 
         return parent_a, parent_b
 
@@ -159,7 +159,8 @@ class BinaryGeneticAlgorithm():
             # Select the 'elite_size' best individuals of the current generation to be in the next
             # generation (elitism)
             n_bests = descending_order[:self.elite_size]
-            next_subpop = subpop[n_bests].copy()
+            next_subpop = np.empty((self.subpop_size, self.n_features), dtype=np.int8)
+            next_subpop[:self.elite_size] = subpop[n_bests]
 
             # Perform (subpop_size - elite_size) tournament selections to build the next population
             for i in range(self.elite_size, self.subpop_size):
@@ -170,7 +171,7 @@ class BinaryGeneticAlgorithm():
                 # Mutate the resulting offspring
                 offspring = self._mutation(offspring)
                 # Add new individual to the subpopulation
-                next_subpop = np.vstack([next_subpop, offspring])
+                next_subpop[i] = offspring
 
         elif self.selection_method == "steady-state":
 

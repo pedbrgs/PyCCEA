@@ -116,7 +116,10 @@ class SubpopulationInitialization(ABC):
         # For each subpopulation
         for i, subpop in enumerate(self.subpops):
             # List to store the context vectors in the current subpopulation
-            subpop_context_vectors = list()
+            subpop_context_vectors = np.empty(
+                (len(subpop), self.data.n_features),
+                dtype=subpop.dtype
+            )
             # List to store the evaluations of these context vectors
             subpop_fitness = list()
             # Evaluate each individual in the subpopulation
@@ -130,13 +133,13 @@ class SubpopulationInitialization(ABC):
                 # Evaluate the context vector
                 fitness = self.fitness_function.evaluate(context_vector, self.data)
                 # Store the complete problem solution related to the current individual
-                subpop_context_vectors.append(context_vector)
+                subpop_context_vectors[j] = context_vector
                 # Store evaluation of the current context vector
                 subpop_fitness.append(fitness)
                 del context_vector, fitness
                 gc.collect()
             # Store all complete problem solutions related to the current subpopulation
-            self.context_vectors.append(np.vstack(subpop_context_vectors))
+            self.context_vectors.append(subpop_context_vectors)
             # Store evaluation of all context vectors of the current subpopulation
             self.fitness.append(subpop_fitness)
             # Update progress bar
