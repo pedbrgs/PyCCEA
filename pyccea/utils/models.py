@@ -206,7 +206,7 @@ class ClassificationModel():
         "k_nearest_neighbors": (KNeighborsClassifier, {"n_neighbors": 1}),
         "logistic_regression": (LogisticRegression, {}),
         "multinomial_naive_bayes": (MultinomialNB, {}),
-        "random_forest": (RandomForestClassifier, {"n_jobs": -1, "class_weight": "balanced"}),
+        "random_forest": (RandomForestClassifier, {"class_weight": "balanced"}),
         "support_vector_machine": (SVC, {}),
     }
 
