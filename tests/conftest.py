@@ -90,6 +90,7 @@ def dummy_classification_evaluator():
     evaluator = MagicMock(spec=WrapperEvaluation)
     evaluator.task = "classification"
     evaluator.eval_function = "accuracy"
+    evaluator.estimators = list()
     return evaluator
 
 
@@ -100,6 +101,7 @@ def dummy_regression_evaluator():
     evaluator = MagicMock(spec=WrapperEvaluation)
     evaluator.task = "regression"
     evaluator.eval_function = "mse"
+    evaluator.estimators = list()
     return evaluator
 
 
