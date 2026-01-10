@@ -115,11 +115,8 @@ class SubpopulationInitialization(ABC):
         progress_bar = tqdm(total=self.n_subcomps, desc="Evaluating individuals")
         # For each subpopulation
         for i, subpop in enumerate(self.subpops):
-            # List to store the context vectors in the current subpopulation
-            subpop_context_vectors = np.empty(
-                (len(subpop), self.data.n_features),
-                dtype=subpop.dtype
-            )
+            # Initialize context vectors in the current subpopulation
+            subpop_context_vectors = None
             # List to store the evaluations of these context vectors
             subpop_fitness = list()
             # Evaluate each individual in the subpopulation
@@ -129,6 +126,11 @@ class SubpopulationInitialization(ABC):
                     subpop_idx=i,
                     indiv_idx=j,
                     subpops=self.subpops
+                )
+                if subpop_context_vectors is None:
+                    subpop_context_vectors = np.empty(
+                        (len(subpop), len(context_vector)),
+                        dtype=subpop.dtype
                 )
                 # Evaluate the context vector
                 fitness = self.fitness_function.evaluate(context_vector, self.data)
