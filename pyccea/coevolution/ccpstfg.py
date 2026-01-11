@@ -149,7 +149,7 @@ class CCPSTFG(CCGA):
                 if (task_type.lower() == "classification") and (len(np.unique(y_train_fold)) > 2):
                     y_train_pls = pd.get_dummies(y_train_fold).astype(np.int8)
                 else:
-                    y_train_pls = y_train_fold.copy()
+                    y_train_pls = y_train_fold
 
                 # Fit projection model
                 projection_model = projection_class(n_components=n_components, copy=True)
@@ -280,8 +280,8 @@ class CCPSTFG(CCGA):
             data_q.train_folds = list()
             data_q.val_folds = list()
             # Removing features from subsets and folds
-            data_q.X_train = self.data.X_train[:, features_to_keep].copy()
-            data_q.X_test = self.data.X_test[:, features_to_keep].copy()
+            data_q.X_train = self.data.X_train[:, features_to_keep]
+            data_q.X_test = self.data.X_test[:, features_to_keep]
             for k in range(data_q.kfolds):
                 # Select features to keep in each training fold
                 X_tr_fold = self.data.train_folds[k][0][:, features_to_keep]
@@ -330,14 +330,14 @@ class CCPSTFG(CCGA):
         logging.info(f"Remaining features: {np.sum(features_to_keep)}.")
 
         # Removing features from subsets and folds
-        self.data.X_train = self.data.X_train[:, features_to_keep].copy()
-        self.data.X_test = self.data.X_test[:, features_to_keep].copy()
+        self.data.X_train = self.data.X_train[:, features_to_keep]
+        self.data.X_test = self.data.X_test[:, features_to_keep]
         for k in range(self.data.kfolds):
-            self.data.train_folds[k][0] = self.data.train_folds[k][0][:, features_to_keep].copy()
-            self.data.val_folds[k][0] = self.data.val_folds[k][0][:, features_to_keep].copy()
+            self.data.train_folds[k][0] = self.data.train_folds[k][0][:, features_to_keep]
+            self.data.val_folds[k][0] = self.data.val_folds[k][0][:, features_to_keep]
 
         # Importance of the remaining features
-        importances = importances[features_to_keep].copy()
+        importances = importances[features_to_keep]
 
         return importances
 
@@ -352,7 +352,7 @@ class CCPSTFG(CCGA):
 
         Returns
         -------
-        importances : np.ndarray (n_features,)
+         : np.ndarray (n_features,)
             Importance of each feature based on its contribution to yield the latent space.
         """
         X_train_normalized = self.data.X_train - self.data.X_train.mean(axis=0)
@@ -360,8 +360,7 @@ class CCPSTFG(CCGA):
         projection_model.fit(X=X_train_normalized, Y=y_train_encoded)
         vip = VIP(model=projection_model)
         vip.compute()
-        importances = vip.importances.copy()
-        return importances
+        return vip.importances
 
     def _init_decomposer(self) -> None:
         """Instantiate feature grouping method."""
@@ -411,7 +410,7 @@ class CCPSTFG(CCGA):
                 ascending=False
             )
 
-        self.feature_importances = importances.copy()
+        self.feature_importances = importances
         self._tuning_time = (
             getattr(self, "_n_components_tuning_time", 0)
             + getattr(self, "_quantile_tuning_time", 0)
@@ -461,7 +460,7 @@ class CCPSTFG(CCGA):
         )
         # Select the globally best context vector
         self.best_context_vector, self.best_fitness = self._get_global_best()
-        self.best_context_vectors.append(self.best_context_vector.copy())
+        self.best_context_vectors.append(self.best_context_vector)
         # Save the order of features considered in the random feature grouping
         self.best_feature_idxs = self.feature_idxs.copy()
 
@@ -540,7 +539,7 @@ class CCPSTFG(CCGA):
                 )
                 # Update best context vector
                 self.best_context_vector = best_context_vector.copy()
-                self.best_context_vectors.append(self.best_context_vector.copy())
+                self.best_context_vectors.append(self.best_context_vector)
                 # Update best fitness
                 self.best_fitness = best_fitness
             else:

@@ -1,3 +1,4 @@
+import gc
 import copy
 import logging
 import warnings
@@ -94,11 +95,11 @@ class WrapperEvaluation():
         # Get model that has not been previously fitted
         self.model = copy.copy(self.base_model)
         # Select subset of features in the training set
-        X_train = data.X_train[:, solution_mask].copy()
-        y_train = data.y_train.copy()
+        X_train = data.X_train[:, solution_mask]
+        y_train = data.y_train
         # Select subset of features in the test set
-        X_test = data.X_test[:, solution_mask].copy()
-        y_test = data.y_test.copy()
+        X_test = data.X_test[:, solution_mask]
+        y_test = data.y_test
         # Train model with the current subset of features
         self.model.train(X_train=X_train, y_train=y_train, optimize=False, verbose=False)
         self.estimators.append(self.model.estimator)
@@ -119,14 +120,14 @@ class WrapperEvaluation():
             X_train, y_train = data.train_folds[k]
             X_val, y_val = data.val_folds[k]
             # Select subset of features in the training subset
-            X_train = X_train[:, solution_mask].copy()
+            X_train = X_train[:, solution_mask]
             # Select subset of features in the validation subset
-            X_val = X_val[:, solution_mask].copy()
+            X_val = X_val[:, solution_mask]
             # Get model that has not been previously fitted
             self.model = copy.copy(self.base_model)
             # Train model with the current subset of features
             self.model.train(X_train=X_train, y_train=y_train, optimize=False, verbose=False)
-            self.estimators.append(copy.copy(self.model.estimator))
+            self.estimators.append(self.model.estimator)
             # Evaluate the individual
             self.model_evaluator.compute(
                 estimator=self.model.estimator,
@@ -137,6 +138,7 @@ class WrapperEvaluation():
             for metric in self.evaluations.keys():
                 self.evaluations[metric] += self.model_evaluator.values[metric]
             del self.model
+            gc.collect()
         # Calculate average performance over k folds
         for metric in self.evaluations.keys():
             self.evaluations[metric] = round(self.evaluations[metric]/data.kfolds, 4)

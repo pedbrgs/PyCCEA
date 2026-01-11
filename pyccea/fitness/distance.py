@@ -1,3 +1,4 @@
+import gc
 import numpy as np
 from ..utils.datasets import DataLoader
 from ..evaluation.wrapper import WrapperEvaluation
@@ -120,4 +121,5 @@ class DistanceBasedFitness(WrapperFitnessFunction):
             self.w3 * (1 - (mean_avg_distance_same_label/sqrt_n_selected_features))
         )
         self.evaluator.estimators.clear()
+        gc.collect()
         return fitness

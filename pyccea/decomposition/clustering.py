@@ -51,7 +51,7 @@ class ClusteringFeatureGrouping(FeatureGrouping):
             self.n_subcomps = len(unique_clusters)
 
         # Shuffle the data features according to the indexes
-        X = X[:, feature_idxs].copy()
+        X = X[:, feature_idxs]
         # Decompose the problem
         subcomponents = self._get_subcomponents(X=X)
 

@@ -1,4 +1,4 @@
-import copy
+import gc
 import logging
 import numpy as np
 from abc import ABC, abstractmethod
@@ -193,30 +193,32 @@ class CCEA(ABC):
         # Number of individuals in each subpopulation is in the list of subcomponent sizes
         self.initializer.evaluate_individuals()
         # Subpopulations
-        self.subpops = copy.copy(self.initializer.subpops)
+        self.subpops = self.initializer.subpops
         # Context vectors
-        self.context_vectors = copy.copy(self.initializer.context_vectors)
+        self.context_vectors = self.initializer.context_vectors
         # Evaluations of context vectors
-        self.fitness = copy.copy(self.initializer.fitness)
+        self.fitness = self.initializer.fitness
+        del initializer
+        gc.collect()
 
     def _problem_decomposition(self):
         """Decompose the problem into smaller subproblems."""
         for k in range(self.data.kfolds):
-            Xk_train = self.data.train_folds[k][0].copy()
+            Xk_train = self.data.train_folds[k][0]
             # Decompose only once to use the same feature indexes on all k-folds
             if k == 0:
-                _, self.feature_idxs = self.decomposer.decompose(X=Xk_train.copy())
-                self.feature_importances = self.feature_importances[self.feature_idxs].copy()
+                _, self.feature_idxs = self.decomposer.decompose(X=Xk_train)
+                self.feature_importances = self.feature_importances[self.feature_idxs]
             # Reorder training and validation folds built from the training set according to the
             # shuffling in the feature decomposition
-            self.data.train_folds[k][0] = Xk_train[:, self.feature_idxs].copy()
-            Xk_val = self.data.val_folds[k][0].copy()
-            self.data.val_folds[k][0] = Xk_val[:, self.feature_idxs].copy()
+            self.data.train_folds[k][0] = Xk_train[:, self.feature_idxs]
+            Xk_val = self.data.val_folds[k][0]
+            self.data.val_folds[k][0] = Xk_val[:, self.feature_idxs]
         # Reorder training set according to the shuffling in the feature decomposition
-        self.data.X_train = self.data.X_train[:, self.feature_idxs].copy()
+        self.data.X_train = self.data.X_train[:, self.feature_idxs]
         # Reorder test set according to the shuffling in the feature decomposition
-        self.data.X_test = self.data.X_test[:, self.feature_idxs].copy()
+        self.data.X_test = self.data.X_test[:, self.feature_idxs]
         # Update 'n_subcomps' when it starts with NoneType
         self.n_subcomps = self.decomposer.n_subcomps
         # Update 'subcomp_sizes' when it starts with an empty list
-        self.subcomp_sizes = self.decomposer.subcomp_sizes.copy()
+        self.subcomp_sizes = self.decomposer.subcomp_sizes

@@ -1,3 +1,4 @@
+import gc
 import numpy as np
 from ..utils.datasets import DataLoader
 from ..evaluation.wrapper import WrapperEvaluation
@@ -60,4 +61,5 @@ class SubsetSizePenalty(WrapperFitnessFunction):
         sign = -1 if self.evaluator.task == "regression" else 1
         fitness = sign * self.w1 * evaluation - self.w2 * penalty
         self.evaluator.estimators.clear()
+        gc.collect()
         return fitness
