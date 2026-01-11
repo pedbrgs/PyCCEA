@@ -173,7 +173,8 @@ class CCPSTFG(CCGA):
                     del model, X_train_projected, X_val_projected, y_pred_val
 
             performance_values.append(np.mean(metric_folds))
-            del metric_folds
+
+            del metric_folds, projection_model, X_train_fold_centered, X_val_fold_centered
             gc.collect()
 
         logging.info(
