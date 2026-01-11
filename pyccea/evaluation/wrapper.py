@@ -23,9 +23,10 @@ class WrapperEvaluation():
         is copied and fitted for each individual.
     model : sklearn model object
         Model that has been fitted to evaluate the current individual.
-    estimators : list of sklearn model objects
+    estimators : list of sklearn model objects, optional
         Estimators used in the current evaluation. It is one when 'eval_mode' is set to "hold_out"
-        and k when 'eval_mode' is set to "k_fold" or "leave_one_out".
+        and k when 'eval_mode' is set to "k_fold" or "leave_one_out". If 'store_estimators' is 
+        False, this attribute is not created.
     """
 
     models = {"classification": ClassificationModel, "regression": RegressionModel}
@@ -38,7 +39,8 @@ class WrapperEvaluation():
             model_type: str,
             eval_function: str,
             eval_mode: str,
-            n_classes: int = None
+            n_classes: int = None,
+            store_estimators: bool = True,
     ):
         """
         Parameters
@@ -54,6 +56,8 @@ class WrapperEvaluation():
             Evaluation mode. It can be 'hold_out', 'leave_one_out', or 'k_fold'.
         n_classes : int, default None
             Number of classes when task parameter is set to 'classification'.
+        store_estimators : bool, default True
+            Whether to store the estimators used in the evaluation.
         """
         # Check if the chosen task is available
         if not task in WrapperEvaluation.metrics.keys():
@@ -86,7 +90,7 @@ class WrapperEvaluation():
                 f"The available evaluation modes are {', '.join(WrapperEvaluation.eval_modes)}."
             )
         self.eval_mode = eval_mode
-        self.store_estimators = None
+        self.store_estimators = store_estimators
         # Initialize logger with info level
         logging.basicConfig(encoding="utf-8", level=logging.INFO)
 
@@ -165,7 +169,8 @@ class WrapperEvaluation():
             Evaluation metrics.
         """
         # Estimator(s) used for the current evaluation
-        self.estimators = list()
+        if self.store_estimators:
+            self.estimators = list()
         # If no feature is selected
         self.evaluations = {metric: 0 for metric in self.model_evaluator.metrics}
         if solution.sum() == 0:

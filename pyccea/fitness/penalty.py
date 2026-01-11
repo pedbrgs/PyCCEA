@@ -34,7 +34,6 @@ class SubsetSizePenalty(WrapperFitnessFunction):
             )
         self.w1 = weights[0]
         self.w2 = weights[1]
-        self.evaluator.store_estimators = False
 
     def evaluate(self, context_vector: np.ndarray, data: DataLoader):
         """

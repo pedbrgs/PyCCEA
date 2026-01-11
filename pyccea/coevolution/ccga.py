@@ -31,7 +31,8 @@ class CCGA(CCEA):
             model_type=self.conf["wrapper"]["model_type"],
             eval_function=self.conf["evaluation"]["eval_function"],
             eval_mode=self.eval_mode,
-            n_classes=getattr(self.data, "n_classes", None)
+            n_classes=getattr(self.data, "n_classes", None),
+            store_estimators=False  # SubsetSizePenalty fitness function does not need estimators
         )
         self.fitness_function = SubsetSizePenalty(
             evaluator=evaluator,
