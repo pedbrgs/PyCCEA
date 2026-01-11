@@ -198,7 +198,7 @@ class CCEA(ABC):
         self.context_vectors = self.initializer.context_vectors
         # Evaluations of context vectors
         self.fitness = self.initializer.fitness
-        del initializer
+        del self.initializer
         gc.collect()
 
     def _problem_decomposition(self):
