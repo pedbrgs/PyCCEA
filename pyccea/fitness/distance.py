@@ -45,6 +45,7 @@ class DistanceBasedFitness(WrapperFitnessFunction):
         self.w1 = weights[0]
         self.w2 = weights[1]
         self.w3 = weights[2]
+        self.evaluator.store_estimators = True
 
     def _compute_distances(self, data: DataLoader):
         """

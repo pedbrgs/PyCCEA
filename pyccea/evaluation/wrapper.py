@@ -86,6 +86,7 @@ class WrapperEvaluation():
                 f"The available evaluation modes are {', '.join(WrapperEvaluation.eval_modes)}."
             )
         self.eval_mode = eval_mode
+        self.store_estimators = None
         # Initialize logger with info level
         logging.basicConfig(encoding="utf-8", level=logging.INFO)
 
@@ -102,7 +103,8 @@ class WrapperEvaluation():
         y_test = data.y_test
         # Train model with the current subset of features
         self.model.train(X_train=X_train, y_train=y_train, optimize=False, verbose=False)
-        self.estimators.append(self.model.estimator)
+        if self.store_estimators:
+            self.estimators.append(self.model.estimator)
         # Evaluate the individual
         self.model_evaluator.compute(
             estimator=self.model.estimator,
@@ -127,7 +129,8 @@ class WrapperEvaluation():
             self.model = copy.copy(self.base_model)
             # Train model with the current subset of features
             self.model.train(X_train=X_train, y_train=y_train, optimize=False, verbose=False)
-            self.estimators.append(self.model.estimator)
+            if self.store_estimators:
+                self.estimators.append(self.model.estimator)
             # Evaluate the individual
             self.model_evaluator.compute(
                 estimator=self.model.estimator,

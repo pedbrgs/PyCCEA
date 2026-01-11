@@ -1,4 +1,3 @@
-import gc
 import numpy as np
 from ..utils.datasets import DataLoader
 from ..evaluation.wrapper import WrapperEvaluation
@@ -35,6 +34,7 @@ class SubsetSizePenalty(WrapperFitnessFunction):
             )
         self.w1 = weights[0]
         self.w2 = weights[1]
+        self.evaluator.store_estimators = False
 
     def evaluate(self, context_vector: np.ndarray, data: DataLoader):
         """
@@ -60,6 +60,4 @@ class SubsetSizePenalty(WrapperFitnessFunction):
         # - For classification: use evaluation directly (higher accuracy is better)
         sign = -1 if self.evaluator.task == "regression" else 1
         fitness = sign * self.w1 * evaluation - self.w2 * penalty
-        self.evaluator.estimators.clear()
-        gc.collect()
         return fitness
