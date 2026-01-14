@@ -110,6 +110,18 @@ class DataLoader():
         self.seed = self.conf["general"].get("seed")
         self.verbose = self.conf["general"].get("verbose", True)
 
+        float_dtype = self.conf["general"].get("float_dtype")
+        if float_dtype is None:
+            self.float_dtype = None
+        else:
+            float_dtype = str(float_dtype).lower()
+            if float_dtype not in ["float32", "float64"]:
+                raise ValueError(
+                    "The 'float_dtype' parameter in the general section of the data "
+                    "configuration file should be either 'float32' or 'float64'."
+                )
+            self.float_dtype = np.float32 if float_dtype == "float32" else np.float64
+
     def _parse_splitter_parameters(self) -> None:
         """Parse parameters from the splitter section of the data configuration file."""
         if self.splitter_type == "k_fold":
@@ -222,7 +234,33 @@ class DataLoader():
                 X_train=self.X_train,
                 X_test=self.X_test
             )
+        self._cast_float_dtype()
         logging.info("Data is ready for use.")
+
+    def _cast_float_dtype(self) -> None:
+        """Cast stored feature matrices to the configured float dtype (if any)."""
+        if self.float_dtype is None:
+            return
+
+        def _cast(X: np.ndarray, array_name: str) -> np.ndarray:
+            """Cast input matrix to the configured float dtype."""
+            # Only cast numeric arrays; object arrays should fail earlier in preprocessing.
+            if isinstance(X, np.ndarray) and np.issubdtype(X.dtype, np.number):
+                if X.dtype != self.float_dtype:
+                    logging.info(f"Casting {array_name} from {X.dtype} to {self.float_dtype}.")
+                    return X.astype(self.float_dtype, copy=False)
+                return X
+
+        # Main subsets
+        if hasattr(self, "X_train"):
+            self.X_train = _cast(self.X_train, "X_train")
+        if hasattr(self, "X_test"):
+            self.X_test = _cast(self.X_test, "X_test")
+        # Fold (if exists)
+        if hasattr(self, "train_folds") and hasattr(self, "val_folds"):
+            for k in range(len(self.train_folds)):
+                self.train_folds[k][0] = _cast(self.train_folds[k][0], f"{k}-th train fold")
+                self.val_folds[k][0] = _cast(self.val_folds[k][0], f"{k}-th val fold")
 
     def _load(self) -> None:
         """Load dataset according to dataset given as a parameter."""
