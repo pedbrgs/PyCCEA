@@ -1,5 +1,4 @@
 import gc
-import copy
 import logging
 import warnings
 import numpy as np
@@ -98,7 +97,7 @@ class WrapperEvaluation():
         """Evaluate an individual using hold_out validation (train/test)."""
 
         # Get model that has not been previously fitted
-        self.model = copy.copy(self.base_model)
+        self.model = self.base_model.clone()
         # Select subset of features in the training set
         X_train = data.X_train[:, solution_mask]
         y_train = data.y_train
@@ -119,6 +118,9 @@ class WrapperEvaluation():
         # Get evaluation in the test set
         self.evaluations = self.model_evaluator.values
 
+        del X_train, X_test, y_train, y_test, self.model
+        gc.collect()
+
     def _cross_validation(self, solution_mask: np.ndarray, data: DataLoader) -> None:
         """Evaluate an individual using cross-validation (leave-one-out or k-fold)."""
         for k in range(data.kfolds):
@@ -130,7 +132,7 @@ class WrapperEvaluation():
             # Select subset of features in the validation subset
             X_val = X_val[:, solution_mask]
             # Get model that has not been previously fitted
-            self.model = copy.copy(self.base_model)
+            self.model = self.base_model.clone()
             # Train model with the current subset of features
             self.model.train(X_train=X_train, y_train=y_train, optimize=False, verbose=False)
             if self.store_estimators:
@@ -144,11 +146,13 @@ class WrapperEvaluation():
             )
             for metric in self.evaluations.keys():
                 self.evaluations[metric] += self.model_evaluator.values[metric]
-            del self.model
-            gc.collect()
+
         # Calculate average performance over k folds
         for metric in self.evaluations.keys():
             self.evaluations[metric] = round(self.evaluations[metric]/data.kfolds, 4)
+
+        del X_train, X_val, y_train, y_val, self.model
+        gc.collect()
 
     def evaluate(self, solution: np.ndarray, data: DataLoader) -> dict:
         """

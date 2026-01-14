@@ -2,6 +2,7 @@ import logging
 import warnings
 import numpy as np
 from sklearn.svm import SVC, SVR
+from sklearn.base import clone as sklearn_clone
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.exceptions import UndefinedMetricWarning
 from sklearn.model_selection import RandomizedSearchCV
@@ -186,6 +187,21 @@ class RegressionModel():
             self.hyperparams = self.estimator.get_params()
         logging.info(f"Hyperparameters: {self.hyperparams}")
 
+    def clone(self) -> "RegressionModel":
+        """Create a new unfitted estimator with the same parameters.
+
+        Clone does a deep copy of the model in an estimator without actually copying attached data.
+        It returns a new estimator with the same parameters that has not been fitted on any data.
+
+        Returns
+        -------
+        cloned_model : RegressionModel
+            Fresh copy of the regression model wrapper with a cloned underlying sklearn estimator.
+        """
+        cloned_model = RegressionModel(model_type=self.model_type)
+        cloned_model.estimator = sklearn_clone(self.estimator)
+        return cloned_model
+
 
 class ClassificationModel():
     """Load a classification model, adjust its hyperparameters and get the best model.
@@ -360,3 +376,18 @@ class ClassificationModel():
             self.estimator.fit(X_train, y_train)
             self.hyperparams = self.estimator.get_params()
         logging.info(f"Hyperparameters: {self.hyperparams}")
+
+    def clone(self) -> "ClassificationModel":
+        """Create a new unfitted estimator with the same parameters.
+
+        Clone does a deep copy of the model in an estimator without actually copying attached data.
+        It returns a new estimator with the same parameters that has not been fitted on any data.
+
+        Returns
+        -------
+        cloned_model : ClassificationModel
+            Fresh copy of the classification model wrapper with a cloned underlying sklearn estimator.
+        """
+        cloned_model = ClassificationModel(model_type=self.model_type)
+        cloned_model.estimator = sklearn_clone(self.estimator)
+        return cloned_model
