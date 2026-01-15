@@ -2,6 +2,7 @@
 
 [general]
 splitter_type = "k_fold"
+float_dtype = "float32"
 verbose = true
 
 [splitter]

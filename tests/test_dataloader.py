@@ -124,6 +124,7 @@ def test_get_ready_calls_all_methods(monkeypatch, mocker, complete_data_conf: di
     mocker.spy(loader, "_split")
     mocker.spy(loader, "_normalize_subsets")
     mocker.spy(loader, "_model_selection")
+    mocker.spy(loader, "_cast_float_dtype")
 
     # Act
     loader.get_ready()
@@ -132,6 +133,7 @@ def test_get_ready_calls_all_methods(monkeypatch, mocker, complete_data_conf: di
     loader._load.assert_called_once()
     loader._preprocess.assert_called_once()
     loader._split.assert_called_once()
+    loader._cast_float_dtype.assert_called_once()
     # Normalize folds for optimization and then training and test sets for final evaluation
     assert loader._normalize_subsets.call_count == 1 + complete_data_conf["splitter"]["kfolds"]
     loader._model_selection.assert_called_once()
@@ -159,6 +161,7 @@ def test_get_ready_without_normalize(mocker, complete_data_conf: dict) -> None:
     mocker.patch.object(loader, "_split")
     mocker.patch.object(loader, "_normalize_subsets")
     mocker.patch.object(loader, "_model_selection")
+    mocker.patch.object(loader, "_cast_float_dtype")
 
     # Act
     loader.get_ready()
@@ -169,6 +172,7 @@ def test_get_ready_without_normalize(mocker, complete_data_conf: dict) -> None:
     loader._split.assert_called_once()
     loader._normalize_subsets.assert_not_called()
     loader._model_selection.assert_called_once()
+    loader._cast_float_dtype.assert_called_once()
 
 
 def test_load_data_invalid_dataset_name(complete_data_conf: dict) -> None:
@@ -516,3 +520,95 @@ def test_leave_one_out_model_selection(complete_data_conf: dict) -> None:
     assert len(loader.train_folds) == len(loader.X_train)
     assert len(loader.val_folds) == len(loader.X_train)
     assert isinstance(loader.splitter, LeaveOneOut)
+
+
+def test_cast_float_dtype_none_does_nothing(complete_data_conf: dict) -> None:
+    """Test float dtype casting when float_dtype is None."""
+    complete_data_conf["general"].pop("float_dtype", None)
+    loader = DataLoader("dummy", complete_data_conf)
+
+    loader.X_train = np.array([[1.0, 2.0]], dtype=np.float64)
+    loader.X_test = np.array([[3.0, 4.0]], dtype=np.float64)
+
+    loader._cast_float_dtype()
+
+    assert loader.X_train.dtype == np.float64
+    assert loader.X_test.dtype == np.float64
+
+
+def test_cast_float_dtype_on_main_subsets(complete_data_conf: dict) -> None:
+    """Test float dtype casting on main train/test subsets."""
+    complete_data_conf["general"]["float_dtype"] = "float32"
+
+    loader = DataLoader("dummy", complete_data_conf)
+
+    loader.X_train = np.array([[1.0, 2.0]], dtype=np.float64)
+    loader.X_test = np.array([[3.0, 4.0]], dtype=np.float64)
+
+    loader._cast_float_dtype()
+
+    assert loader.X_train.dtype == np.float32
+    assert loader.X_test.dtype == np.float32
+
+
+def test_cast_float_dtype_on_folds(complete_data_conf: dict) -> None:
+    """Test float dtype casting on train/val folds."""
+    complete_data_conf["general"]["float_dtype"] = "float32"
+    loader = DataLoader("dummy", complete_data_conf)
+
+    X_fold = np.array([[1.0], [2.0]], dtype=np.float64)
+    y_fold = np.array([0, 1], dtype=np.int64)
+
+    loader.train_folds = [[X_fold.copy(), y_fold.copy()]]
+    loader.val_folds = [[X_fold.copy(), y_fold.copy()]]
+
+    loader._cast_float_dtype()
+
+    assert loader.train_folds[0][0].dtype == np.float32
+    assert loader.val_folds[0][0].dtype == np.float32
+
+    # y must NOT be cast
+    assert loader.train_folds[0][1].dtype == np.int64
+    assert loader.val_folds[0][1].dtype == np.int64
+
+
+def test_cast_float_dtype_invalid_value_raises_value_error(complete_data_conf: dict) -> None:
+    """Test float dtype casting with invalid float_dtype value."""
+    complete_data_conf["general"]["float_dtype"] = "float16"
+    with pytest.raises(ValueError):
+        loader = DataLoader("dummy", complete_data_conf)
+
+
+def test_cast_array_handles_integer_array(complete_data_conf: dict) -> None:
+    """Test _cast_array method with integer input array."""
+    complete_data_conf["general"]["float_dtype"] = "float32"
+    loader = DataLoader("dummy", complete_data_conf)
+
+    X = np.array([[1, 2, 3]], dtype=np.int64)
+    out = loader._cast_array(X, "X_train")
+
+    assert out.dtype == np.float32
+
+
+def test_cast_array_returns_same_array_if_dtype_matches(complete_data_conf: dict) -> None:
+    """Test _cast_array method returns the same array if dtype matches."""
+    complete_data_conf["general"]["float_dtype"] = "float32"
+    loader = DataLoader("dummy", complete_data_conf)
+
+    X = np.array([[1.0]], dtype=np.float32)
+    out = loader._cast_array(X, "X_train")
+
+    assert out is X
+    assert out.dtype == np.float32
+
+
+def test_cast_array_converts_dtype(complete_data_conf: dict) -> None:
+    """Test _cast_array method converts array to specified float dtype."""
+    complete_data_conf["general"]["float_dtype"] = "float32"
+    loader = DataLoader("dummy", complete_data_conf)
+
+    X = np.array([[1.0, 2.0]], dtype=np.float64)
+
+    out = loader._cast_array(X, "X_train")
+
+    assert out.dtype == np.float32
