@@ -164,7 +164,7 @@ class CCPSTFG(CCGA):
                     X_train_projected = projection_model.transform(X_train_fold_centered)
                     X_val_projected = projection_model.transform(X_val_fold_centered)
                     # Fit classifier on the projected training data
-                    model = copy.copy(self.fitness_function.evaluator.base_model)
+                    model = self.fitness_function.evaluator.base_model.clone()
                     model.estimator.fit(X_train_projected, y_train_fold)
                     # Predict and evaluate on the projected validation data
                     y_pred_val = model.estimator.predict(X_val_projected)
