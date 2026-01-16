@@ -26,10 +26,10 @@ class RegressionModel():
 
     models = {
         "linear": (LinearRegression, {}),
-        "ridge": (Ridge, {}),
-        "lasso": (Lasso, {}),
-        "elastic_net": (ElasticNet, {}),
-        "random_forest": (RandomForestRegressor, {}),
+        "ridge": (Ridge, {"random_state": 0}),
+        "lasso": (Lasso, {"random_state": 0}),
+        "elastic_net": (ElasticNet, {"random_state": 0}),
+        "random_forest": (RandomForestRegressor, {"random_state": 0}),
         "support_vector_machine": (SVR, {}),
     }
 
@@ -222,8 +222,8 @@ class ClassificationModel():
         "k_nearest_neighbors": (KNeighborsClassifier, {"n_neighbors": 1}),
         "logistic_regression": (LogisticRegression, {}),
         "multinomial_naive_bayes": (MultinomialNB, {}),
-        "random_forest": (RandomForestClassifier, {"class_weight": "balanced"}),
-        "support_vector_machine": (SVC, {}),
+        "random_forest": (RandomForestClassifier, {"class_weight": "balanced", "random_state": 0}),
+        "support_vector_machine": (SVC, {"random_state": 0}),
     }
 
     def __init__(self, model_type: str):
