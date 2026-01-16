@@ -20,6 +20,7 @@ method = "best"
 
 [wrapper]
 task = "classification"
+cache_size = 2000
 model_type = "k_nearest_neighbors"
 
 [evaluation]

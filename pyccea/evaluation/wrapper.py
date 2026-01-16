@@ -2,6 +2,7 @@ import gc
 import logging
 import warnings
 import numpy as np
+from collections import OrderedDict
 from ..utils.datasets import DataLoader
 from ..utils.models import ClassificationModel, RegressionModel
 from ..utils.metrics import ClassificationMetrics, RegressionMetrics
@@ -26,6 +27,9 @@ class WrapperEvaluation():
         Estimators used in the current evaluation. It is one when 'eval_mode' is set to "hold_out"
         and k when 'eval_mode' is set to "k_fold" or "leave_one_out". If 'store_estimators' is 
         False, this attribute is not created.
+    _cache : collections.OrderedDict
+        Internal LRU cache mapping a packed-bit representation of 'solution' to the evaluation
+        dict. The cache is bounded by 'cache_size'.
     """
 
     models = {"classification": ClassificationModel, "regression": RegressionModel}
@@ -40,6 +44,7 @@ class WrapperEvaluation():
             eval_mode: str,
             n_classes: int = None,
             store_estimators: bool = True,
+            cache_size: int = 0,
     ):
         """
         Parameters
@@ -57,6 +62,12 @@ class WrapperEvaluation():
             Number of classes when task parameter is set to 'classification'.
         store_estimators : bool, default True
             Whether to store the estimators used in the evaluation.
+        cache_size : int, default 0
+            Maximum number of distinct feature-subset evaluations to keep in an in-memory LRU
+            cache. Set to 0 or None to disable caching. This is useful when the evolutionary loop
+            revisits the same solution multiple time (e.g., due to elitism/crossover), avoiding
+            redundant model fits. Note: caching assumes evaluation is deterministic for a given
+            solution.
         """
         # Check if the chosen task is available
         if not task in WrapperEvaluation.metrics.keys():
@@ -90,6 +101,9 @@ class WrapperEvaluation():
             )
         self.eval_mode = eval_mode
         self.store_estimators = store_estimators
+        # Optional bounded cache: avoids reffiting identifical feature subsets many times
+        self.cache_size = int(cache_size) if cache_size is not None else 0
+        self._cache = OrderedDict() if self.cache_size > 0 else None
         # Initialize logger with info level
         logging.basicConfig(encoding="utf-8", level=logging.INFO)
 
@@ -97,28 +111,27 @@ class WrapperEvaluation():
         """Evaluate an individual using hold_out validation (train/test)."""
 
         # Get model that has not been previously fitted
-        self.model = self.base_model.clone()
-        # Select subset of features in the training set
-        X_train = data.X_train[:, solution_mask]
-        y_train = data.y_train
-        # Select subset of features in the test set
-        X_test = data.X_test[:, solution_mask]
-        y_test = data.y_test
+        model = self.base_model.clone()
         # Train model with the current subset of features
-        self.model.train(X_train=X_train, y_train=y_train, optimize=False, verbose=False)
+        model.train(
+            X_train=data.X_train[:, solution_mask],
+            y_train=data.y_train,
+            optimize=False,
+            verbose=False
+        )
         if self.store_estimators:
-            self.estimators.append(self.model.estimator)
+            self.estimators.append(model.estimator)
         # Evaluate the individual
         self.model_evaluator.compute(
-            estimator=self.model.estimator,
-            X_test=X_test,
-            y_test=y_test,
+            estimator=model.estimator,
+            X_test=data.X_test[:, solution_mask],
+            y_test=data.y_test,
             verbose=False
         )
         # Get evaluation in the test set
         self.evaluations = self.model_evaluator.values
 
-        del X_train, X_test, y_train, y_test, self.model
+        del model
         gc.collect()
 
     def _cross_validation(self, solution_mask: np.ndarray, data: DataLoader) -> None:
@@ -127,20 +140,21 @@ class WrapperEvaluation():
             # Get training and validations subsets built from the full training set
             X_train, y_train = data.train_folds[k]
             X_val, y_val = data.val_folds[k]
-            # Select subset of features in the training subset
-            X_train = X_train[:, solution_mask]
-            # Select subset of features in the validation subset
-            X_val = X_val[:, solution_mask]
             # Get model that has not been previously fitted
-            self.model = self.base_model.clone()
+            model = self.base_model.clone()
             # Train model with the current subset of features
-            self.model.train(X_train=X_train, y_train=y_train, optimize=False, verbose=False)
+            model.train(
+                X_train=X_train[:, solution_mask],
+                y_train=y_train,
+                optimize=False,
+                verbose=False
+            )
             if self.store_estimators:
-                self.estimators.append(self.model.estimator)
+                self.estimators.append(model.estimator)
             # Evaluate the individual
             self.model_evaluator.compute(
-                estimator=self.model.estimator,
-                X_test=X_val,
+                estimator=model.estimator,
+                X_test=X_val[:, solution_mask],
                 y_test=y_val,
                 verbose=False
             )
@@ -151,7 +165,7 @@ class WrapperEvaluation():
         for metric in self.evaluations.keys():
             self.evaluations[metric] = round(self.evaluations[metric]/data.kfolds, 4)
 
-        del X_train, X_val, y_train, y_val, self.model
+        del X_train, X_val, y_train, y_val, model
         gc.collect()
 
     def evaluate(self, solution: np.ndarray, data: DataLoader) -> dict:
@@ -175,10 +189,22 @@ class WrapperEvaluation():
         # Estimator(s) used for the current evaluation
         if self.store_estimators:
             self.estimators = list()
+
         # If no feature is selected
         self.evaluations = {metric: 0 for metric in self.model_evaluator.metrics}
         if solution.sum() == 0:
             return self.evaluations
+
+        # Cache lookup (key is unique for fixed-length solutions)
+        cache_key = None
+        if self.cache_size > 0:
+            packed = np.packbits(solution.astype(np.uint8, copy=False))
+            cache_key = (solution.shape[0], packed.tobytes)
+            cached = self._cache.get(cache_key)
+            if cached is not None:
+                self._cache.move_to_end(cache_key)
+                return cached.copy()
+
         # Boolean array used to filter which features will be used to fit the model
         solution_mask = solution.astype(bool)
 
@@ -194,5 +220,12 @@ class WrapperEvaluation():
                 solution_mask=solution_mask,
                 data=data,
             )
+
+        # Cache store (bounded)
+        if cache_key is not None and self.cache_size > 0:
+            self._cache[cache_key] = self.evaluations.copy()
+            self._cache.move_to_end(cache_key)
+            while len(self._cache) > self.cache_size:
+                self._cache.popitem(last=False)
 
         return self.evaluations
