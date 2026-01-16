@@ -186,6 +186,16 @@ class WrapperEvaluation():
         : dict
             Evaluation metrics.
         """
+        # Cache lookup (key is unique for fixed-length solutions)
+        cache_key = None
+        if self.cache_size > 0:
+            packed = np.packbits(solution.astype(np.uint8, copy=False))
+            cache_key = (solution.shape[0], packed.tobytes())
+            cached = self._cache.get(cache_key)
+            if cached is not None:
+                self._cache.move_to_end(cache_key)
+                return cached.copy()
+
         # Estimator(s) used for the current evaluation
         if self.store_estimators:
             self.estimators = list()
@@ -194,16 +204,6 @@ class WrapperEvaluation():
         self.evaluations = {metric: 0 for metric in self.model_evaluator.metrics}
         if solution.sum() == 0:
             return self.evaluations
-
-        # Cache lookup (key is unique for fixed-length solutions)
-        cache_key = None
-        if self.cache_size > 0:
-            packed = np.packbits(solution.astype(np.uint8, copy=False))
-            cache_key = (solution.shape[0], packed.tobytes)
-            cached = self._cache.get(cache_key)
-            if cached is not None:
-                self._cache.move_to_end(cache_key)
-                return cached.copy()
 
         # Boolean array used to filter which features will be used to fit the model
         solution_mask = solution.astype(bool)

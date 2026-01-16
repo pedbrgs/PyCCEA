@@ -142,3 +142,33 @@ def test_kfold_cross_validation(monkeypatch, classification_data, complete_data_
     # Assert that all expected evaluation metrics are present in the evaluator's output dictionary
     for metric in evaluator.model_evaluator.metrics:
         assert metric in evaluator.evaluations.keys()
+
+
+def test_cache_hit_avoids_recompute(monkeypatch) -> None:
+    """Test when cache hit avoids recompute the same solution."""
+    calls = {"n": 0}
+
+    def fake_hold_out(self, solution_mask, data):
+        calls["n"] += 1
+        self.evaluations = {m: float(calls["n"]) for m in self.model_evaluator.metrics}
+
+    monkeypatch.setattr(WrapperEvaluation, "_hold_out_validation", fake_hold_out)
+
+    evaluator = WrapperEvaluation(
+        task="classification",
+        n_classes=2,
+        eval_function="accuracy",
+        model_type="logistic_regression",
+        eval_mode="hold_out",
+        cache_size=128,
+        store_estimators=False
+    )
+
+    solution = np.array([0, 1, 0, 1, 1, 0, 0, 0], dtype=np.int8)
+
+    r1 = evaluator.evaluate(solution=solution, data=None)
+    r2 = evaluator.evaluate(solution=solution, data=None)
+
+    assert r1 == r2
+    assert calls["n"] == 1
+    assert r2 is not r1  # second return is a copy from cache (should not be the same object)
