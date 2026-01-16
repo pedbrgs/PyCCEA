@@ -172,3 +172,64 @@ def test_cache_hit_avoids_recompute(monkeypatch) -> None:
     assert r1 == r2
     assert calls["n"] == 1
     assert r2 is not r1  # second return is a copy from cache (should not be the same object)
+
+
+def test_cache_disabled(monkeypatch) -> None:
+    """Test when cache is disabled."""
+    calls = {"n": 0}
+
+    def fake_hold_out(self, solution_mask, data):
+        calls["n"] += 1
+        self.evaluations = {m: float(calls["n"]) for m in self.model_evaluator.metrics}
+
+    monkeypatch.setattr(WrapperEvaluation, "_hold_out_validation", fake_hold_out)
+
+    evaluator = WrapperEvaluation(
+        task="classification",
+        n_classes=2,
+        eval_function="accuracy",
+        model_type="logistic_regression",
+        eval_mode="hold_out",
+        cache_size=0,
+        store_estimators=False
+    )
+
+    solution = np.array([0, 1, 0, 1, 1, 0, 0, 0], dtype=np.int8)
+
+    _ = evaluator.evaluate(solution=solution, data=None)
+    _ = evaluator.evaluate(solution=solution, data=None)
+
+    assert calls["n"] == 2
+
+
+def test_cache_eviction(monkeypatch) -> None:
+    """Test cache eviction when max size is reached."""
+    calls = {"n": 0}
+
+    def fake_hold_out(self, solution_mask, data):
+        calls["n"] += 1
+        self.evaluations = {m: float(calls["n"]) for m in self.model_evaluator.metrics}
+
+    monkeypatch.setattr(WrapperEvaluation, "_hold_out_validation", fake_hold_out)
+
+    evaluator = WrapperEvaluation(
+        task="classification",
+        n_classes=2,
+        eval_function="accuracy",
+        model_type="logistic_regression",
+        eval_mode="hold_out",
+        cache_size=2,
+        store_estimators=False
+    )
+
+    solution1 = np.array([0, 1, 0, 1, 1, 0, 0, 0], dtype=np.int8)
+    solution2 = np.array([1, 0, 1, 0, 0, 1, 0, 0], dtype=np.int8)
+    solution3 = np.array([1, 1, 0, 0, 1, 0, 0, 0], dtype=np.int8)
+
+    _ = evaluator.evaluate(solution=solution1, data=None)  # cached
+    _ = evaluator.evaluate(solution=solution2, data=None)  # cached
+    _ = evaluator.evaluate(solution=solution1, data=None)  # cache hit
+    _ = evaluator.evaluate(solution=solution3, data=None)  # causes eviction of solution2
+    _ = evaluator.evaluate(solution=solution2, data=None)  # recompute
+
+    assert calls["n"] == 4
