@@ -1,4 +1,5 @@
 import copy
+import gc
 import importlib.resources
 import logging
 import os
@@ -235,6 +236,7 @@ class DataLoader():
                 X_test=self.X_test
             )
         self._cast_float_dtype()
+        self._delete_intermediate_data()
         logging.info("Data is ready for use.")
 
     def _cast_array(self, X: np.ndarray, array_name: str) -> np.ndarray:
@@ -261,6 +263,16 @@ class DataLoader():
             for k in range(len(self.train_folds)):
                 self.train_folds[k][0] = self._cast_array(self.train_folds[k][0], f"{k}-th train fold")
                 self.val_folds[k][0] = self._cast_array(self.val_folds[k][0], f"{k}-th val fold")
+
+    def _delete_intermediate_data(self) -> None:
+        """Delete intermediate data to free memory."""
+        if hasattr(self, "data"):
+            delattr(self, "data")
+        if hasattr(self, "X"):
+            delattr(self, "X")
+        if hasattr(self, "y"):
+            delattr(self, "y")
+        gc.collect()
 
     def _load(self) -> None:
         """Load dataset according to dataset given as a parameter."""

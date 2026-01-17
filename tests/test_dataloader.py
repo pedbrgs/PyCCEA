@@ -612,3 +612,23 @@ def test_cast_array_converts_dtype(complete_data_conf: dict) -> None:
     out = loader._cast_array(X, "X_train")
 
     assert out.dtype == np.float32
+
+
+def test_delete_intermediate_data(complete_data_conf: dict) -> None:
+    """Test _delete_intermediate_data method."""
+    loader = DataLoader("dummy", complete_data_conf)
+
+    loader.data = pd.DataFrame({
+        "0": [1, 2],
+        "1": [3, 4],
+        "label": [5, 6],
+        "subset": ["train", "test"]
+    })
+    loader.X = loader._get_input()
+    loader.y = loader._get_output()
+
+    loader._delete_intermediate_data()
+
+    assert not hasattr(loader, "data")
+    assert not hasattr(loader, "X")
+    assert not hasattr(loader, "y")
