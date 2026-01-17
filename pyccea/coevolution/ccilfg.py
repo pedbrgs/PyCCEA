@@ -1,5 +1,4 @@
 import gc
-import copy
 import logging
 import numpy as np
 from math import log
@@ -345,7 +344,7 @@ class CCILFG(CCGA):
         )
         # Select the globally best context vector
         self.best_context_vector, self.best_fitness = self._get_global_best()
-        self.best_context_vectors.append(self.best_context_vector.copy())
+        self.self._record_best_context_vector(self.best_context_vector)
         # Save the order of features considered in the random feature grouping
         self.best_feature_idxs = self.feature_idxs.copy()
 
@@ -393,10 +392,11 @@ class CCILFG(CCGA):
                     current_context_vectors[i].append(context_vector.copy())
                     # Update fitness
                     current_fitness[i].append(self.fitness_function.evaluate(context_vector, self.data))
+                    del collaborators, context_vector
             # Update subpopulations, context vectors and evaluations
-            self.subpops = copy.deepcopy(current_subpops)
-            self.fitness = copy.deepcopy(current_fitness)
-            self.context_vectors = copy.deepcopy(current_context_vectors)
+            self.subpops = current_subpops
+            self.fitness = current_fitness
+            self.context_vectors = current_context_vectors
             del current_subpops, current_fitness, current_context_vectors
             gc.collect()
 
@@ -424,7 +424,7 @@ class CCILFG(CCGA):
                 )
                 # Update best context vector
                 self.best_context_vector = best_context_vector.copy()
-                self.best_context_vectors.append(self.best_context_vector.copy())
+                self.self._record_best_context_vector(self.best_context_vector)
                 # Update best fitness
                 self.best_fitness = best_fitness
             else:

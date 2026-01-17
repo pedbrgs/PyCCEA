@@ -1,4 +1,3 @@
-import copy
 import gc
 import importlib.resources
 import logging
@@ -9,6 +8,7 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 import toml
+from sklearn.base import clone as sklearn_clone
 from sklearn.model_selection import (GroupKFold, KFold, LeaveOneOut,
                                      StratifiedKFold, train_test_split)
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -423,7 +423,7 @@ class DataLoader():
         """
         # Normalization across instances should be done after splitting the data between training
         # and test set to avoid leakage
-        normalizer = copy.copy(self.normalizer)
+        normalizer = sklearn_clone(self.normalizer)
         if self.winsorization:
             X_train, X_test = self._truncate_subsets(X_train, X_test)
         X_normalized_train = normalizer.fit_transform(X=X_train)

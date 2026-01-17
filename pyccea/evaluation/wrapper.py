@@ -159,12 +159,13 @@ class WrapperEvaluation():
             )
             for metric in self.evaluations.keys():
                 self.evaluations[metric] += self.model_evaluator.values[metric]
+            del model
 
         # Calculate average performance over k folds
         for metric in self.evaluations.keys():
             self.evaluations[metric] = round(self.evaluations[metric]/data.kfolds, 4)
 
-        del X_train, X_val, y_train, y_val, model
+        del X_train, X_val, y_train, y_val
         gc.collect()
 
     def evaluate(self, solution: np.ndarray, data: DataLoader) -> dict:

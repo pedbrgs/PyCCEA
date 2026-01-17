@@ -41,6 +41,8 @@ class CCEA(ABC):
         Evaluation of the best solution of the complete problem.
     feature_idxs : np.ndarray
         List of feature indexes.
+    best_context_vectors: list
+        Best context vector in each generation.
     """
 
     def __init__(self, data: DataLoader, conf: dict, verbose: bool = True):
@@ -97,6 +99,8 @@ class CCEA(ABC):
         self.convergence_curve = list()
         # List to store the best context vector in each generation
         self.best_context_vectors = list()
+        # Maximum number of best context vectors to store
+        self.max_best_context_vectors = conf["coevolution"].get("max_best_context_vectors")
 
         # Initialize logger with info level
         logging.basicConfig(encoding="utf-8", level=logging.INFO)
@@ -181,6 +185,16 @@ class CCEA(ABC):
         best_fitness = self.current_best[best_idx]["fitness"]
         best_context_vector = self.current_best[best_idx]["context_vector"].copy()
         return best_context_vector, best_fitness
+
+    def _record_best_context_vector(self, context_vector: np.ndarray) -> None:
+        """Store best context vectors while keeping memory bounded."""
+        self.best_context_vectors.append(context_vector.copy())
+        max_keep = self.max_best_context_vectors
+        if max_keep is None:
+            return
+        if isinstance(max_keep, int) and max_keep > 0:
+            if len(self.best_context_vectors) > max_keep:
+                self.best_context_vectors = self.best_context_vectors[-max_keep:]
 
     def _init_subpopulations(self):
         """Initialize all subpopulations according to their respective sizes."""

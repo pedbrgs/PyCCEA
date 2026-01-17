@@ -1,5 +1,4 @@
 import gc
-import copy
 import time
 import logging
 import fastcluster
@@ -442,7 +441,7 @@ class CCPSTFG(CCGA):
         )
         # Select the globally best context vector
         self.best_context_vector, self.best_fitness = self._get_global_best()
-        self.best_context_vectors.append(self.best_context_vector)
+        self.self._record_best_context_vector(self.best_context_vector)
         # Save the order of features considered in the random feature grouping
         self.best_feature_idxs = self.feature_idxs.copy()
 
@@ -490,6 +489,7 @@ class CCPSTFG(CCGA):
                     current_context_vectors[i].append(context_vector)
                     # Update fitness
                     current_fitness[i].append(self.fitness_function.evaluate(context_vector, self.data))
+                    del collaborators, context_vector
             # Update subpopulations, context vectors and evaluations
             self.subpops = current_subpops
             self.fitness = current_fitness
@@ -521,7 +521,7 @@ class CCPSTFG(CCGA):
                 )
                 # Update best context vector
                 self.best_context_vector = best_context_vector.copy()
-                self.best_context_vectors.append(self.best_context_vector)
+                self.self._record_best_context_vector(self.best_context_vector)
                 # Update best fitness
                 self.best_fitness = best_fitness
             else:
