@@ -135,7 +135,7 @@ def test_get_ready_calls_all_methods(monkeypatch, mocker, complete_data_conf: di
     loader._split.assert_called_once()
     loader._cast_float_dtype.assert_called_once()
     # Normalize folds for optimization and then training and test sets for final evaluation
-    assert loader._normalize_subsets.call_count == 1 + complete_data_conf["splitter"]["kfolds"]
+    assert loader._normalize_subsets.call_count == 1
     loader._model_selection.assert_called_once()
 
 
@@ -395,8 +395,8 @@ def test_stratified_kfold_model_selection(monkeypatch, complete_data_conf: dict)
 
     loader._model_selection()
 
-    assert len(loader.train_folds) == loader.kfolds
-    assert len(loader.val_folds) == loader.kfolds
+    assert len(loader.train_indices) == loader.kfolds
+    assert len(loader.val_indices) == loader.kfolds
     assert isinstance(loader.splitter, StratifiedKFold)
 
 
@@ -410,8 +410,8 @@ def test_kfold_model_selection(monkeypatch, complete_data_conf: dict) -> None:
 
     loader._model_selection()
 
-    assert len(loader.train_folds) == loader.kfolds
-    assert len(loader.val_folds) == loader.kfolds
+    assert len(loader.train_indices) == loader.kfolds
+    assert len(loader.val_indices) == loader.kfolds
     assert isinstance(loader.splitter, KFold)
 
 
@@ -434,8 +434,8 @@ def test_group_kfold_model_selection(monkeypatch, complete_data_conf: dict) -> N
     loader._split()
     loader._model_selection()
 
-    assert len(loader.train_folds) == loader.kfolds
-    assert len(loader.val_folds) == loader.kfolds
+    assert len(loader.train_indices) == loader.kfolds
+    assert len(loader.val_indices) == loader.kfolds
     assert isinstance(loader.splitter, GroupKFold)
 
     # Original group counts by fold (only for training subset)
@@ -443,7 +443,8 @@ def test_group_kfold_model_selection(monkeypatch, complete_data_conf: dict) -> N
         loader.data.query("subset == 'train'").groupby("fold")["fold"].count()
     )
 
-    for i, _ in enumerate(zip(loader.train_folds, loader.val_folds)):
+    for i in range(loader.kfolds):
+        # Indices for the current fold
         val_indices = loader.val_indices[i]
         train_indices = loader.train_indices[i]
 
@@ -517,8 +518,8 @@ def test_leave_one_out_model_selection(complete_data_conf: dict) -> None:
 
     loader._model_selection()
 
-    assert len(loader.train_folds) == len(loader.X_train)
-    assert len(loader.val_folds) == len(loader.X_train)
+    assert len(loader.train_indices) == len(loader.X_train)
+    assert len(loader.val_indices) == len(loader.X_train)
     assert isinstance(loader.splitter, LeaveOneOut)
 
 
@@ -551,25 +552,15 @@ def test_cast_float_dtype_on_main_subsets(complete_data_conf: dict) -> None:
     assert loader.X_test.dtype == np.float32
 
 
-def test_cast_float_dtype_on_folds(complete_data_conf: dict) -> None:
+def test_cast_float_dtype_on_raw_training_data(complete_data_conf: dict) -> None:
     """Test float dtype casting on train/val folds."""
     complete_data_conf["general"]["float_dtype"] = "float32"
     loader = DataLoader("dummy", complete_data_conf)
 
-    X_fold = np.array([[1.0], [2.0]], dtype=np.float64)
-    y_fold = np.array([0, 1], dtype=np.int64)
-
-    loader.train_folds = [[X_fold.copy(), y_fold.copy()]]
-    loader.val_folds = [[X_fold.copy(), y_fold.copy()]]
-
+    loader._raw_X_train = np.array([[1.0], [2.0]], dtype=np.float64)
     loader._cast_float_dtype()
 
-    assert loader.train_folds[0][0].dtype == np.float32
-    assert loader.val_folds[0][0].dtype == np.float32
-
-    # y must NOT be cast
-    assert loader.train_folds[0][1].dtype == np.int64
-    assert loader.val_folds[0][1].dtype == np.int64
+    assert loader._raw_X_train.dtype == np.float32
 
 
 def test_cast_float_dtype_invalid_value_raises_value_error(complete_data_conf: dict) -> None:

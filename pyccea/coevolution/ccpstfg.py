@@ -137,8 +137,7 @@ class CCPSTFG(CCGA):
             for k in range(self.data.kfolds):
 
                 # Retrieve training and validation inputs and outputs
-                X_train_fold, y_train_fold = self.data.train_folds[k][0], self.data.train_folds[k][1]
-                X_val_fold, y_val_fold = self.data.val_folds[k][0], self.data.val_folds[k][1]
+                X_train_fold, y_train_fold, X_val_fold, y_val_fold = self.data.get_fold(k)
 
                 # Apply centering to both training and validation folds
                 X_train_fold_mean = X_train_fold.mean(axis=0)
@@ -316,9 +315,8 @@ class CCPSTFG(CCGA):
         # Removing features from subsets and folds
         self.data.X_train = self.data.X_train[:, features_to_keep]
         self.data.X_test = self.data.X_test[:, features_to_keep]
-        for k in range(self.data.kfolds):
-            self.data.train_folds[k][0] = self.data.train_folds[k][0][:, features_to_keep]
-            self.data.val_folds[k][0] = self.data.val_folds[k][0][:, features_to_keep]
+        if hasattr(self.data, "_raw_X_train"):
+            self.data._raw_X_train = self.data._raw_X_train[:, features_to_keep]
 
         # Importance of the remaining features
         importances = importances[features_to_keep]

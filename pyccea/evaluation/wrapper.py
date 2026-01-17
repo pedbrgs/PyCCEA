@@ -138,8 +138,7 @@ class WrapperEvaluation():
         """Evaluate an individual using cross-validation (leave-one-out or k-fold)."""
         for k in range(data.kfolds):
             # Get training and validations subsets built from the full training set
-            X_train, y_train = data.train_folds[k]
-            X_val, y_val = data.val_folds[k]
+            X_train, y_train, X_val, y_val = data.get_fold(k)
             # Get model that has not been previously fitted
             model = self.base_model.clone()
             # Train model with the current subset of features

@@ -198,26 +198,22 @@ class CCEA(ABC):
         self.context_vectors = self.initializer.context_vectors
         # Evaluations of context vectors
         self.fitness = self.initializer.fitness
-        del self.initializer
+        delattr(self, "initializer")
         gc.collect()
 
     def _problem_decomposition(self):
         """Decompose the problem into smaller subproblems."""
-        for k in range(self.data.kfolds):
-            Xk_train = self.data.train_folds[k][0]
-            # Decompose only once to use the same feature indexes on all k-folds
-            if k == 0:
-                _, self.feature_idxs = self.decomposer.decompose(X=Xk_train)
-                self.feature_importances = self.feature_importances[self.feature_idxs]
-            # Reorder training and validation folds built from the training set according to the
-            # shuffling in the feature decomposition
-            self.data.train_folds[k][0] = Xk_train[:, self.feature_idxs]
-            Xk_val = self.data.val_folds[k][0]
-            self.data.val_folds[k][0] = Xk_val[:, self.feature_idxs]
+        # Decompose only once to use the same feature indexes on all k-folds
+        Xk_train, _, _, _ = self.data.get_fold(0, normalize=False)
+        _, self.feature_idxs = self.decomposer.decompose(X=Xk_train)
+        self.feature_importances = self.feature_importances[self.feature_idxs]
         # Reorder training set according to the shuffling in the feature decomposition
         self.data.X_train = self.data.X_train[:, self.feature_idxs]
         # Reorder test set according to the shuffling in the feature decomposition
         self.data.X_test = self.data.X_test[:, self.feature_idxs]
+        # Keep raw training data aligned for fold normalization if it exists
+        if hasattr(self.data, "_raw_X_train"):
+            self.data._raw_X_train = self.data._raw_X_train[:, self.feature_idxs]
         # Update 'n_subcomps' when it starts with NoneType
         self.n_subcomps = self.decomposer.n_subcomps
         # Update 'subcomp_sizes' when it starts with an empty list

@@ -111,3 +111,33 @@ def test_regression_model_selection_grid_setup(regression_data, model_type, expe
     model._model_selection(X, y, n_iter=2, seed=42, kfolds=2)
     for key in expected_keys:
         assert key in model.grid
+
+
+def test_classification_model_clone_is_unfitted(classification_data) -> None:
+    """Test clone returns a new, unfitted classification model with same hyperparameters."""
+    X_train, y_train = classification_data
+    model = ClassificationModel("random_forest")
+    model.train(X_train, y_train, optimize=False)
+
+    cloned = model.clone()
+
+    assert cloned is not model
+    assert cloned.model_type == model.model_type
+    assert cloned.estimator is not model.estimator
+    assert cloned.estimator.get_params() == model.estimator.get_params()
+    assert not hasattr(cloned.estimator, "n_features_in_")
+
+
+def test_regression_model_clone_is_unfitted(regression_data) -> None:
+    """Test clone returns a new, unfitted regression model with same hyperparameters."""
+    X_train, y_train = regression_data
+    model = RegressionModel("random_forest")
+    model.train(X_train, y_train, optimize=False)
+
+    cloned = model.clone()
+
+    assert cloned is not model
+    assert cloned.model_type == model.model_type
+    assert cloned.estimator is not model.estimator
+    assert cloned.estimator.get_params() == model.estimator.get_params()
+    assert not hasattr(cloned.estimator, "n_features_in_")

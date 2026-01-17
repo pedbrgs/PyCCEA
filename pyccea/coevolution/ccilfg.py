@@ -183,9 +183,8 @@ class CCILFG(CCGA):
         # Removing features from subsets and folds
         self.data.X_train = self.data.X_train[:, features_to_keep].copy()
         self.data.X_test = self.data.X_test[:, features_to_keep].copy()
-        for k in range(self.data.kfolds):
-            self.data.train_folds[k][0] = self.data.train_folds[k][0][:, features_to_keep].copy()
-            self.data.val_folds[k][0] = self.data.val_folds[k][0][:, features_to_keep].copy()
+        if hasattr(self.data, "_raw_X_train"):
+            self.data._raw_X_train = self.data._raw_X_train[:, features_to_keep].copy()
 
         # Importance of the remaining features
         importances = importances[features_to_keep].copy()
