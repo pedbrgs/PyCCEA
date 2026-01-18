@@ -255,7 +255,12 @@ class CCEA(ABC):
             f"Test data: {test_mb} MB | "
             f"Raw Training data: {raw_training_mb} MB"
         )
+        # Log message even if logging is disabled
+        logger = logging.getLogger()
+        was_disabled = logger.disabled
+        logger.disabled = False
         logging.info(message)
+        logger.disabled = was_disabled
 
     def _init_subpopulations(self):
         """Initialize all subpopulations according to their respective sizes."""
