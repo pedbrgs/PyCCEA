@@ -115,8 +115,9 @@ class SubpopulationInitialization(ABC):
         progress_bar = tqdm(total=self.n_subcomps, desc="Evaluating individuals")
         # For each subpopulation
         for i, subpop in enumerate(self.subpops):
-            # Initialize context vectors in the current subpopulation
-            subpop_context_vectors = None
+            # Track only the best context vector in the current subpopulation
+            best_context_vector = None
+            best_fitness = None
             # List to store the evaluations of these context vectors
             subpop_fitness = list()
             # Evaluate each individual in the subpopulation
@@ -127,27 +128,24 @@ class SubpopulationInitialization(ABC):
                     indiv_idx=j,
                     subpops=self.subpops
                 )
-                if subpop_context_vectors is None:
-                    subpop_context_vectors = np.empty(
-                        (len(subpop), len(context_vector)),
-                        dtype=subpop.dtype
-                )
                 # Evaluate the context vector
                 fitness = self.fitness_function.evaluate(context_vector, self.data)
-                # Store the complete problem solution related to the current individual
-                subpop_context_vectors[j] = context_vector
+                # Track best context vector for this subpopulation
+                if (best_fitness is None) or (fitness > best_fitness):
+                    best_fitness = fitness
+                    best_context_vector = context_vector.copy()
                 # Store evaluation of the current context vector
                 subpop_fitness.append(fitness)
                 del context_vector, fitness
                 gc.collect()
-            # Store all complete problem solutions related to the current subpopulation
-            self.context_vectors.append(subpop_context_vectors)
+            # Store best complete problem solution related to the current subpopulation
+            self.context_vectors.append(best_context_vector)
             # Store evaluation of all context vectors of the current subpopulation
             self.fitness.append(subpop_fitness)
             # Update progress bar
             progress_bar.update(1)
             # Delete variables related to the current subpopulation
-            del subpop_context_vectors, subpop_fitness
+            del subpop_fitness, best_context_vector, best_fitness
             gc.collect()
         # Close progress bar
         progress_bar.close()

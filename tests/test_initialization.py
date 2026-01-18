@@ -143,7 +143,7 @@ def test_evaluate_individuals(
 
     # Each entry in context_vectors should be a numpy array with shape matching subpop size
     for i, subpop in enumerate(instance.subpops):
-        assert instance.context_vectors[i].shape[0] == len(subpop)
+        assert instance.context_vectors[i].ndim == 1
         # Each fitness list should have fitness values equal to subpop size
         assert len(instance.fitness[i]) == len(subpop)
         # Fitness values should be what dummy_fitness_function.evaluate returns (42.0)

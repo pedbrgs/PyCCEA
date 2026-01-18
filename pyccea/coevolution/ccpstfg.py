@@ -473,10 +473,9 @@ class CCPSTFG(CCGA):
 
             # Evaluate each individual of the evolved subpopulations
             current_fitness = list()
-            current_context_vectors = list()
+            current_best_context_vectors = list()
             for i in range(self.n_subcomps):
                 current_fitness.append(list())
-                current_context_vectors.append(list())
                 # Use best individuals from the previous generation (`self.current_best`) as
                 # collaborators for each individual in the current generation after evolve
                 # (`current_subpops`)
@@ -488,16 +487,20 @@ class CCPSTFG(CCGA):
                         current_best=self.current_best
                     )
                     context_vector = self.best_collaborator.build_context_vector(collaborators)
-                    # Update the context vector
-                    current_context_vectors[i].append(context_vector)
                     # Update fitness
-                    current_fitness[i].append(self.fitness_function.evaluate(context_vector, self.data))
+                    fitness = self.fitness_function.evaluate(context_vector, self.data)
+                    current_fitness[i].append(fitness)
+                    # Update best context vector for the current subpopulation
+                    if (best_fitness is None) or (fitness > best_fitness):
+                        best_fitness = fitness
+                        best_context_vector = context_vector.copy()
                     del collaborators, context_vector
+                current_best_context_vectors.append(best_context_vector)
             # Update subpopulations, context vectors and evaluations
             self.subpops = current_subpops
             self.fitness = current_fitness
-            self.context_vectors = current_context_vectors
-            del current_subpops, current_fitness, current_context_vectors
+            self.context_vectors = current_best_context_vectors
+            del current_subpops, current_fitness, current_best_context_vectors
             gc.collect()
             self._log_memory_usage(stage="After subpopulation evaluation", n_gen=n_gen)
 

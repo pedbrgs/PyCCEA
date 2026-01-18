@@ -178,7 +178,7 @@ class CCEA(ABC):
             best_ind_idx = np.argmax(fitness[i])
             current_best[i] = dict()
             current_best[i]["individual"] = subpops[i][best_ind_idx].copy()
-            current_best[i]["context_vector"] = context_vectors[i][best_ind_idx].copy()
+            current_best[i]["context_vector"] = context_vectors[i].copy()
             current_best[i]["fitness"] = fitness[i][best_ind_idx]
 
         return current_best
