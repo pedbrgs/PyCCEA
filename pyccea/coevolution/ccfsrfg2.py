@@ -42,7 +42,7 @@ class CCFSRFG2(CCGA):
         )
         # Select the globally best context vector
         self.best_context_vector, self.best_fitness = self._get_global_best()
-        self.self._record_best_context_vector(self.best_context_vector)
+        self._record_best_context_vector(self.best_context_vector)
         # Store the shuffled feature list that generated the best context vector
         self.best_feature_idxs = self.feature_idxs.copy()
 
@@ -149,7 +149,7 @@ class CCFSRFG2(CCGA):
                 )
                 # Update best context vector
                 self.best_context_vector = best_context_vector.copy()
-                self.self._record_best_context_vector(self.best_context_vector)
+                self._record_best_context_vector(self.best_context_vector)
                 # Update best fitness
                 self.best_fitness = best_fitness
                 # Update the shuffled feature list that generated the best context vector

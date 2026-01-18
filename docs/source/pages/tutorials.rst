@@ -250,7 +250,7 @@ including decomposition, initialization, evolution, evaluation, and convergence 
             context_vectors=self.context_vectors
         )
         self.best_context_vector, self.best_fitness = self._get_global_best()
-        self.self._record_best_context_vector(self.best_context_vector)
+        self._record_best_context_vector(self.best_context_vector)
         self.best_feature_idxs = self.feature_idxs.copy()
 
         n_gen = 0
@@ -298,7 +298,7 @@ including decomposition, initialization, evolution, evaluation, and convergence 
             if self.best_fitness < best_fitness:
                 stagnation_counter = 0
                 self.best_context_vector = best_context_vector.copy()
-                self.self._record_best_context_vector(self.best_context_vector)
+                self._record_best_context_vector(self.best_context_vector)
                 self.best_fitness = best_fitness
             else:
                 stagnation_counter += 1
