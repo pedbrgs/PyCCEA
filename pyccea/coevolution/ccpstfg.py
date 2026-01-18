@@ -428,8 +428,10 @@ class CCPSTFG(CCGA):
         if self.conf["coevolution"].get("optimized_resource_allocation", False):
             logging.info("Optimizing resource allocation...")
             self._allocate_subproblem_resources()
+        self._log_memory_usage(stage="After problem decomposition")
         # Initialize subpopulations
         self._init_subpopulations()
+        self._log_memory_usage(stage="After subpopulation initialization")
         # Instantiate optimizers
         self._init_optimizers()
 
@@ -467,6 +469,7 @@ class CCPSTFG(CCGA):
                     fitness=self.fitness[i]
                 )
                 current_subpops.append(current_subpop)
+            self._log_memory_usage(stage="After subpopulation evolution", n_gen=n_gen)
 
             # Evaluate each individual of the evolved subpopulations
             current_fitness = list()
@@ -496,6 +499,7 @@ class CCPSTFG(CCGA):
             self.context_vectors = current_context_vectors
             del current_subpops, current_fitness, current_context_vectors
             gc.collect()
+            self._log_memory_usage(stage="After subpopulation evaluation", n_gen=n_gen)
 
             # Get the best individual and context vector from each subpopulation
             self.current_best = self._get_best_individuals(
@@ -536,6 +540,7 @@ class CCPSTFG(CCGA):
                         f"{stagnation_counter} generations in a row."
                     )
                     break
+            self._log_memory_usage(stage="After generation", n_gen=n_gen)
             # Increase number of generations
             n_gen += 1
             # Update progress bar

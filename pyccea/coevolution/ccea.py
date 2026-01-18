@@ -1,3 +1,4 @@
+import os
 import gc
 import logging
 import numpy as np
@@ -197,6 +198,61 @@ class CCEA(ABC):
                 self.best_context_vectors = self.best_context_vectors[-max_keep:]
         if isinstance(max_keep, int) and max_keep <= 0:
             self.best_context_vectors.clear()
+
+    def _get_rss_mb(self) -> float:
+        """Get resident set size (RSS) in megabytes (MB) when available."""
+        if os.name != "posix":
+            return None
+        try:
+            with open("/proc/self/status", "r", encoding="utf-8") as status_file:
+                for line in status_file:
+                    if line.startswith("VmRSS:"):
+                        parts = line.split()
+                        return round(int(parts[1]) / 1024, 2)  # Convert from kB to MB
+        except FileNotFoundError:
+            return None
+        return None
+
+    def _sum_nbytes(self, obj) -> int:
+        """Recursively sum the number of bytes of a given object and its contents."""
+        total_size = 0
+        if isinstance(obj, np.ndarray):
+            total_size += obj.nbytes
+        elif isinstance(obj, (list, tuple, set)):
+            for item in obj:
+                total_size += self._sum_nbytes(item)
+        elif isinstance(obj, dict):
+            for key, value in obj.items():
+                total_size += self._sum_nbytes(key)
+                total_size += self._sum_nbytes(value)
+        return total_size
+
+    def _log_memory_usage(self, stage: str, n_gen: int = None) -> None:
+        """Log memory usage of objects to help find bottenecks."""
+        if not self.memory_profile:
+            return
+        if n_gen is not None:
+            if not self.memory_log_every or (n_gen % self.memory_log_every) != 0:
+                return
+        rss_mb = self._get_rss_mb()
+        subpops_mb = round(self._sum_nbytes(getattr(self, "subpops", None)) / (1024 ** 2), 2)
+        context_vectors_mb = round(self._sum_nbytes(getattr(self, "context_vectors", None)) / (1024 ** 2), 2)
+        best_context_vectors_mb = round(self._sum_nbytes(getattr(self, "best_context_vectors", None)) / (1024 ** 2), 2)
+        training_mb = round(self._sum_nbytes(getattr(self.data, "X_train", None)) / (1024 ** 2), 2)
+        test_mb = round(self._sum_nbytes(getattr(self.data, "X_test", None)) / (1024 ** 2), 2)
+        raw_training_mb = round(self._sum_nbytes(getattr(self.data, "_raw_X_train", None)) / (1024 ** 2), 2)
+        message = (
+            f"[Memory Usage] Stage: {stage} | "
+            f"{'' if n_gen is None else f' Generation: {n_gen} | '}"
+            f"RSS: {rss_mb} MB | "
+            f"Subpopulations: {subpops_mb} MB | "
+            f"Context Vectors: {context_vectors_mb} MB | "
+            f"Best Context Vectors: {best_context_vectors_mb} MB | "
+            f"Training data: {training_mb} MB | "
+            f"Test data: {test_mb} MB | "
+            f"Raw Training data: {raw_training_mb} MB"
+        )
+        logging.info(message)
 
     def _init_subpopulations(self):
         """Initialize all subpopulations according to their respective sizes."""
