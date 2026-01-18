@@ -195,6 +195,8 @@ class CCEA(ABC):
         if isinstance(max_keep, int) and max_keep > 0:
             if len(self.best_context_vectors) > max_keep:
                 self.best_context_vectors = self.best_context_vectors[-max_keep:]
+        if isinstance(max_keep, int) and max_keep <= 0:
+            self.best_context_vectors.clear()
 
     def _init_subpopulations(self):
         """Initialize all subpopulations according to their respective sizes."""
