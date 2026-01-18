@@ -102,6 +102,9 @@ class CCEA(ABC):
         self.best_context_vectors = list()
         # Maximum number of best context vectors to store
         self.max_best_context_vectors = conf["coevolution"].get("max_best_context_vectors")
+        # Optional memory profiling
+        self.memory_profile = conf["coevolution"].get("memory_profile", False)
+        self.memory_log_every = conf["coevolution"].get("memory_log_every", 0)
 
         # Initialize logger with info level
         logging.basicConfig(encoding="utf-8", level=logging.INFO)
