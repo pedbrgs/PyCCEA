@@ -476,6 +476,8 @@ class CCPSTFG(CCGA):
             current_best_context_vectors = list()
             for i in range(self.n_subcomps):
                 current_fitness.append(list())
+                best_context_vector = None
+                best_fitness = None
                 # Use best individuals from the previous generation (`self.current_best`) as
                 # collaborators for each individual in the current generation after evolve
                 # (`current_subpops`)
