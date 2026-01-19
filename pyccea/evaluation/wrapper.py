@@ -1,4 +1,3 @@
-import gc
 import logging
 import warnings
 import numpy as np
@@ -6,6 +5,7 @@ from collections import OrderedDict
 from ..utils.datasets import DataLoader
 from ..utils.models import ClassificationModel, RegressionModel
 from ..utils.metrics import ClassificationMetrics, RegressionMetrics
+from ..utils.memory import force_memory_release
 
 warnings.filterwarnings(action="ignore", category=UserWarning, message="y_pred contains classes")
 
@@ -132,7 +132,7 @@ class WrapperEvaluation():
         self.evaluations = self.model_evaluator.values
 
         del model
-        gc.collect()
+        force_memory_release()
 
     def _cross_validation(self, solution_mask: np.ndarray, data: DataLoader) -> None:
         """Evaluate an individual using cross-validation (leave-one-out or k-fold)."""
@@ -166,7 +166,7 @@ class WrapperEvaluation():
             self.evaluations[metric] = round(self.evaluations[metric]/data.kfolds, 4)
 
         del X_train, X_val, y_train, y_val
-        gc.collect()
+        force_memory_release()
 
     def evaluate(self, solution: np.ndarray, data: DataLoader) -> dict:
         """

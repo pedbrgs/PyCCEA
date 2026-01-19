@@ -1,8 +1,8 @@
-import gc
 import numpy as np
 from tqdm import tqdm
 from abc import ABC, abstractmethod
 from ..utils.datasets import DataLoader
+from ..utils.memory import force_memory_release
 
 
 class SubpopulationInitialization(ABC):
@@ -137,7 +137,7 @@ class SubpopulationInitialization(ABC):
                 # Store evaluation of the current context vector
                 subpop_fitness.append(fitness)
                 del context_vector, fitness
-                gc.collect()
+                force_memory_release()
             # Store best complete problem solution related to the current subpopulation
             self.context_vectors.append(best_context_vector)
             # Store evaluation of all context vectors of the current subpopulation
@@ -146,6 +146,6 @@ class SubpopulationInitialization(ABC):
             progress_bar.update(1)
             # Delete variables related to the current subpopulation
             del subpop_fitness, best_context_vector, best_fitness
-            gc.collect()
+            force_memory_release()
         # Close progress bar
         progress_bar.close()

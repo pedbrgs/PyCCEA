@@ -1,4 +1,3 @@
-import gc
 import time
 import logging
 import fastcluster
@@ -15,6 +14,7 @@ from ..projection.vip import VIP
 from ..coevolution.ccga import CCGA
 from ..projection.cipls import CIPLS
 from ..utils.datasets import DataLoader
+from ..utils.memory import force_memory_release
 from ..decomposition.ranking import RankingFeatureGrouping
 from ..decomposition.clustering import ClusteringFeatureGrouping
 
@@ -173,7 +173,7 @@ class CCPSTFG(CCGA):
             performance_values.append(np.mean(metric_folds))
 
             del metric_folds, projection_model, X_train_fold_centered, X_val_fold_centered
-            gc.collect()
+            force_memory_release()
 
         logging.info(
             [
@@ -230,7 +230,7 @@ class CCPSTFG(CCGA):
                 clustering_model = clustering_method(n_clusters=n_clusters, **clustering_params)
                 cluster_labels = clustering_model.fit_predict(feature_loadings)
                 del clustering_model
-                gc.collect()
+                force_memory_release()
             silhouette_avg = silhouette_score(
                 X=feature_loadings,
                 labels=cluster_labels,
@@ -278,7 +278,7 @@ class CCPSTFG(CCGA):
             metrics[quantile] = self.fitness_function.evaluate(features_to_keep, self.data)
             logging.getLogger().disabled = False
             del features_to_keep
-            gc.collect()
+            force_memory_release()
         # Get the quantile that gives the best fitness value
         metrics = pd.DataFrame(list(metrics.items()), columns=["quantile", "fitness"])
         best_quantile = metrics.loc[metrics["fitness"].idxmax(), "quantile"]
@@ -503,7 +503,7 @@ class CCPSTFG(CCGA):
             self.fitness = current_fitness
             self.context_vectors = current_best_context_vectors
             del current_subpops, current_fitness, current_best_context_vectors
-            gc.collect()
+            force_memory_release()
             self._log_memory_usage(stage="After subpopulation evaluation", n_gen=n_gen)
 
             # Get the best individual and context vector from each subpopulation

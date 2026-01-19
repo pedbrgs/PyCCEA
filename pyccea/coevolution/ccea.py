@@ -1,9 +1,9 @@
 import os
-import gc
 import logging
 import numpy as np
 from abc import ABC, abstractmethod
 from ..utils.datasets import DataLoader
+from ..utils.memory import force_memory_release
 
 
 class CCEA(ABC):
@@ -279,7 +279,7 @@ class CCEA(ABC):
         # Evaluations of context vectors
         self.fitness = self.initializer.fitness
         delattr(self, "initializer")
-        gc.collect()
+        force_memory_release()
 
     def _problem_decomposition(self):
         """Decompose the problem into smaller subproblems."""
