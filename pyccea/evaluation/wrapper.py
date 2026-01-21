@@ -1,3 +1,4 @@
+import os
 import logging
 import warnings
 import numpy as np
@@ -45,6 +46,7 @@ class WrapperEvaluation():
             n_classes: int = None,
             store_estimators: bool = True,
             cache_size: int = 0,
+            use_subprocess: bool = False
     ):
         """
         Parameters
@@ -68,6 +70,8 @@ class WrapperEvaluation():
             revisits the same solution multiple time (e.g., due to elitism/crossover), avoiding
             redundant model fits. Note: caching assumes evaluation is deterministic for a given
             solution.
+        use_subprocess : bool, default False
+            Whether to evaluate in a subprocess to release native memory back to the OS.
         """
         # Check if the chosen task is available
         if not task in WrapperEvaluation.metrics.keys():
@@ -101,6 +105,9 @@ class WrapperEvaluation():
             )
         self.eval_mode = eval_mode
         self.store_estimators = store_estimators
+        self.use_subprocess = use_subprocess
+        if self.use_subprocess and self.store_estimators:
+            raise ValueError("Subprocess evaluation does not support storing estimators.")
         # Optional bounded cache: avoids reffiting identifical feature subsets many times
         self.cache_size = int(cache_size) if cache_size is not None else 0
         self._cache = OrderedDict() if self.cache_size > 0 else None
@@ -168,9 +175,70 @@ class WrapperEvaluation():
         del X_train, X_val, y_train, y_val
         force_memory_release()
 
+    def _evaluate_core(self, solution: np.ndarray, data: DataLoader) -> dict:
+        """Evaluate an individual without cache or subprocess."""
+       # If no feature is selected
+        self.evaluations = {metric: 0 for metric in self.model_evaluator.metrics}
+        if solution.sum() == 0:
+            return self.evaluations
+
+        # Boolean array used to filter which features will be used to fit the model
+        solution_mask = solution.astype(bool)
+
+        # Hold-out validation
+        if self.eval_mode == "hold_out":
+            self._hold_out_validation(
+                solution_mask=solution_mask,
+                data=data,
+            )
+        # K-fold cross validation or leave-one-out cross validation
+        elif self.eval_mode in ["k_fold", "leave_one_out"]:
+            self._cross_validation(
+                solution_mask=solution_mask,
+                data=data,
+            )
+        return self.evaluations
+
+    def _evaluate_in_subprocess(self, solution: np.ndarray, data: DataLoader) -> dict:
+        """Evaluate in a forked subprocess and return evaluations."""
+        if os.name != "posix":
+            return self._evaluate_core(solution=solution, data=data)
+
+        read_fd, write_fd = os.pipe()
+        pid = os.fork()
+        if pid == 0:
+            try:
+                os.close(read_fd)
+                result = self._evaluate_core(solution=solution, data=data)
+                payload = pickle.dumps(result)
+                os.write(write_fd, payload)
+            except Exception as e:
+                payload = pickle.dumps({"__error__": repr(e)})
+                os.write(write_fd, payload)
+            finally:
+                os.close(write_fd)
+                os._exit(0)
+
+        os.close(write_fd)
+        chunks = list()
+        while True:
+            chunk = os.read(read_fd, 1024 * 1024)
+            if not chunk:
+                break
+            chunks.append(chunk)
+        os.close(read_fd)
+        os.waitpid(pid, 0)
+        data_bytes = b"".join(chunks)
+        if not data_bytes:
+            return {}
+        result = pickle.loads(data_bytes)
+        if "__error__" in result:
+            raise RunetimeError(result["__error__"])
+        self.evaluations = result
+        return result
+
     def evaluate(self, solution: np.ndarray, data: DataLoader) -> dict:
-        """
-        Evaluate an individual represented by a complete solution through the predictive
+        """Evaluate an individual represented by a complete solution through the predictive
         performance of a machine learning model.
 
         Parameters
@@ -200,32 +268,17 @@ class WrapperEvaluation():
         if self.store_estimators:
             self.estimators = list()
 
-        # If no feature is selected
-        self.evaluations = {metric: 0 for metric in self.model_evaluator.metrics}
-        if solution.sum() == 0:
-            return self.evaluations
-
-        # Boolean array used to filter which features will be used to fit the model
-        solution_mask = solution.astype(bool)
-
-        # Hold-out validation
-        if self.eval_mode == "hold_out":
-            self._hold_out_validation(
-                solution_mask=solution_mask,
-                data=data,
-            )
-        # K-fold cross validation or leave-one-out cross validation
-        elif self.eval_mode in ["k_fold", "leave_one_out"]:
-            self._cross_validation(
-                solution_mask=solution_mask,
-                data=data,
-            )
+        # Evaluate in subprocess (if enabled)
+        if self.use_subprocess:
+            result = self._evaluate_in_subprocess(solution=solution, data=data)
+        else:
+            result = self._evaluate_core(solution=solution, data=data)
 
         # Cache store (bounded)
         if cache_key is not None and self.cache_size > 0:
-            self._cache[cache_key] = self.evaluations.copy()
+            self._cache[cache_key] = result.copy()
             self._cache.move_to_end(cache_key)
             while len(self._cache) > self.cache_size:
                 self._cache.popitem(last=False)
 
-        return self.evaluations
+        return result

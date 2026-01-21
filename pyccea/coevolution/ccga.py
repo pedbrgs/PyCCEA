@@ -34,6 +34,7 @@ class CCGA(CCEA):
             n_classes=getattr(self.data, "n_classes", None),
             store_estimators=False,  # SubsetSizePenalty fitness function does not need estimators
             cache_size=self.conf["wrapper"].get("cache_size", 0),
+            use_subprocess=self.conf["wrapper"].get("use_subprocess", False)
         )
         self.fitness_function = SubsetSizePenalty(
             evaluator=evaluator,
