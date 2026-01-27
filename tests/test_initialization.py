@@ -260,3 +260,46 @@ def test_build_context_vector_continuous_initialization(
 
     # Assertion
     assert context_vector.shape == (sum(subcomp_sizes),)
+
+
+def test_evaluate_individuals_parallel_uses_clone(dummy_collaborator, dummy_dataloader) -> None:
+    """Test parallel evaluation uses cloned fitness functions."""
+
+    class DummyFitnessFunction:
+        def __init__(self):
+            self.used = False
+            self.clone_calls = 0
+        def clone(self):
+            self.clone_calls += 1
+            parent = self
+            class _Clone:
+                def evaluate(self, context_vector, data):
+                    return float(np.sum(context_vector))
+            return _Clone()
+        def evaluate(self, context_vector, data):
+            self.used = True
+            return -1.0
+
+    class ConcreteSubpopInit(SubpopulationInitialization):
+        def _get_subpop(self, subcomp_size, subpop_size):
+            return np.zeros((subpop_size, subcomp_size), dtype=int)
+        def _build_context_vector(self, subpop_idx, indiv_idx, subpops):
+            return np.array([indiv_idx], dtype=int)
+
+    fitness_fn = DummyFitnessFunction()
+    instance = ConcreteSubpopInit(
+        data=dummy_dataloader,
+        subcomp_sizes=[1, 1],
+        subpop_sizes=[4, 3],
+        collaborator=dummy_collaborator,
+        fitness_function=fitness_fn,
+        n_workers=2
+    )
+
+    instance.build_subpopulations()
+    instance.evaluate_individuals()
+
+    assert fitness_fn.used is False
+    assert fitness_fn.clone_calls >= 1 
+    assert instance.context_vectors[0][0] == 3
+    assert instance.context_vectors[1][0] == 2
