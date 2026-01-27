@@ -30,7 +30,7 @@ jobs:
       - name: Run tests
         run: poetry run pytest
 
-      - name: Check commit message and bump version if prefix 'release:' is present
+      - name: Check commit message and tag version if prefix 'release:' is present
         id: bump_version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,11 +57,6 @@ jobs:
 
             git add CHANGELOG.md
             git commit -m "docs: update changelog [skip ci]"
-
-            # Bump version
-            poetry version patch
-            git add pyproject.toml
-            git commit -m "ci: bump version [skip ci]"
 
             # Tag and push
             NEW_VERSION=$(poetry version -s)
