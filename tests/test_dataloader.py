@@ -623,3 +623,26 @@ def test_delete_intermediate_data(complete_data_conf: dict) -> None:
     assert not hasattr(loader, "data")
     assert not hasattr(loader, "X")
     assert not hasattr(loader, "y")
+
+
+def test_get_fold_requires_model_selection(complete_data_conf: dict) -> None:
+    """Test get fold raises before train/val indices are created."""
+    loader = DataLoader("dummy", complete_data_conf)
+
+    with pytest.raises(AttributeError, match="train and validation folds have not been created"):
+        loader.get_fold(0)
+
+
+def test_cast_float_dtype_on_folds(complete_data_conf: dict) -> None:
+    """Test cast float dtype casts train/val folds when present."""
+
+    complete_data_conf["general"]["float_dtype"] = "float32"
+    loader = DataLoader("dummy", complete_data_conf)
+
+    loader.train_folds = [[np.array([[1.0, 2.0]], dtype=np.float64), None]]
+    loader.val_folds = [[np.array([[3.0, 4.0]], dtype=np.float64), None]]
+
+    loader._cast_float_dtype()
+
+    assert loader.train_folds[0][0].dtype == np.float32
+    assert loader.val_folds[0][0].dtype == np.float32
