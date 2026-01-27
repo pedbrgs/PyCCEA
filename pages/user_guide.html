@@ -150,11 +150,11 @@ evaluation of each individual is determined based on their effectiveness in coll
 representative individuals from other subpopulations to collectively compose one or more complete
 solutions (context vectors). This iterative process continues until convergence or a termination
 condition is met, as shown in <a class="reference internal" href="#ccea-framework-figure"><span class="std std-numref">Fig. 1</span></a>.</p>
-<figure class="align-center" id="id9">
+<figure class="align-center" id="id1">
 <span id="ccea-framework-figure"></span><a class="reference internal image-reference" href="../_images/CCEA.png"><img alt="CCEA Framework" src="../_images/CCEA.png" style="width: 60%;" />
 </a>
 <figcaption>
-<p><span class="caption-number">Fig. 1 </span><span class="caption-text">A general framework of a Cooperative Co-Evolutionary Algorithm (CCEA).</span><a class="headerlink" href="#id9" title="Link to this image"></a></p>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">A general framework of a Cooperative Co-Evolutionary Algorithm (CCEA).</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <section id="problem-decomposition">
@@ -483,8 +483,8 @@ complexity and relevance to various experimental scenarios.</p>
 <p>The classification datasets vary in sample size, dimensionality, number of target classes, and
 imbalance ratio, covering domains such as medical diagnosis, sensor activity, gene expression, and
 more. This diversity provides a robust basis for evaluating both performance and scalability.</p>
-<table class="docutils align-default" id="id10">
-<caption><span class="caption-number">Table 1 </span><span class="caption-text">Classification datasets.</span><a class="headerlink" href="#id10" title="Link to this table"></a></caption>
+<table class="docutils align-default" id="id2">
+<caption><span class="caption-number">Table 1 </span><span class="caption-text">Classification datasets.</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 23.5%" />
 <col style="width: 17.6%" />
@@ -689,8 +689,8 @@ more. This diversity provides a robust basis for evaluating both performance and
 <p>The regression datasets are lower in dimensionality and serve to test capability of CCEAs on
 continuous target variables. These datasets are useful for evaluating the generalization of
 fitness functions under regression-specific evaluation metrics.</p>
-<table class="docutils align-default" id="id11">
-<caption><span class="caption-number">Table 2 </span><span class="caption-text">Regression datasets.</span><a class="headerlink" href="#id11" title="Link to this table"></a></caption>
+<table class="docutils align-default" id="id3">
+<caption><span class="caption-number">Table 2 </span><span class="caption-text">Regression datasets.</span><a class="headerlink" href="#id3" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 33.3%" />
 <col style="width: 33.3%" />
@@ -723,27 +723,26 @@ preprocess the Leukemia 2 dataset according to the data loader configuration fil
 <p>Custom datasets are supported as long as they conform to the PyCCEA input schema (<cite>.parquet</cite> file
 with feature columns and a <cite>label</cite> column). To register a custom dataset at runtime, add an entry
 to <cite>DataLoader</cite> and execute the standard preprocessing, splitting, and normalization pipeline:</p>
-<p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>python
-from pyccea.utils.datasets import DataLoader</p>
-<p># Path to your dataset in PyCCEA schema
-data_path = “./custom_data.parquet”
-dataset_name = “custom_data”</p>
-<p># Register the dataset path and task
-DataLoader.DATASETS = {</p>
-<blockquote>
-<div><p>“task”: “classification”  # or regression
-“file”: data_path</p>
-</div></blockquote>
-<p>}</p>
-<p># Load and prepare the dataset
-dataloader = DataLoader(</p>
-<blockquote>
-<div><p>dataset_name=dataset_name,
-conf=data_conf</p>
-</div></blockquote>
-<p>)
-dataloader.get_ready()
-<a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pyccea.utils.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+
+<span class="c1"># Path to your dataset in PyCCEA schema</span>
+<span class="n">data_path</span> <span class="o">=</span> <span class="s2">&quot;./custom_data.parquet&quot;</span>
+<span class="n">dataset_name</span> <span class="o">=</span> <span class="s2">&quot;custom_data&quot;</span>
+
+<span class="c1"># Register the dataset path and task</span>
+<span class="n">DataLoader</span><span class="o">.</span><span class="n">DATASETS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;task&quot;</span><span class="p">:</span> <span class="s2">&quot;classification&quot;</span>  <span class="c1"># or regression</span>
+    <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="n">data_path</span>
+<span class="p">}</span>
+
+<span class="c1"># Load and prepare the dataset</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">dataset_name</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">,</span>
+    <span class="n">conf</span><span class="o">=</span><span class="n">data_conf</span>
+<span class="p">)</span>
+<span class="n">dataloader</span><span class="o">.</span><span class="n">get_ready</span><span class="p">()</span>
+</pre></div>
+</div>
 <p>If you prefer ready-to-use data, additional datasets already normalized to the PyCCEA format are
 available in the [High-Dimensional datasets repository](<a class="reference external" href="https://github.com/pedbrgs/High-Dimensional-Datasets/">https://github.com/pedbrgs/High-Dimensional-Datasets/</a>).</p>
 </section>
@@ -753,8 +752,8 @@ available in the [High-Dimensional datasets repository](<a class="reference exte
 <p>The PyCCEA package implements a family of modular CCEAs, where all algorithms share a common
 evolutionary structure and differ only in how they decompose the feature space. Below is a list of
 the available CCEA variants, highlighting the decomposition strategy used and how it operates.</p>
-<table class="docutils align-default" id="id12">
-<caption><span class="caption-number">Table 3 </span><span class="caption-text"><strong>Available cooperative co-evolutionary algorithms for feature selection.</strong></span><a class="headerlink" href="#id12" title="Link to this table"></a></caption>
+<table class="docutils align-default" id="id4">
+<caption><span class="caption-number">Table 3 </span><span class="caption-text"><strong>Available cooperative co-evolutionary algorithms for feature selection.</strong></span><a class="headerlink" href="#id4" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 17.1%" />
 <col style="width: 32.9%" />
@@ -813,8 +812,8 @@ selected automatically via lightweight parameter tuning mechanisms.</p></td>
 <p>While the decomposition strategy varies, all algorithms implemented in PyCCEA rely on the same
 core components during the cooperative co-evolutionary process. The following table summarizes
 the core components and their corresponding strategies:</p>
-<table class="docutils align-default" id="id13">
-<caption><span class="caption-number">Table 4 </span><span class="caption-text"><strong>Components of the baseline cooperative co-evolutionary algorithms.</strong></span><a class="headerlink" href="#id13" title="Link to this table"></a></caption>
+<table class="docutils align-default" id="id5">
+<caption><span class="caption-number">Table 4 </span><span class="caption-text"><strong>Components of the baseline cooperative co-evolutionary algorithms.</strong></span><a class="headerlink" href="#id5" title="Link to this table"></a></caption>
 <colgroup>
 <col style="width: 42.9%" />
 <col style="width: 57.1%" />

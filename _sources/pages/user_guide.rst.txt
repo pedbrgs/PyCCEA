@@ -596,26 +596,27 @@ Custom datasets are supported as long as they conform to the PyCCEA input schema
 with feature columns and a `label` column). To register a custom dataset at runtime, add an entry 
 to `DataLoader` and execute the standard preprocessing, splitting, and normalization pipeline:
 
-```python
-from pyccea.utils.datasets import DataLoader
+.. code-block:: python
+    
+    from pyccea.utils.datasets import DataLoader
 
-# Path to your dataset in PyCCEA schema
-data_path = "./custom_data.parquet"
-dataset_name = "custom_data"
+    # Path to your dataset in PyCCEA schema
+    data_path = "./custom_data.parquet"
+    dataset_name = "custom_data"
 
-# Register the dataset path and task
-DataLoader.DATASETS = {
-    "task": "classification"  # or regression
-    "file": data_path
-}
+    # Register the dataset path and task
+    DataLoader.DATASETS = {
+        "task": "classification"  # or regression
+        "file": data_path
+    }
 
-# Load and prepare the dataset
-dataloader = DataLoader(
-    dataset_name=dataset_name,
-    conf=data_conf
-)
-dataloader.get_ready()
-```
+    # Load and prepare the dataset
+    dataloader = DataLoader(
+        dataset_name=dataset_name,
+        conf=data_conf
+    )
+    dataloader.get_ready()
+
 
 If you prefer ready-to-use data, additional datasets already normalized to the PyCCEA format are 
 available in the [High-Dimensional datasets repository](https://github.com/pedbrgs/High-Dimensional-Datasets/).
