@@ -4,6 +4,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 from ..utils.datasets import DataLoader
 from ..utils.memory import force_memory_release
+from concurrent.futures import ThreadPoolExecutor
 
 
 class CCEA(ABC):
@@ -105,6 +106,8 @@ class CCEA(ABC):
         # Optional memory profiling
         self.memory_profile = conf["coevolution"].get("memory_profile", False)
         self.memory_log_every = conf["coevolution"].get("memory_log_every", 0)
+        # Optional parallel evaluation workers
+        self.evaluation_workers = conf["evaluation"].get("n_workers", 1)
 
         # Initialize logger with info level
         logging.basicConfig(encoding="utf-8", level=logging.INFO)
@@ -216,6 +219,13 @@ class CCEA(ABC):
             return None
         return None
 
+    def _evaluate_context_vectors(self, context_vectors: list) -> list:
+        """Evaluate a batch of context vectors with optional parallel workers."""
+        if self.evaluation_workers and self.evaluation_workers > 1:
+            with ThreadPoolExecutor(max_workers=self.evaluation_workers) as executor:
+                return list(executor.map(lambda cv: self.fitness_function.evaluate(cv, self.data), context_vectors))
+            return [self.fitness_function(cv, self.data) for cv in context_vectors]
+
     def _sum_nbytes(self, obj) -> int:
         """Recursively sum the number of bytes of a given object and its contents."""
         total_size = 0
@@ -286,7 +296,9 @@ class CCEA(ABC):
         # Decompose only once to use the same feature indexes on all k-folds
         Xk_train, _, _, _ = self.data.get_fold(0, normalize=False)
         _, self.feature_idxs = self.decomposer.decompose(X=Xk_train)
-        self.feature_importances = self.feature_importances[self.feature_idxs]
+        if hasattr(self, "feature_importances"):
+            # Reorder feature importances according to the shuffling in the feature decomposition
+            self.feature_importances = self.feature_importances[self.feature_idxs]
         # Reorder training set according to the shuffling in the feature decomposition
         self.data.X_train = self.data.X_train[:, self.feature_idxs]
         # Reorder test set according to the shuffling in the feature decomposition

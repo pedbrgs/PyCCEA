@@ -62,3 +62,26 @@ class CCGA(CCEA):
                 conf=self.conf
             )
             self.optimizers.append(optimizer)
+
+    def _evaluate_evolved_subpopulations(
+            self,
+            collaborators_getter: object,
+            build_context_vector: object
+        ) -> tuple:
+        """Evaluate each individual of the evolved subpopulations."""
+        current_fitness = list()
+        current_context_vectors = list()
+        for i in range(self.n_subcomps):
+            subpop_context_vectors = list()
+            for j in range(self.subpop_sizes[i]):
+                collaborators = collaborators_getter(
+                    subpop_idx=i,
+                    indiv_idx=j
+                )
+                context_vector = build_context_vector(collaborators)
+                subpop_context_vectors.append(context_vector)
+            fitness_values = self._evaluate_context_vectors(subpop_context_vectors)
+            current_fitness.append(fitness_values)
+            best_idx = int(np.argmax(fitness_values))
+            current_context_vectors.append(subpop_context_vectors[best_idx].copy())
+        return current_fitness, current_context_vectors

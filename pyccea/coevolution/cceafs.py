@@ -1,7 +1,7 @@
-import gc
 import logging
 from tqdm import tqdm
 from ..coevolution.ccga import CCGA
+from ..utils.memory import force_memory_release
 from ..decomposition.static import SequentialFeatureGrouping
 
 
@@ -64,33 +64,21 @@ class CCEAFS(CCGA):
                 current_subpops.append(current_subpop)
 
             # Evaluate each individual of the evolved subpopulations
-            current_fitness = list()
-            current_context_vectors = list()
-            for i in range(self.n_subcomps):
-                current_fitness.append(list())
-                current_context_vectors.append(list())
-                # Use best individuals from the previous generation (`self.current_best`) as
-                # collaborators for each individual in the current generation after evolve
-                # (`current_subpops`)
-                for j in range(self.subpop_sizes[i]):
-                    collaborators = self.best_collaborator.get_collaborators(
-                        subpop_idx=i,
-                        indiv_idx=j,
-                        current_subpops=current_subpops,
-                        current_best=self.current_best
-                    )
-                    context_vector = self.best_collaborator.build_context_vector(collaborators)
-                    # Update the context vector
-                    current_context_vectors[i].append(context_vector.copy())
-                    # Update fitness
-                    current_fitness[i].append(self.fitness_function.evaluate(context_vector, self.data))
-                    del collaborators, context_vector
+            current_fitness, current_best_context_vectors = self._evaluate_evolved_subpopulations(
+                collaborators_getter=lambda subpop_idx, indiv_idx: self.best_collaborator.get_collaborators(
+                    subpop_idx=subpop_idx,
+                    indiv_idx=indiv_idx,
+                    current_subpops=current_subpops,
+                    current_best=self.current_best
+                )
+                build_context_vector=self.best_collaborator.build_context_vector
+            )
             # Update subpopulations, context vectors and evaluations
             self.subpops = current_subpops
             self.fitness = current_fitness
-            self.context_vectors = current_context_vectors
-            del current_subpops, current_fitness, current_context_vectors
-            gc.collect()
+            self.context_vectors = current_best_context_vectors
+            del current_subpops, current_fitness, current_best_context_vectors
+            force_memory_release()
 
             # Get the best individual and context vector from each subpopulation
             self.current_best = self._get_best_individuals(

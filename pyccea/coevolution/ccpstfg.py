@@ -472,32 +472,15 @@ class CCPSTFG(CCGA):
             self._log_memory_usage(stage="After subpopulation evolution", n_gen=n_gen)
 
             # Evaluate each individual of the evolved subpopulations
-            current_fitness = list()
-            current_best_context_vectors = list()
-            for i in range(self.n_subcomps):
-                current_fitness.append(list())
-                best_context_vector = None
-                best_fitness = None
-                # Use best individuals from the previous generation (`self.current_best`) as
-                # collaborators for each individual in the current generation after evolve
-                # (`current_subpops`)
-                for j in range(self.subpop_sizes[i]):
-                    collaborators = self.best_collaborator.get_collaborators(
-                        subpop_idx=i,
-                        indiv_idx=j,
-                        current_subpops=current_subpops,
-                        current_best=self.current_best
-                    )
-                    context_vector = self.best_collaborator.build_context_vector(collaborators)
-                    # Update fitness
-                    fitness = self.fitness_function.evaluate(context_vector, self.data)
-                    current_fitness[i].append(fitness)
-                    # Update best context vector for the current subpopulation
-                    if (best_fitness is None) or (fitness > best_fitness):
-                        best_fitness = fitness
-                        best_context_vector = context_vector.copy()
-                    del collaborators, context_vector
-                current_best_context_vectors.append(best_context_vector)
+            current_fitness, current_best_context_vectors = self._evaluate_evolved_subpopulations(
+                collaborators_getter=lambda subpop_idx, indiv_idx: self.best_collaborator.get_collaborators(
+                    subpop_idx=subpop_idx,
+                    indiv_idx=indiv_idx,
+                    current_subpops=current_subpops,
+                    current_best=self.current_best
+                )
+                build_context_vector=self.best_collaborator.build_context_vector
+            )
             # Update subpopulations, context vectors and evaluations
             self.subpops = current_subpops
             self.fitness = current_fitness
