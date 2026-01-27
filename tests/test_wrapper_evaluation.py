@@ -1,3 +1,4 @@
+import pickle
 import pytest
 import numpy as np
 import pandas as pd
@@ -318,3 +319,202 @@ def test_wrapper_evaluation_clone_copies_config() -> None:
     assert cloned.store_estimators == evaluator.store_estimators
     assert cloned.cache_size == evaluator.cache_size
     assert cloned.use_subprocess == evaluator.use_subprocess
+
+
+def test_subprocess_posix_path_reads_result(monkeypatch) -> None:
+    """Test subprocess path on POSIX reads result from pipe."""
+
+    expected = {"accuracy": 0.33}
+
+    class FakeOS:
+        name = "posix"
+        def __init__(self, payload):
+            self._payload = payload
+            self._read_calls = 0
+        def pipe(self):
+            return (1, 2)
+        def fork(self):
+            return 12345
+        def close(self, fd):
+            return None
+        def read(self, fd, nbytes):
+            if self._read_calls == 0:
+                self._read_calls += 1
+                return self._payload
+            return b""
+        def write(self, fd, data):
+            return len(data)
+        def waitpid(self, pid, options):
+            return (pid, 0)
+
+    fake_os = FakeOS(pickle.dumps(expected))
+
+    monkeypatch.setattr(wrapper_module, "os", fake_os)
+
+    evaluator = WrapperEvaluation(
+        task="classification",
+        n_classes=2,
+        eval_function="accuracy",
+        model_type="logistic_regression",
+        eval_mode="hold_out",
+        use_subprocess=True,
+        store_estimators=False
+    )
+
+    result = evaluator._evaluate_in_subprocess(solution=np.array([1, 0]), data=None)
+
+    assert result == expected
+    assert evaluator.evaluations == expected
+
+
+def test_subprocess_child_branch_writes_payload(monkeypatch) -> None:
+    """Test child branch writes payload and exists."""
+
+    class FakeOS:
+        name = "posix"
+        def __init__(self):
+            self.write = MagicMock()
+            self.close = MagicMock()
+        def pipe(self):
+            return (1, 2)
+        def fork(self):
+            return 0
+        def _exit(self, code):
+            raise SystemExit(code)
+
+    fake_os = FakeOS()
+    monkeypatch.setattr(wrapper_module, "os", fake_os)
+
+    evaluator = WrapperEvaluation(
+        task="classification",
+        n_classes=2,
+        eval_function="accuracy",
+        model_type="logistic_regression",
+        eval_mode="hold_out",
+        use_subprocess=True,
+        store_estimators=False
+    )
+
+    monkeypatch.setattr(WrapperEvaluation, "_evaluate_core", lambda *args, **kwargs: {"accuracy": 0.1})
+    monkeypatch.setattr(wrapper_module.pickle, "dumps", lambda obj: b"payload")
+
+    with pytest.raises(SystemExit):
+        evaluator._evaluate_in_subprocess(solution=np.array([1, 0]), data=None)
+
+    fake_os.write.assert_called_once_with(2, b"payload")
+
+
+def test_subprocess_child_branch_writes_error(monkeypatch) -> None:
+    """Test child branch writes error payload and exists."""
+
+    class FakeOS:
+        name = "posix"
+        def __init__(self):
+            self.write = MagicMock()
+            self.close = MagicMock()
+        def pipe(self):
+            return (1, 2)
+        def fork(self):
+            return 0
+        def _exit(self, code):
+            raise SystemExit(code)
+
+    fake_os = FakeOS()
+    monkeypatch.setattr(wrapper_module, "os", fake_os)
+
+    evaluator = WrapperEvaluation(
+        task="classification",
+        n_classes=2,
+        eval_function="accuracy",
+        model_type="logistic_regression",
+        eval_mode="hold_out",
+        use_subprocess=True,
+        store_estimators=False
+    )
+
+    def raise_core(*args, **kwargs):
+        raise ValueError("boom")
+
+    monkeypatch.setattr(WrapperEvaluation, "_evaluate_core", raise_core)
+    monkeypatch.setattr(wrapper_module.pickle, "dumps", lambda obj: b"err")
+
+    with pytest.raises(SystemExit):
+        evaluator._evaluate_in_subprocess(solution=np.array([1, 0]), data=None)
+
+    fake_os.write.assert_called_once_with(2, b"err")
+
+
+def test_subprocess_parent_empty_payload_returns_empty(monkeypatch) -> None:
+    """Test parent branch returns empty dictionary when pipe yields no data."""
+
+    class FakeOS:
+        name = "posix"
+        def __init__(self):
+            self._read_calls = 0
+        def pipe(self):
+            return (1, 2)
+        def fork(self):
+            return 123
+        def close(self, fd):
+            return None
+        def read(self, fd, nbytes):
+            return b""
+        def waitpid(self, pid, options):
+            return (pid, 0)
+
+    monkeypatch.setattr(wrapper_module, "os", FakeOS())
+
+    evaluator = WrapperEvaluation(
+        task="classification",
+        n_classes=2,
+        eval_function="accuracy",
+        model_type="logistic_regression",
+        eval_mode="hold_out",
+        use_subprocess=True,
+        store_estimators=False
+    )
+
+    result = evaluator._evaluate_in_subprocess(solution=np.array([1, 0]), data=None)
+
+    assert result == {}
+
+
+def test_subprocess_parent_error_payload_raises(monkeypatch) -> None:
+    """Test parent branch raises when error is returned."""
+
+    class FakeOS:
+        name = "posix"
+        def __init__(self, payload):
+            self._payload = payload
+            self._read_calls = 0
+        def pipe(self):
+            return (1, 2)
+        def fork(self):
+            return 12345
+        def close(self, fd):
+            return None
+        def read(self, fd, nbytes):
+            if self._read_calls == 0:
+                self._read_calls += 1
+                return self._payload
+            return b""
+        def write(self, fd, data):
+            return len(data)
+        def waitpid(self, pid, options):
+            return (pid, 0)
+
+    monkeypatch.setattr(wrapper_module, "os", FakeOS(pickle.dumps({"__error__": "boom"})))
+    monkeypatch.setattr(wrapper_module, "RunetimeError", RuntimeError, raising=False)
+
+    evaluator = WrapperEvaluation(
+        task="classification",
+        n_classes=2,
+        eval_function="accuracy",
+        model_type="logistic_regression",
+        eval_mode="hold_out",
+        use_subprocess=True,
+        store_estimators=False
+    )
+
+    with pytest.raises(RuntimeError):
+        evaluator._evaluate_in_subprocess(solution=np.array([0, 1]), data=None)
