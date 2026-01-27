@@ -212,3 +212,36 @@ def test_distance_based_regression_evaluation(
 
     assert fitness_value == pytest.approx(expected_fitness)
     fitness._compute_distances.assert_called_once_with(dummy_dataloader)
+
+
+def test_subset_size_penalty_clone(dummy_classification_evaluator) -> None:
+    """Test clone returns a new penalty fitness with a cloned evaluator."""
+    evaluator_clone = MagicMock()
+    dummy_classification_evaluator.clone = MagicMock(return_value=evaluator_clone)
+    fitness = SubsetSizePenalty(dummy_classification_evaluator, [0.7, 0.3])
+
+    fitness_clone = fitness.clone()
+
+    assert fitness_clone is not fitness
+    assert isinstance(fitness_clone, SubsetSizePenalty)
+    assert fitness_clone.w1 == fitness.w1
+    assert fitness_clone.w2 == fitness.w2
+    assert fitness_clone.evaluator is evaluator_clone
+    dummy_classification_evaluator.clone.assert_called_once()
+
+
+def test_distance_based_clone(dummy_regression_evaluator) -> None:
+    """Test clone returns a new distance-based fitness with a cloned evaluator."""
+    evaluator_clone = MagicMock()
+    dummy_regression_evaluator.clone = MagicMock(return_value=evaluator_clone)
+    fitness = DistanceBasedFitness(dummy_regression_evaluator, [0.5, 0.25, 0.25])
+
+    fitness_clone = fitness.clone()
+
+    assert fitness_clone is not fitness
+    assert isinstance(fitness_clone, DistanceBasedFitness)
+    assert fitness_clone.w1 == fitness.w1
+    assert fitness_clone.w2 == fitness.w2
+    assert fitness_clone.w3 == fitness.w3
+    assert fitness_clone.evaluator is evaluator_clone
+    dummy_regression_evaluator.clone.assert_called_once()
