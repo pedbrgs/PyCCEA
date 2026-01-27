@@ -1,5 +1,6 @@
 import os
 import logging
+import threading
 import numpy as np
 from abc import ABC, abstractmethod
 from ..utils.datasets import DataLoader
@@ -108,6 +109,7 @@ class CCEA(ABC):
         self.memory_log_every = conf["coevolution"].get("memory_log_every", 0)
         # Optional parallel evaluation workers
         self.evaluation_workers = conf["evaluation"].get("n_workers", 1)
+        self._fitness_fn_tls = threading.local()
 
         # Initialize logger with info level
         logging.basicConfig(encoding="utf-8", level=logging.INFO)
@@ -221,10 +223,25 @@ class CCEA(ABC):
 
     def _evaluate_context_vectors(self, context_vectors: list) -> list:
         """Evaluate a batch of context vectors with optional parallel workers."""
+        def _get_local_fitness_fn():
+            fitness_fn = getattr(self._fitness_fn_tls, "fitness_fn", None)
+            if fitness_fn is None:
+                if hasattr(self.fitness_function, "clone"):
+                    fitness_fn = self.fitness_function.clone()
+                else:
+                    fitness_fn = self.fitness_function
+                self._fitness_fn_tls.fitness_fn = fitness_fn
+            return fitness_fn
+
         if self.evaluation_workers and self.evaluation_workers > 1:
             with ThreadPoolExecutor(max_workers=self.evaluation_workers) as executor:
-                return list(executor.map(lambda cv: self.fitness_function.evaluate(cv, self.data), context_vectors))
-            return [self.fitness_function(cv, self.data) for cv in context_vectors]
+                return list(
+                    executor.map(
+                        lambda cv: _get_local_fitness_fn().evaluate(cv, self.data),
+                        context_vectors
+                    )
+                )
+        return [_get_local_fitness_fn().evaluate(cv, self.data) for cv in context_vectors]
 
     def _sum_nbytes(self, obj) -> int:
         """Recursively sum the number of bytes of a given object and its contents."""

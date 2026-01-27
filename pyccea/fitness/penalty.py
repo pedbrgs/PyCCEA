@@ -60,3 +60,7 @@ class SubsetSizePenalty(WrapperFitnessFunction):
         sign = -1 if self.evaluator.task == "regression" else 1
         fitness = sign * self.w1 * evaluation - self.w2 * penalty
         return fitness
+
+    def clone(self) -> "SubsetSizePenalty":
+        """Create a new fitness function with the same configuration."""
+        return SubsetSizePenalty(self.evaluator.clone(), [self.w1, self.w2])

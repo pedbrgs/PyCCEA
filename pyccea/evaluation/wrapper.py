@@ -107,13 +107,27 @@ class WrapperEvaluation():
         self.eval_mode = eval_mode
         self.store_estimators = store_estimators
         self.use_subprocess = use_subprocess
-        if self.use_subprocess and self.store_estimators:
-            raise ValueError("Subprocess evaluation does not support storing estimators.")
+        self._init_kwargs = {
+            "task": task,
+            "model_type": model_type,
+            "eval_function": eval_function,
+            "eval_mode": eval_mode,
+            "n_classes": n_classes,
+            "store_estimators": store_estimators,
+            "cache_size": cache_size,
+            "use_subprocess": use_subprocess,
+        }
         # Optional bounded cache: avoids reffiting identifical feature subsets many times
         self.cache_size = int(cache_size) if cache_size is not None else 0
         self._cache = OrderedDict() if self.cache_size > 0 else None
         # Initialize logger with info level
         logging.basicConfig(encoding="utf-8", level=logging.INFO)
+        if self.use_subprocess and self.store_estimators:
+            raise ValueError("Subprocess evaluation does not support storing estimators.")
+
+    def clone(self) -> "WrapperEvaluation":
+        """Create a new evaluator with the same configuration."""
+        return WrapperEvaluation(**self._init_kwargs)
 
     def _hold_out_validation(self, solution_mask: np.ndarray, data: DataLoader) -> None:
         """Evaluate an individual using hold_out validation (train/test)."""

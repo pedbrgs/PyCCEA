@@ -123,3 +123,7 @@ class DistanceBasedFitness(WrapperFitnessFunction):
         self.evaluator.estimators.clear()
         gc.collect()
         return fitness
+
+    def clone(self) -> "DistanceBasedFitness":
+        """Create a new fitness function with the same configuration."""
+        return DistanceBasedFitness(self.evaluator.clone(), [self.w1, self.w2, self.w3])
