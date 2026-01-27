@@ -25,6 +25,25 @@ class CCFSRFG2(CCGA):
             subcomp_sizes=self.subcomp_sizes
         )
 
+    def _get_best_individuals(self, subpops, fitness, context_vectors) -> dict:
+        """Get the best individual of each subpopulation and its respective evaluation.
+
+        In CCFSRFG2, each subpopulation can keep multiple context vectors (one per individual),
+        so we need to select the context vector aligned with the best fitness
+        """
+        current_best = dict()
+        n_subpops = len(subpops)
+        for i in range(n_subpops):
+            best_ind_idx = np.argmax(fitness[i])
+            current_best[i] = dict()
+            current_best[i]["individual"] = subpops[i][best_ind_idx].copy()
+            context_vector = context_vectors[i].copy()
+            if isinstance(context_vector, list):
+                context_vector = context_vector[best_ind_idx].copy()
+            current_best[i]["context_vector"] = context_vector
+            current_best[i]["fitness"] = fitness[i][best_ind_idx]
+        return current_best
+
     def optimize(self):
         """Solve the feature selection problem through optimization."""
         # Decompose problem
@@ -80,15 +99,29 @@ class CCFSRFG2(CCGA):
             for i in range(self.n_subcomps):
                 # Select the 'elite_size' best individuals of the previous generation to be in the
                 # current generation (elitism)
-                descending_order = np.argsort(self.fitness[i])[::-1]
-                n_bests = descending_order[:self.optimizers[i].elite_size]
-                current_fitness.append(np.array(self.fitness[i])[n_bests].tolist().copy())
-                current_context_vectors.append(np.array(self.context_vectors[i])[n_bests].tolist().copy())
+                prev_context_vectors = self.context_vectors[i]
+                if isinstance(prev_context_vectors, np.ndarray) and prev_context_vectors.ndim == 1:
+                    prev_context_vectors = [prev_context_vectors]
+                else:
+                    prev_context_vectors = list(prev_context_vectors)
+                elite_size = min(self.optimizers[i].elite_size, len(prev_context_vectors))
+                if elite_size == 0:
+                    elite_fitness = list()
+                    elite_context_vectors = list()
+                elif elite_size == 1 and len(prev_context_vectors) == 1:
+                    elite_fitness = [max(self.fitness[i])]
+                    elite_context_vectors = [prev_context_vectors[0].copy()]
+                else:
+                    descending_order = np.argsort(self.fitness[i])[::-1][:elite_size]
+                    elite_fitness = [self.fitness[i][idx] for idx in descending_order]
+                    elite_context_vectors = [prev_context_vectors[idx].copy() for idx in descending_order]
+                current_fitness.append(list(elite_fitness))
+                current_context_vectors.append(list(elite_context_vectors))
                 # Use random individuals from the previous generation as collaborators for each
                 # individual in the current generation. Except the first 'elite_size' individuals
                 # from each subpopulation which are being used as elitism and have different
                 # features from the individuals of the previous generation
-                for j in range(self.optimizers[i].elite_size, self.subpop_sizes[i]):
+                for j in range(elite_size, self.subpop_sizes[i]):
                     collaborators = self.random_collaborator.get_collaborators(
                         subpop_idx=i,
                         indiv_idx=j,
@@ -134,13 +167,13 @@ class CCFSRFG2(CCGA):
                 # Penalty weight
                 w2 = self.conf["evaluation"]["weights"][1]
                 # Current fitness, performance evaluation and penalty
-                current_best_fitness = round(self.best_fitness, 4)
-                current_penalty = round(self.best_context_vector.sum()/self.data.n_features, 4)
-                current_eval = round((self.best_fitness + w2*current_penalty)/w1, 4)
+                current_best_fitness = round(float(self.best_fitness), 4)
+                current_penalty = round(float(sum(self.best_context_vector))/self.data.n_features, 4)
+                current_eval = round((float(self.best_fitness) + w2*current_penalty)/w1, 4)
                 # New fitness, performance evaluation and penalty
-                new_best_fitness = round(best_fitness, 4)
-                new_penalty = round(best_context_vector.sum()/self.data.n_features, 4)
-                new_eval = round((best_fitness + w2*new_penalty)/w1, 4)
+                new_best_fitness = round(float(best_fitness), 4)
+                new_penalty = round(float(sum(best_context_vector))/self.data.n_features, 4)
+                new_eval = round((float(best_fitness) + w2*new_penalty)/w1, 4)
                 # Show improvement
                 logging.info(
                     f"\nUpdate fitness from {current_best_fitness} to {new_best_fitness}.\n"
