@@ -619,7 +619,7 @@ to `DataLoader` and execute the standard preprocessing, splitting, and normaliza
 
 
 If you prefer ready-to-use data, additional datasets already normalized to the PyCCEA format are 
-available in the `High-Dimensional datasets repository <https://github.com/pedbrgs/High-Dimensional-Datasets/>`.
+available in the `High-Dimensional datasets repository <https://github.com/pedbrgs/High-Dimensional-Datasets/>`_.
 
 CCEAs
 ^^^^^
