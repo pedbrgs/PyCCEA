@@ -1,6 +1,8 @@
+import threading
 import numpy as np
 from tqdm import tqdm
 from abc import ABC, abstractmethod
+from concurrent.futures import ThreadPoolExecutor
 from ..utils.datasets import DataLoader
 from ..utils.memory import force_memory_release
 
@@ -24,7 +26,8 @@ class SubpopulationInitialization(ABC):
             subcomp_sizes: list,
             subpop_sizes: list,
             collaborator,
-            fitness_function
+            fitness_function,
+            n_workers: int = 1
     ):
         """
         Parameters
@@ -39,11 +42,16 @@ class SubpopulationInitialization(ABC):
             Responsible for selecting collaborators for individuals.
         fitness_function : object of one of the fitness classes.
             Responsible for evaluating individuals, that is, subsets of features.
+        n_workers : int, optional
+            Number of workers to use for parallel evaluations. Default is 1 (no parallelism).
         """
         self.data = data
         self.subpop_sizes = subpop_sizes
         self.fitness_function = fitness_function
         self.collaborator = collaborator
+        # Number of parallel workers
+        self.n_workers = n_workers
+        self._fitness_fn_tls = threading.local()
         # Complete problem solutions
         self.context_vectors = list()
         # Individuals of all subpopulations
@@ -111,16 +119,32 @@ class SubpopulationInitialization(ABC):
 
     def evaluate_individuals(self):
         """Evaluate all individuals from all subpopulations."""
+        def _get_local_fitness_fn():
+            fitness_fn = getattr(self._fitness_fn_tls, "fitness_function", None)
+            if fitness_fn is None:
+                fitness_fn = self.fitness_function.clone() \
+                    if hasattr(self.fitness_function, "clone") \
+                        else self.fitness_function
+                self._fitness_fn_tls.fitness_function = fitness_fn
+            return fitness_fn
+
+        def _evaluate_context_vector(context_vector: list) -> list:
+            if self.n_workers and self.n_workers > 1:
+                with ThreadPoolExecutor(max_workers=self.n_workers) as executor:
+                    return list(
+                        executor.map(
+                            lambda cv: _get_local_fitness_fn().evaluate(cv, self.data),
+                            context_vector
+                        )
+                    )
+            return [_get_local_fitness_fn().evaluate(cv, self.data) for cv in context_vector]
+
         # Initialize the progress bar
         progress_bar = tqdm(total=self.n_subcomps, desc="Evaluating individuals")
         # For each subpopulation
         for i, subpop in enumerate(self.subpops):
-            # Track only the best context vector in the current subpopulation
-            best_context_vector = None
-            best_fitness = None
-            # List to store the evaluations of these context vectors
-            subpop_fitness = list()
-            # Evaluate each individual in the subpopulation
+            # Build all context vectors for this subpopulation
+            subpop_context_vectors = list()
             for j, _ in enumerate(subpop):
                 # Build a context vector to evaluate a complete solution
                 context_vector = self._build_context_vector(
@@ -129,15 +153,12 @@ class SubpopulationInitialization(ABC):
                     subpops=self.subpops
                 )
                 # Evaluate the context vector
-                fitness = self.fitness_function.evaluate(context_vector, self.data)
-                # Track best context vector for this subpopulation
-                if (best_fitness is None) or (fitness > best_fitness):
-                    best_fitness = fitness
-                    best_context_vector = context_vector.copy()
-                # Store evaluation of the current context vector
-                subpop_fitness.append(fitness)
-                del context_vector, fitness
-                force_memory_release()
+                subpop_context_vectors.append(context_vector)
+            # Evaluate all context vectors of the current subpopulation
+            subpop_fitness = _evaluate_context_vector(subpop_context_vectors)
+            # Get the best context vector and its fitness
+            best_idx = int(np.argmax(subpop_fitness))
+            best_context_vector = subpop_context_vectors[best_idx].copy()
             # Store best complete problem solution related to the current subpopulation
             self.context_vectors.append(best_context_vector)
             # Store evaluation of all context vectors of the current subpopulation
@@ -145,7 +166,7 @@ class SubpopulationInitialization(ABC):
             # Update progress bar
             progress_bar.update(1)
             # Delete variables related to the current subpopulation
-            del subpop_fitness, best_context_vector, best_fitness
+            del subpop_context_vectors, subpop_fitness, best_context_vector
             force_memory_release()
         # Close progress bar
         progress_bar.close()

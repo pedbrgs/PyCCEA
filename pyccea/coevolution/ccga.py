@@ -48,7 +48,8 @@ class CCGA(CCEA):
             subcomp_sizes=self.subcomp_sizes,
             subpop_sizes=self.subpop_sizes,
             collaborator=self.random_collaborator,
-            fitness_function=self.fitness_function
+            fitness_function=self.fitness_function,
+            n_workers=self.evaluation_workers
         )
 
     def _init_optimizers(self):
