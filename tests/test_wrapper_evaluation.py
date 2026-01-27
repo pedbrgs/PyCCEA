@@ -1,7 +1,9 @@
 import pytest
 import numpy as np
 import pandas as pd
+from unittest.mock import MagicMock
 from pyccea.utils.datasets import DataLoader
+from pyccea.evaluation import wrapper as wrapper_module
 from pyccea.evaluation.wrapper import WrapperEvaluation
 
 
@@ -233,3 +235,61 @@ def test_cache_eviction(monkeypatch) -> None:
     _ = evaluator.evaluate(solution=solution2, data=None)  # recompute
 
     assert calls["n"] == 4
+
+
+def test_subprocess_fallback_on_non_posix(monkeypatch) -> None:
+    """Test subprocess evaluation falls back when not on POSIX system."""
+    evaluator = WrapperEvaluation(
+        task="classification",
+        n_classes=2,
+        eval_function="accuracy",
+        model_type="logistic_regression",
+        eval_mode="hold_out",
+        use_subprocess=True,
+        store_estimators=False
+    )
+
+    def fake_core(self, solution, data):
+        return {"accuracy": 0.87}
+
+    monkeypatch.setattr(wrapper_module.os, "name", "nt", raising=False)
+    monkeypatch.setattr(WrapperEvaluation, "_evaluate_core", fake_core)
+
+    result = evaluator._evaluate_in_subprocess(solution=np.array([1, 0]), data=None)
+
+    assert result == {"accuracy": 0.87}
+
+
+def test_evaluate_uses_subprocess(monkeypatch) -> None:
+    """Test evaluate delegates to subprocess path when enabled."""
+    evaluator = WrapperEvaluation(
+        task="classification",
+        n_classes=2,
+        eval_function="accuracy",
+        model_type="logistic_regression",
+        eval_mode="hold_out",
+        use_subprocess=True,
+        store_estimators=False
+    )
+
+    expected = {"accuracy": 0.92}
+    mock = MagicMock(return_value=expected)
+    monkeypatch.setattr(evaluator, "_evaluate_in_subprocess", mock)
+
+    result = evaluator.evaluate(solution=np.array([1, 0]), data=None)
+    assert result == expected
+    assert mock.call_count == 1
+
+
+def test_subprocess_store_estimators_raises() -> None:
+    """Test subprocess evaluation forbids storing estimators."""
+    with pytest.raises(ValueError, match="Subprocess evaluation does not support storing estimators."):
+        _ = WrapperEvaluation(
+            task="classification",
+            n_classes=2,
+            eval_function="accuracy",
+            model_type="logistic_regression",
+            eval_mode="hold_out",
+            use_subprocess=True,
+            store_estimators=True
+        )
