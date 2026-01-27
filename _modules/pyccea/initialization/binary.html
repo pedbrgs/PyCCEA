@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pyccea.initialization.binary &mdash; PyCCEA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ab21f1d8" />
 
   
@@ -104,7 +104,7 @@
 <span class="sd">            position of the array, it indicates that the i-th feature should be considered and if</span>
 <span class="sd">            there is a 0, it indicates that the feature should not be considered.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">subpop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">subpop_size</span><span class="p">,</span> <span class="n">subcomp_size</span><span class="p">))</span>
+        <span class="n">subpop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">subpop_size</span><span class="p">,</span> <span class="n">subcomp_size</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">subpop</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_build_context_vector</span><span class="p">(</span>
@@ -139,7 +139,7 @@
             <span class="n">current_subpops</span><span class="o">=</span><span class="n">subpops</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="c1"># Build a context vector to evaluate a complete solution</span>
-        <span class="n">context_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collaborator</span><span class="o">.</span><span class="n">build_context_vector</span><span class="p">(</span><span class="n">collaborators</span><span class="p">)</span>
+        <span class="n">context_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collaborator</span><span class="o">.</span><span class="n">build_context_vector</span><span class="p">(</span><span class="n">collaborators</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">context_vector</span></div>
 
 </pre></div>

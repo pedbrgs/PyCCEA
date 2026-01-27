@@ -250,7 +250,7 @@ including decomposition, initialization, evolution, evaluation, and convergence 
             context_vectors=self.context_vectors
         )
         self.best_context_vector, self.best_fitness = self._get_global_best()
-        self.best_context_vectors.append(self.best_context_vector.copy())
+        self._record_best_context_vector(self.best_context_vector)
         self.best_feature_idxs = self.feature_idxs.copy()
 
         n_gen = 0
@@ -283,9 +283,9 @@ including decomposition, initialization, evolution, evaluation, and convergence 
                     current_fitness[i].append(fitness_value)
 
             # Update subpopulations and fitness
-            self.subpops = copy.deepcopy(current_subpops)
-            self.fitness = copy.deepcopy(current_fitness)
-            self.context_vectors = copy.deepcopy(current_context_vectors)
+            self.subpops = current_subpops
+            self.fitness = current_fitness
+            self.context_vectors = current_context_vectors
 
             self.current_best = self._get_best_individuals(
                 subpops=self.subpops,
@@ -298,7 +298,7 @@ including decomposition, initialization, evolution, evaluation, and convergence 
             if self.best_fitness < best_fitness:
                 stagnation_counter = 0
                 self.best_context_vector = best_context_vector.copy()
-                self.best_context_vectors.append(self.best_context_vector.copy())
+                self._record_best_context_vector(self.best_context_vector)
                 self.best_fitness = best_fitness
             else:
                 stagnation_counter += 1

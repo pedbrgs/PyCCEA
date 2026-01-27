@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyccea.utils.config &mdash; PyCCEA  documentation</title>
+  <title>pyccea.utils.memory &mdash; PyCCEA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ab21f1d8" />
@@ -67,7 +67,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
-      <li class="breadcrumb-item active">pyccea.utils.config</li>
+      <li class="breadcrumb-item active">pyccea.utils.memory</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -76,26 +76,24 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for pyccea.utils.config</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">toml</span>
+  <h1>Source code for pyccea.utils.memory</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ctypes</span>
 
-<div class="viewcode-block" id="load_params">
-<a class="viewcode-back" href="../../../pages/pyccea.utils.html#pyccea.utils.config.load_params">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">load_params</span><span class="p">(</span><span class="n">conf_path</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Load parameters of a Cooperative Co-Evolutionary Algorithm (CCEA) from configuration file.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    conf_path: str</span>
-<span class="sd">        Path to the configuration file.</span>
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    conf: dict</span>
-<span class="sd">        Configuration parameters of a CCEA.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">conf</span> <span class="o">=</span> <span class="n">toml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">conf_path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">conf</span></div>
+<div class="viewcode-block" id="force_memory_release">
+<a class="viewcode-back" href="../../../pages/pyccea.utils.html#pyccea.utils.memory.force_memory_release">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">force_memory_release</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Force memory release back to the OS when supported.&quot;&quot;&quot;</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;posix&quot;</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">libc</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">CDLL</span><span class="p">(</span><span class="s2">&quot;libc.so.6&quot;</span><span class="p">)</span>
+        <span class="n">libc</span><span class="o">.</span><span class="n">malloc_trim</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span></div>
 
 </pre></div>
 

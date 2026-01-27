@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Index &mdash; PyCCEA  documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/custom.css?v=ab21f1d8" />
 
   
@@ -86,6 +86,7 @@
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
@@ -175,8 +176,6 @@
         <li><a href="pages/pyccea.coevolution.html#pyccea.coevolution.ccpstfg.CCPSTFG">(class in pyccea.coevolution.ccpstfg)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pages/pyccea.coevolution.html#pyccea.coevolution.CCSUFG">CCSUFG (class in pyccea.coevolution)</a>
 
       <ul>
@@ -185,10 +184,28 @@
       </ul></li>
       <li><a href="pages/pyccea.projection.html#pyccea.projection.cipls.CIPLS">CIPLS (class in pyccea.projection.cipls)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pages/pyccea.utils.html#pyccea.utils.metrics.ClassificationMetrics">ClassificationMetrics (class in pyccea.utils.metrics)</a>
 </li>
       <li><a href="pages/pyccea.utils.html#pyccea.utils.models.ClassificationModel">ClassificationModel (class in pyccea.utils.models)</a>
 </li>
+      <li><a href="pages/pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation.clone">clone() (pyccea.evaluation.wrapper.WrapperEvaluation method)</a>
+
+      <ul>
+        <li><a href="pages/pyccea.fitness.html#pyccea.fitness.distance.DistanceBasedFitness.clone">(pyccea.fitness.distance.DistanceBasedFitness method)</a>
+</li>
+        <li><a href="pages/pyccea.fitness.html#pyccea.fitness.DistanceBasedFitness.clone">(pyccea.fitness.DistanceBasedFitness method)</a>
+</li>
+        <li><a href="pages/pyccea.fitness.html#pyccea.fitness.penalty.SubsetSizePenalty.clone">(pyccea.fitness.penalty.SubsetSizePenalty method)</a>
+</li>
+        <li><a href="pages/pyccea.fitness.html#pyccea.fitness.SubsetSizePenalty.clone">(pyccea.fitness.SubsetSizePenalty method)</a>
+</li>
+        <li><a href="pages/pyccea.utils.html#pyccea.utils.models.ClassificationModel.clone">(pyccea.utils.models.ClassificationModel method)</a>
+</li>
+        <li><a href="pages/pyccea.utils.html#pyccea.utils.models.RegressionModel.clone">(pyccea.utils.models.RegressionModel method)</a>
+</li>
+      </ul></li>
       <li><a href="pages/pyccea.coevolution.html#pyccea.coevolution.CCPSTFG.CLUSTERING_METHODS">CLUSTERING_METHODS (pyccea.coevolution.CCPSTFG attribute)</a>
 
       <ul>
@@ -317,9 +334,17 @@
         <li><a href="pages/pyccea.decomposition.html#pyccea.decomposition.grouping.FeatureGrouping">(class in pyccea.decomposition.grouping)</a>
 </li>
       </ul></li>
+      <li><a href="pages/pyccea.projection.html#pyccea.projection.cipls.CIPLS.fit">fit() (pyccea.projection.cipls.CIPLS method)</a>
+
+      <ul>
+        <li><a href="pages/pyccea.projection.html#pyccea.projection.kpls.KernelPLS.fit">(pyccea.projection.kpls.KernelPLS method)</a>
+</li>
+        <li><a href="pages/pyccea.utils.html#pyccea.utils.preprocessing.Winsoriser.fit">(pyccea.utils.preprocessing.Winsoriser method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="pages/pyccea.projection.html#pyccea.projection.cipls.CIPLS.fit">fit() (pyccea.projection.cipls.CIPLS method)</a>
+      <li><a href="pages/pyccea.utils.html#pyccea.utils.memory.force_memory_release">force_memory_release() (in module pyccea.utils.memory)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -343,7 +368,17 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pages/pyccea.utils.html#pyccea.utils.datasets.DataLoader.get_fold">get_fold() (pyccea.utils.datasets.DataLoader method)</a>
+</li>
       <li><a href="pages/pyccea.utils.html#pyccea.utils.datasets.DataLoader.get_ready">get_ready() (pyccea.utils.datasets.DataLoader method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pages/pyccea.projection.html#pyccea.projection.kpls.KernelPLS">KernelPLS (class in pyccea.projection.kpls)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -461,6 +496,8 @@
 </li>
         <li><a href="pages/pyccea.projection.html#module-pyccea.projection.cipls">pyccea.projection.cipls</a>
 </li>
+        <li><a href="pages/pyccea.projection.html#module-pyccea.projection.kpls">pyccea.projection.kpls</a>
+</li>
         <li><a href="pages/pyccea.projection.html#module-pyccea.projection.vip">pyccea.projection.vip</a>
 </li>
         <li><a href="pages/pyccea.utils.html#module-pyccea.utils">pyccea.utils</a>
@@ -471,9 +508,13 @@
 </li>
         <li><a href="pages/pyccea.utils.html#module-pyccea.utils.mapping">pyccea.utils.mapping</a>
 </li>
+        <li><a href="pages/pyccea.utils.html#module-pyccea.utils.memory">pyccea.utils.memory</a>
+</li>
         <li><a href="pages/pyccea.utils.html#module-pyccea.utils.metrics">pyccea.utils.metrics</a>
 </li>
         <li><a href="pages/pyccea.utils.html#module-pyccea.utils.models">pyccea.utils.models</a>
+</li>
+        <li><a href="pages/pyccea.utils.html#module-pyccea.utils.preprocessing">pyccea.utils.preprocessing</a>
 </li>
         <li><a href="pages/pyccea.utils.html#module-pyccea.utils.stats">pyccea.utils.stats</a>
 </li>
@@ -534,6 +575,8 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pages/pyccea.projection.html#pyccea.projection.kpls.KernelPLS.predict">predict() (pyccea.projection.kpls.KernelPLS method)</a>
+</li>
       <li><a href="pages/pyccea.utils.html#pyccea.utils.datasets.DataLoader.PRIMARY_CONF_KEYS">PRIMARY_CONF_KEYS (pyccea.utils.datasets.DataLoader attribute)</a>
 </li>
       <li>
@@ -697,8 +740,6 @@
         <li><a href="pages/pyccea.decomposition.html#module-pyccea.decomposition.static">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     pyccea.evaluation
 
@@ -706,6 +747,8 @@
         <li><a href="pages/pyccea.evaluation.html#module-pyccea.evaluation">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     pyccea.evaluation.wrapper
 
@@ -805,6 +848,13 @@
 </li>
       </ul></li>
       <li>
+    pyccea.projection.kpls
+
+      <ul>
+        <li><a href="pages/pyccea.projection.html#module-pyccea.projection.kpls">module</a>
+</li>
+      </ul></li>
+      <li>
     pyccea.projection.vip
 
       <ul>
@@ -840,6 +890,13 @@
 </li>
       </ul></li>
       <li>
+    pyccea.utils.memory
+
+      <ul>
+        <li><a href="pages/pyccea.utils.html#module-pyccea.utils.memory">module</a>
+</li>
+      </ul></li>
+      <li>
     pyccea.utils.metrics
 
       <ul>
@@ -851,6 +908,13 @@
 
       <ul>
         <li><a href="pages/pyccea.utils.html#module-pyccea.utils.models">module</a>
+</li>
+      </ul></li>
+      <li>
+    pyccea.utils.preprocessing
+
+      <ul>
+        <li><a href="pages/pyccea.utils.html#module-pyccea.utils.preprocessing">module</a>
 </li>
       </ul></li>
       <li>
@@ -914,6 +978,8 @@
         <li><a href="pages/pyccea.decomposition.html#pyccea.decomposition.static.SequentialFeatureGrouping">(class in pyccea.decomposition.static)</a>
 </li>
       </ul></li>
+      <li><a href="pages/pyccea.projection.html#pyccea.projection.kpls.KernelPLS.set_predict_request">set_predict_request() (pyccea.projection.kpls.KernelPLS method)</a>
+</li>
       <li><a href="pages/pyccea.utils.html#pyccea.utils.mapping.shifted_heaviside_function">shifted_heaviside_function() (in module pyccea.utils.mapping)</a>
 </li>
       <li><a href="pages/pyccea.cooperation.html#pyccea.cooperation.SingleBestCollaboration">SingleBestCollaboration (class in pyccea.cooperation)</a>
@@ -969,7 +1035,11 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="pages/pyccea.projection.html#pyccea.projection.cipls.CIPLS.transform">transform() (pyccea.projection.cipls.CIPLS method)</a>
+
+      <ul>
+        <li><a href="pages/pyccea.utils.html#pyccea.utils.preprocessing.Winsoriser.transform">(pyccea.utils.preprocessing.Winsoriser method)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -984,6 +1054,8 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="pages/pyccea.utils.html#pyccea.utils.preprocessing.Winsoriser">Winsoriser (class in pyccea.utils.preprocessing)</a>
+</li>
       <li><a href="pages/pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation">WrapperEvaluation (class in pyccea.evaluation.wrapper)</a>
 </li>
   </ul></td>

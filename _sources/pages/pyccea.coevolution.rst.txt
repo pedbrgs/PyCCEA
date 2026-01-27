@@ -3,8 +3,8 @@ pyccea.coevolution package
 
 .. automodule:: pyccea.coevolution
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Submodules
 ----------
@@ -14,69 +14,69 @@ pyccea.coevolution.ccea module
 
 .. automodule:: pyccea.coevolution.ccea
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.coevolution.cceafs module
 --------------------------------
 
 .. automodule:: pyccea.coevolution.cceafs
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.coevolution.ccfc module
 ------------------------------
 
 .. automodule:: pyccea.coevolution.ccfc
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.coevolution.ccfsrfg1 module
 ----------------------------------
 
 .. automodule:: pyccea.coevolution.ccfsrfg1
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.coevolution.ccfsrfg2 module
 ----------------------------------
 
 .. automodule:: pyccea.coevolution.ccfsrfg2
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.coevolution.ccga module
 ------------------------------
 
 .. automodule:: pyccea.coevolution.ccga
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.coevolution.ccilfg module
 --------------------------------
 
 .. automodule:: pyccea.coevolution.ccilfg
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.coevolution.ccpstfg module
 ---------------------------------
 
 .. automodule:: pyccea.coevolution.ccpstfg
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.coevolution.ccsufg module
 --------------------------------
 
 .. automodule:: pyccea.coevolution.ccsufg
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:

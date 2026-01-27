@@ -3,8 +3,8 @@ pyccea.fitness package
 
 .. automodule:: pyccea.fitness
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Submodules
 ----------
@@ -14,21 +14,21 @@ pyccea.fitness.distance module
 
 .. automodule:: pyccea.fitness.distance
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.fitness.function module
 ------------------------------
 
 .. automodule:: pyccea.fitness.function
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.fitness.penalty module
 -----------------------------
 
 .. automodule:: pyccea.fitness.penalty
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:

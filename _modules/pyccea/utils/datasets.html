@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pyccea.utils.datasets &mdash; PyCCEA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ab21f1d8" />
 
   
@@ -77,18 +77,22 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyccea.utils.datasets</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">toml</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.resources</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">importlib.resources</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">toml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">clone</span> <span class="k">as</span> <span class="n">sklearn_clone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">GroupKFold</span><span class="p">,</span> <span class="n">KFold</span><span class="p">,</span> <span class="n">LeaveOneOut</span><span class="p">,</span>
+                                     <span class="n">StratifiedKFold</span><span class="p">,</span> <span class="n">train_test_split</span><span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinMaxScaler</span><span class="p">,</span> <span class="n">StandardScaler</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">GroupKFold</span><span class="p">,</span> <span class="n">KFold</span><span class="p">,</span> <span class="n">LeaveOneOut</span><span class="p">,</span> <span class="n">StratifiedKFold</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Winsoriser</span>
 
 
 <div class="viewcode-block" id="DataLoader">
@@ -144,7 +148,7 @@
 
     <span class="c1"># Class parameters</span>
     <span class="n">SPLITTER_TYPES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;k_fold&quot;</span><span class="p">,</span> <span class="s2">&quot;leave_one_out&quot;</span><span class="p">]</span>
-    <span class="n">PRIMARY_CONF_KEYS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">,</span> <span class="s2">&quot;splitter&quot;</span><span class="p">,</span> <span class="s2">&quot;normalization&quot;</span><span class="p">]</span>
+    <span class="n">PRIMARY_CONF_KEYS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">,</span> <span class="s2">&quot;splitter&quot;</span><span class="p">,</span> <span class="s2">&quot;preprocessing&quot;</span><span class="p">,</span> <span class="s2">&quot;normalization&quot;</span><span class="p">]</span>
     <span class="n">NORMALIZATION_METHODS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;min_max&quot;</span><span class="p">:</span> <span class="n">MinMaxScaler</span><span class="p">,</span> <span class="s2">&quot;standard&quot;</span><span class="p">:</span> <span class="n">StandardScaler</span><span class="p">}</span>
     <span class="k">with</span> <span class="n">importlib</span><span class="o">.</span><span class="n">resources</span><span class="o">.</span><span class="n">open_text</span><span class="p">(</span><span class="s2">&quot;pyccea.parameters&quot;</span><span class="p">,</span> <span class="s2">&quot;datasets.toml&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">toml_file</span><span class="p">:</span>
         <span class="n">DATASETS</span> <span class="o">=</span> <span class="n">toml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">toml_file</span><span class="p">)</span>
@@ -187,6 +191,18 @@
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;verbose&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">float_dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;general&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;float_dtype&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">float_dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">float_dtype</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">float_dtype</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">float_dtype</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">float_dtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;float32&quot;</span><span class="p">,</span> <span class="s2">&quot;float64&quot;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The &#39;float_dtype&#39; parameter in the general section of the data &quot;</span>
+                    <span class="s2">&quot;configuration file should be either &#39;float32&#39; or &#39;float64&#39;.&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">float_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span> <span class="k">if</span> <span class="n">float_dtype</span> <span class="o">==</span> <span class="s2">&quot;float32&quot;</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_parse_splitter_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse parameters from the splitter section of the data configuration file.&quot;&quot;&quot;</span>
@@ -266,29 +282,64 @@
                     <span class="s2">&quot; of the data configuration file when &#39;method&#39; parameter is specified.&quot;</span>
                 <span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_parse_preprocessing_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse parameters from the preprocessing section of the data configuration file.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dropna</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;preprocessing&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;drop_na&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">winsorization</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;preprocessing&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;winsorization&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">winsorization</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;quantiles&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;preprocessing&quot;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+                    <span class="s2">&quot;The Winsorization method is enable, but the required &#39;quantiles&#39; key is&quot;</span>
+                    <span class="s2">&quot;missing in the &#39;preprocessing configuration section.&quot;</span>
+                <span class="p">)</span>
+            <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;preprocessing&quot;</span><span class="p">][</span><span class="s2">&quot;quantiles&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">winsor</span> <span class="o">=</span> <span class="n">Winsoriser</span><span class="p">(</span><span class="n">lower</span><span class="o">=</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="n">upper</span><span class="p">)</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_parse_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse parameters, validate their values, and assign them to attributes.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parse_general_parameters</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parse_splitter_parameters</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parse_normalization_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parse_preprocessing_parameters</span><span class="p">()</span>
 
-<div class="viewcode-block" id="DataLoader.get_ready">
-<a class="viewcode-back" href="../../../pages/pyccea.utils.html#pyccea.utils.datasets.DataLoader.get_ready">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Prepare the data for a Cooperative Co-Evolutionary Algorithm to perform feature selection.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_model_selection</span><span class="p">()</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_subsets</span><span class="p">(</span>
-                <span class="n">X_train</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span>
-                <span class="n">X_test</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">X_test</span>
-            <span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Data is ready for use.&quot;</span><span class="p">)</span></div>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cast_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">array_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cast input matrix to the configured float dtype.&quot;&quot;&quot;</span>
+        <span class="c1"># Only cast numeric arrays; object arrays should fail earlier in preprocessing.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_dtype</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Casting </span><span class="si">{</span><span class="n">array_name</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">float_dtype</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">X</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">float_dtype</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">X</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cast_float_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cast stored feature matrices to the configured float dtype (if any).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">float_dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Main subsets</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;X_train&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cast_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="s2">&quot;X_train&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;X_test&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cast_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_test</span><span class="p">,</span> <span class="s2">&quot;X_test&quot;</span><span class="p">)</span>
+        <span class="c1"># Fold (if exists)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;train_folds&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;val_folds&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_folds</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">train_folds</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cast_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_folds</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">-th train fold&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">val_folds</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cast_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">val_folds</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">-th val fold&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Raw training set used for fold normalization (if exists)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_raw_X_train&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_raw_X_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cast_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raw_X_train</span><span class="p">,</span> <span class="s2">&quot;_raw_X_train&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_delete_intermediate_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Delete intermediate data to free memory.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">):</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">):</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;X&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">):</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+        <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load dataset according to dataset given as a parameter.&quot;&quot;&quot;</span>
@@ -310,38 +361,31 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        X : pd.DataFrame (n_examples, n_features)</span>
+<span class="sd">         : pd.DataFrame (n_examples, n_features)</span>
 <span class="sd">            Input data (features).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Get all columns except &#39;label&#39;, &#39;subset&#39;, and &#39;fold&#39; while preserving order</span>
         <span class="n">excluded_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;subset&quot;</span><span class="p">,</span> <span class="s2">&quot;fold&quot;</span><span class="p">]</span>
         <span class="n">selected_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excluded_cols</span><span class="p">]</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">selected_cols</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">X</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">selected_cols</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_output</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the output data y from the dataset.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        y : pd.Series (n_examples, )</span>
+<span class="sd">         : pd.Series (n_examples, )</span>
 <span class="sd">            Output data (labels).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">y</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;label&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_preprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dropna</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Preprocess the dataset to be used by machine learning models.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        dropna : bool, default False</span>
-<span class="sd">            Remove rows that contains NaN values.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Setting a default representation for NaN values </span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_preprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Preprocess the dataset to be used by machine learning models.&quot;&quot;&quot;</span>
+        <span class="c1"># Setting a default representation for NaN values</span>
+        <span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;future.no_silent_downcasting&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">to_replace</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="c1"># Remove rows with at least one NaN value</span>
-        <span class="k">if</span> <span class="n">dropna</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dropna</span><span class="p">:</span>
             <span class="c1"># Store the number of rows before dropping NaNs</span>
             <span class="n">initial_row_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -369,7 +413,7 @@
             <span class="n">majority_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">imbalance_ratio</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">majority_class</span><span class="o">/</span><span class="n">minority_class</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
             <span class="c1"># Ensure labels are integer-encoded</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_split</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Split dataset into training and test sets.&quot;&quot;&quot;</span>
@@ -408,6 +452,35 @@
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training set with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">train_size</span><span class="si">}</span><span class="s2"> observations.&quot;</span><span class="p">)</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Test set with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">test_size</span><span class="si">}</span><span class="s2"> observations.&quot;</span><span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">_truncate_subsets</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">X_train</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+            <span class="n">X_test</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Truncate the outliers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X_train : pd.DataFrame</span>
+<span class="sd">            Training input data.</span>
+<span class="sd">        X_test : pd.DataFrame</span>
+<span class="sd">            Test input data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        X_truncated_train : pd.DataFrame</span>
+<span class="sd">            Truncated training input data.</span>
+<span class="sd">        X_truncated_test : pd.DataFrame</span>
+<span class="sd">            Truncated test input data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Winsorization across instances should be done after splitting the data between training</span>
+        <span class="c1"># and test set to avoid leakage</span>
+        <span class="n">X_truncated_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">winsor</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_train</span><span class="p">)</span>
+        <span class="c1"># When truncating the test set, it should apply the quantiles parameters previously</span>
+        <span class="c1"># obtained from the training set as-is</span>
+        <span class="n">X_truncated_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">winsor</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_test</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">X_truncated_train</span><span class="p">,</span> <span class="n">X_truncated_test</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_normalize_subsets</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
             <span class="n">X_train</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
@@ -431,7 +504,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Normalization across instances should be done after splitting the data between training</span>
         <span class="c1"># and test set to avoid leakage</span>
-        <span class="n">normalizer</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span><span class="p">)</span>
+        <span class="n">normalizer</span> <span class="o">=</span> <span class="n">sklearn_clone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">winsorization</span><span class="p">:</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_truncate_subsets</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">)</span>
         <span class="n">X_normalized_train</span> <span class="o">=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_train</span><span class="p">)</span>
         <span class="c1"># When normalizing the test set, it should apply the normalization parameters previously</span>
         <span class="c1"># obtained from the training set as-is</span>
@@ -444,21 +519,11 @@
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_populate_folds</span><span class="p">(</span><span class="n">splitter</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
             <span class="s2">&quot;Populate the train and validation folds using the provided splitter.&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">train_folds</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">val_folds</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">train_indices</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">val_indices</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">split_args</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">if</span> <span class="n">groups</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">train_idx</span><span class="p">,</span> <span class="n">val_idx</span> <span class="ow">in</span> <span class="n">splitter</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="o">*</span><span class="n">split_args</span><span class="p">):</span>
-                <span class="n">X_train_fold</span><span class="p">,</span> <span class="n">X_val_fold</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">train_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">X</span><span class="p">[</span><span class="n">val_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="n">y_train_fold</span><span class="p">,</span> <span class="n">y_val_fold</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">train_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">y</span><span class="p">[</span><span class="n">val_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">:</span>
-                    <span class="n">X_train_fold</span><span class="p">,</span> <span class="n">X_val_fold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_subsets</span><span class="p">(</span>
-                        <span class="n">X_train_fold</span><span class="p">,</span> <span class="n">X_val_fold</span>
-                    <span class="p">)</span>
-                <span class="c1"># Store the train and validation folds</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">train_folds</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">X_train_fold</span><span class="p">,</span> <span class="n">y_train_fold</span><span class="p">])</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">val_folds</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">X_val_fold</span><span class="p">,</span> <span class="n">y_val_fold</span><span class="p">])</span>
+                <span class="c1"># Store the train and validation indices</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">train_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">train_idx</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">val_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_idx</span><span class="p">)</span>
 
@@ -495,7 +560,80 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter_type</span> <span class="o">==</span> <span class="s2">&quot;leave_one_out&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">splitter</span> <span class="o">=</span> <span class="n">LeaveOneOut</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">kfolds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_size</span>
-            <span class="n">_populate_folds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="p">)</span></div>
+            <span class="n">_populate_folds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">splitter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DataLoader.get_fold">
+<a class="viewcode-back" href="../../../pages/pyccea.utils.html#pyccea.utils.datasets.DataLoader.get_fold">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_fold</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get k-th train and validation folds.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        k : int</span>
+<span class="sd">            Fold index.</span>
+<span class="sd">        normalize : bool, default None</span>
+<span class="sd">            If True, normalizes training and validation sets generated by the split method.</span>
+<span class="sd">            If None, uses the value of the &#39;normalize&#39; attribute.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        X_fold_train : np.ndarray</span>
+<span class="sd">            k-th fold training input data.</span>
+<span class="sd">        y_fold_train : np.ndarray</span>
+<span class="sd">            k-th fold training output data.</span>
+<span class="sd">        X_fold_val : np.ndarray</span>
+<span class="sd">            k-th fold validation input data.</span>
+<span class="sd">        y_fold_val : np.ndarray</span>
+<span class="sd">            k-th fold validation output data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;train_indices&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;val_indices&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">&quot;The train and validation folds have not been created yet. Please, run the &quot;</span>
+                <span class="s2">&quot;&#39;_model_selection()&#39; method first.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">base_X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_X_train</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_raw_X_train&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span>
+        <span class="n">train_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_indices</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">val_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_indices</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+        <span class="n">X_fold_train</span> <span class="o">=</span> <span class="n">base_X</span><span class="p">[</span><span class="n">train_idx</span><span class="p">]</span>
+        <span class="n">y_fold_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="p">[</span><span class="n">train_idx</span><span class="p">]</span>
+        <span class="n">X_fold_val</span> <span class="o">=</span> <span class="n">base_X</span><span class="p">[</span><span class="n">val_idx</span><span class="p">]</span>
+        <span class="n">y_fold_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="p">[</span><span class="n">val_idx</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">normalize</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">normalize</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span>
+        <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+            <span class="n">X_fold_train</span><span class="p">,</span> <span class="n">X_fold_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_subsets</span><span class="p">(</span><span class="n">X_fold_train</span><span class="p">,</span> <span class="n">X_fold_val</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">X_fold_train</span><span class="p">,</span> <span class="n">y_fold_train</span><span class="p">,</span> <span class="n">X_fold_val</span><span class="p">,</span> <span class="n">y_fold_val</span></div>
+
+
+<div class="viewcode-block" id="DataLoader.get_ready">
+<a class="viewcode-back" href="../../../pages/pyccea.utils.html#pyccea.utils.datasets.DataLoader.get_ready">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prepare data for a machine learning algorithm to perform feature selection.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_preprocess</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_split</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model_selection</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Normalizing train and test subsets...&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;k_fold&quot;</span><span class="p">,</span> <span class="s2">&quot;leave_one_out&quot;</span><span class="p">]:</span>
+                <span class="c1"># No .copy() needed. X_train is replaced (not modified in-place), so this</span>
+                <span class="c1"># keeps the pre-normalization array without duplicating memory.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_raw_X_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_subsets</span><span class="p">(</span>
+                <span class="n">X_train</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span>
+                <span class="n">X_test</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">X_test</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cast_float_dtype</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delete_intermediate_data</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Data is ready for use.&quot;</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 

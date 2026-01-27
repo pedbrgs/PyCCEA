@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pyccea.initialization.build &mdash; PyCCEA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ab21f1d8" />
 
   
@@ -77,10 +77,13 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyccea.initialization.build</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.memory</span><span class="w"> </span><span class="kn">import</span> <span class="n">force_memory_release</span>
 
 
 <div class="viewcode-block" id="SubpopulationInitialization">
@@ -104,7 +107,8 @@
             <span class="n">subcomp_sizes</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
             <span class="n">subpop_sizes</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
             <span class="n">collaborator</span><span class="p">,</span>
-            <span class="n">fitness_function</span>
+            <span class="n">fitness_function</span><span class="p">,</span>
+            <span class="n">n_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
@@ -119,11 +123,16 @@
 <span class="sd">            Responsible for selecting collaborators for individuals.</span>
 <span class="sd">        fitness_function : object of one of the fitness classes.</span>
 <span class="sd">            Responsible for evaluating individuals, that is, subsets of features.</span>
+<span class="sd">        n_workers : int, optional</span>
+<span class="sd">            Number of workers to use for parallel evaluations. Default is 1 (no parallelism).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span> <span class="o">=</span> <span class="n">subpop_sizes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span> <span class="o">=</span> <span class="n">fitness_function</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collaborator</span> <span class="o">=</span> <span class="n">collaborator</span>
+        <span class="c1"># Number of parallel workers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_workers</span> <span class="o">=</span> <span class="n">n_workers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fitness_fn_tls</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">local</span><span class="p">()</span>
         <span class="c1"># Complete problem solutions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="c1"># Individuals of all subpopulations</span>
@@ -196,15 +205,32 @@
 <a class="viewcode-back" href="../../../pages/pyccea.initialization.html#pyccea.initialization.SubpopulationInitialization.evaluate_individuals">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_individuals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate all individuals from all subpopulations.&quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_get_local_fitness_fn</span><span class="p">():</span>
+            <span class="n">fitness_fn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fitness_fn_tls</span><span class="p">,</span> <span class="s2">&quot;fitness_function&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fitness_fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">fitness_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span> \
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="p">,</span> <span class="s2">&quot;clone&quot;</span><span class="p">)</span> \
+                        <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_fitness_fn_tls</span><span class="o">.</span><span class="n">fitness_function</span> <span class="o">=</span> <span class="n">fitness_fn</span>
+            <span class="k">return</span> <span class="n">fitness_fn</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_context_vector</span><span class="p">(</span><span class="n">context_vector</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_workers</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_workers</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
+                        <span class="n">executor</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+                            <span class="k">lambda</span> <span class="n">cv</span><span class="p">:</span> <span class="n">_get_local_fitness_fn</span><span class="p">()</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">cv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">),</span>
+                            <span class="n">context_vector</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">_get_local_fitness_fn</span><span class="p">()</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">cv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">cv</span> <span class="ow">in</span> <span class="n">context_vector</span><span class="p">]</span>
+
         <span class="c1"># Initialize the progress bar</span>
         <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Evaluating individuals&quot;</span><span class="p">)</span>
         <span class="c1"># For each subpopulation</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">subpop</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subpops</span><span class="p">):</span>
-            <span class="c1"># List to store the context vectors in the current subpopulation</span>
+            <span class="c1"># Build all context vectors for this subpopulation</span>
             <span class="n">subpop_context_vectors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-            <span class="c1"># List to store the evaluations of these context vectors</span>
-            <span class="n">subpop_fitness</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-            <span class="c1"># Evaluate each individual in the subpopulation</span>
             <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">subpop</span><span class="p">):</span>
                 <span class="c1"># Build a context vector to evaluate a complete solution</span>
                 <span class="n">context_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_context_vector</span><span class="p">(</span>
@@ -213,19 +239,21 @@
                     <span class="n">subpops</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subpops</span>
                 <span class="p">)</span>
                 <span class="c1"># Evaluate the context vector</span>
-                <span class="n">fitness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context_vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-                <span class="c1"># Store the complete problem solution related to the current individual</span>
-                <span class="n">subpop_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
-                <span class="c1"># Store evaluation of the current context vector</span>
-                <span class="n">subpop_fitness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fitness</span><span class="p">)</span>
-            <span class="c1"># Store all complete problem solutions related to the current subpopulation</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">subpop_context_vectors</span><span class="p">))</span>
+                <span class="n">subpop_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">context_vector</span><span class="p">)</span>
+            <span class="c1"># Evaluate all context vectors of the current subpopulation</span>
+            <span class="n">subpop_fitness</span> <span class="o">=</span> <span class="n">_evaluate_context_vector</span><span class="p">(</span><span class="n">subpop_context_vectors</span><span class="p">)</span>
+            <span class="c1"># Get the best context vector and its fitness</span>
+            <span class="n">best_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">subpop_fitness</span><span class="p">))</span>
+            <span class="n">best_context_vector</span> <span class="o">=</span> <span class="n">subpop_context_vectors</span><span class="p">[</span><span class="n">best_idx</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="c1"># Store best complete problem solution related to the current subpopulation</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">best_context_vector</span><span class="p">)</span>
             <span class="c1"># Store evaluation of all context vectors of the current subpopulation</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subpop_fitness</span><span class="p">)</span>
             <span class="c1"># Update progress bar</span>
             <span class="n">progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="c1"># Delete variables related to the current subpopulation</span>
-            <span class="k">del</span> <span class="n">subpop_context_vectors</span><span class="p">,</span> <span class="n">subpop_fitness</span>
+            <span class="k">del</span> <span class="n">subpop_context_vectors</span><span class="p">,</span> <span class="n">subpop_fitness</span><span class="p">,</span> <span class="n">best_context_vector</span>
+            <span class="n">force_memory_release</span><span class="p">()</span>
         <span class="c1"># Close progress bar</span>
         <span class="n">progress_bar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 </div>

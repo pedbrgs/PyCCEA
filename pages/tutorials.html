@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tutorials &mdash; PyCCEA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=ab21f1d8" />
 
   
@@ -307,7 +307,7 @@ including decomposition, initialization, evolution, evaluation, and convergence 
         <span class="n">context_vectors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_global_best</span><span class="p">()</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_record_best_context_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">best_feature_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_idxs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="n">n_gen</span> <span class="o">=</span> <span class="mi">0</span>
@@ -340,9 +340,9 @@ including decomposition, initialization, evolution, evaluation, and convergence 
                 <span class="n">current_fitness</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fitness_value</span><span class="p">)</span>
 
         <span class="c1"># Update subpopulations and fitness</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">subpops</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_subpops</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_fitness</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_context_vectors</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subpops</span> <span class="o">=</span> <span class="n">current_subpops</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">current_fitness</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span> <span class="o">=</span> <span class="n">current_context_vectors</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">current_best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_individuals</span><span class="p">(</span>
             <span class="n">subpops</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">subpops</span><span class="p">,</span>
@@ -355,7 +355,7 @@ including decomposition, initialization, evolution, evaluation, and convergence 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">&lt;</span> <span class="n">best_fitness</span><span class="p">:</span>
             <span class="n">stagnation_counter</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span> <span class="o">=</span> <span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_record_best_context_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">=</span> <span class="n">best_fitness</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">stagnation_counter</span> <span class="o">+=</span> <span class="mi">1</span>

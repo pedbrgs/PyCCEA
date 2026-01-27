@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pyccea package &mdash; PyCCEA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=ab21f1d8" />
 
   
@@ -295,6 +295,7 @@
 <li class="toctree-l2"><a class="reference internal" href="pyccea.evaluation.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pyccea.evaluation.html#module-pyccea.evaluation.wrapper">pyccea.evaluation.wrapper module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation"><code class="docutils literal notranslate"><span class="pre">WrapperEvaluation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation.clone"><code class="docutils literal notranslate"><span class="pre">WrapperEvaluation.clone()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation.eval_modes"><code class="docutils literal notranslate"><span class="pre">WrapperEvaluation.eval_modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation.evaluate"><code class="docutils literal notranslate"><span class="pre">WrapperEvaluation.evaluate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation.metrics"><code class="docutils literal notranslate"><span class="pre">WrapperEvaluation.metrics</span></code></a></li>
@@ -307,10 +308,12 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pyccea.fitness.html">pyccea.fitness package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.DistanceBasedFitness"><code class="docutils literal notranslate"><span class="pre">DistanceBasedFitness</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.DistanceBasedFitness.clone"><code class="docutils literal notranslate"><span class="pre">DistanceBasedFitness.clone()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.DistanceBasedFitness.evaluate"><code class="docutils literal notranslate"><span class="pre">DistanceBasedFitness.evaluate()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.SubsetSizePenalty"><code class="docutils literal notranslate"><span class="pre">SubsetSizePenalty</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.SubsetSizePenalty.clone"><code class="docutils literal notranslate"><span class="pre">SubsetSizePenalty.clone()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.SubsetSizePenalty.evaluate"><code class="docutils literal notranslate"><span class="pre">SubsetSizePenalty.evaluate()</span></code></a></li>
 </ul>
 </li>
@@ -318,6 +321,7 @@
 <li class="toctree-l2"><a class="reference internal" href="pyccea.fitness.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pyccea.fitness.html#module-pyccea.fitness.distance">pyccea.fitness.distance module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.distance.DistanceBasedFitness"><code class="docutils literal notranslate"><span class="pre">DistanceBasedFitness</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.distance.DistanceBasedFitness.clone"><code class="docutils literal notranslate"><span class="pre">DistanceBasedFitness.clone()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.distance.DistanceBasedFitness.evaluate"><code class="docutils literal notranslate"><span class="pre">DistanceBasedFitness.evaluate()</span></code></a></li>
 </ul>
 </li>
@@ -329,6 +333,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="pyccea.fitness.html#module-pyccea.fitness.penalty">pyccea.fitness.penalty module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.penalty.SubsetSizePenalty"><code class="docutils literal notranslate"><span class="pre">SubsetSizePenalty</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.penalty.SubsetSizePenalty.clone"><code class="docutils literal notranslate"><span class="pre">SubsetSizePenalty.clone()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.fitness.html#pyccea.fitness.penalty.SubsetSizePenalty.evaluate"><code class="docutils literal notranslate"><span class="pre">SubsetSizePenalty.evaluate()</span></code></a></li>
 </ul>
 </li>
@@ -402,6 +407,15 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="pyccea.projection.html#module-pyccea.projection.kpls">pyccea.projection.kpls module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyccea.projection.html#pyccea.projection.kpls.KernelPLS"><code class="docutils literal notranslate"><span class="pre">KernelPLS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyccea.projection.html#pyccea.projection.kpls.KernelPLS.fit"><code class="docutils literal notranslate"><span class="pre">KernelPLS.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyccea.projection.html#pyccea.projection.kpls.KernelPLS.predict"><code class="docutils literal notranslate"><span class="pre">KernelPLS.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyccea.projection.html#pyccea.projection.kpls.KernelPLS.set_predict_request"><code class="docutils literal notranslate"><span class="pre">KernelPLS.set_predict_request()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="pyccea.projection.html#module-pyccea.projection.vip">pyccea.projection.vip module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="pyccea.projection.html#pyccea.projection.vip.VIP"><code class="docutils literal notranslate"><span class="pre">VIP</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.projection.html#pyccea.projection.vip.VIP.compute"><code class="docutils literal notranslate"><span class="pre">VIP.compute()</span></code></a></li>
@@ -423,6 +437,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader.NORMALIZATION_METHODS"><code class="docutils literal notranslate"><span class="pre">DataLoader.NORMALIZATION_METHODS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader.PRIMARY_CONF_KEYS"><code class="docutils literal notranslate"><span class="pre">DataLoader.PRIMARY_CONF_KEYS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader.SPLITTER_TYPES"><code class="docutils literal notranslate"><span class="pre">DataLoader.SPLITTER_TYPES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader.get_fold"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_fold()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader.get_ready"><code class="docutils literal notranslate"><span class="pre">DataLoader.get_ready()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.datasets.DataLoader.toml_file"><code class="docutils literal notranslate"><span class="pre">DataLoader.toml_file</span></code></a></li>
 </ul>
@@ -432,6 +447,10 @@
 <li class="toctree-l2"><a class="reference internal" href="pyccea.utils.html#module-pyccea.utils.mapping">pyccea.utils.mapping module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.mapping.angle_modulation_function"><code class="docutils literal notranslate"><span class="pre">angle_modulation_function()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.mapping.shifted_heaviside_function"><code class="docutils literal notranslate"><span class="pre">shifted_heaviside_function()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyccea.utils.html#module-pyccea.utils.memory">pyccea.utils.memory module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.memory.force_memory_release"><code class="docutils literal notranslate"><span class="pre">force_memory_release()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="pyccea.utils.html#module-pyccea.utils.metrics">pyccea.utils.metrics module</a><ul>
@@ -449,13 +468,23 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="pyccea.utils.html#module-pyccea.utils.models">pyccea.utils.models module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.models.ClassificationModel"><code class="docutils literal notranslate"><span class="pre">ClassificationModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.models.ClassificationModel.clone"><code class="docutils literal notranslate"><span class="pre">ClassificationModel.clone()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.models.ClassificationModel.models"><code class="docutils literal notranslate"><span class="pre">ClassificationModel.models</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.models.ClassificationModel.train"><code class="docutils literal notranslate"><span class="pre">ClassificationModel.train()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.models.RegressionModel"><code class="docutils literal notranslate"><span class="pre">RegressionModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.models.RegressionModel.clone"><code class="docutils literal notranslate"><span class="pre">RegressionModel.clone()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.models.RegressionModel.models"><code class="docutils literal notranslate"><span class="pre">RegressionModel.models</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.models.RegressionModel.train"><code class="docutils literal notranslate"><span class="pre">RegressionModel.train()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="pyccea.utils.html#module-pyccea.utils.preprocessing">pyccea.utils.preprocessing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.preprocessing.Winsoriser"><code class="docutils literal notranslate"><span class="pre">Winsoriser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.preprocessing.Winsoriser.fit"><code class="docutils literal notranslate"><span class="pre">Winsoriser.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pyccea.utils.html#pyccea.utils.preprocessing.Winsoriser.transform"><code class="docutils literal notranslate"><span class="pre">Winsoriser.transform()</span></code></a></li>
 </ul>
 </li>
 </ul>

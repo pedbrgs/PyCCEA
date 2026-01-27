@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pyccea.fitness.distance &mdash; PyCCEA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ab21f1d8" />
 
   
@@ -77,7 +77,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyccea.fitness.distance</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..evaluation.wrapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">WrapperEvaluation</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..fitness.function</span><span class="w"> </span><span class="kn">import</span> <span class="n">WrapperFitnessFunction</span>
@@ -202,7 +203,16 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">w2</span> <span class="o">*</span> <span class="p">(</span><span class="n">mean_avg_distance_diff_label</span><span class="o">/</span><span class="n">sqrt_n_selected_features</span><span class="p">)</span> <span class="o">+</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">w3</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">mean_avg_distance_same_label</span><span class="o">/</span><span class="n">sqrt_n_selected_features</span><span class="p">))</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">estimators</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">fitness</span></div>
+
+
+<div class="viewcode-block" id="DistanceBasedFitness.clone">
+<a class="viewcode-back" href="../../../pages/pyccea.fitness.html#pyccea.fitness.DistanceBasedFitness.clone">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DistanceBasedFitness&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new fitness function with the same configuration.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">DistanceBasedFitness</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">clone</span><span class="p">(),</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">w1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">w3</span><span class="p">])</span></div>
 </div>
 
 </pre></div>

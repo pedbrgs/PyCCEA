@@ -3,8 +3,8 @@ pyccea.cooperation package
 
 .. automodule:: pyccea.cooperation
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Submodules
 ----------
@@ -14,29 +14,29 @@ pyccea.cooperation.best module
 
 .. automodule:: pyccea.cooperation.best
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.cooperation.collaboration module
 ---------------------------------------
 
 .. automodule:: pyccea.cooperation.collaboration
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.cooperation.elite module
 -------------------------------
 
 .. automodule:: pyccea.cooperation.elite
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.cooperation.random module
 --------------------------------
 
 .. automodule:: pyccea.cooperation.random
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:

@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pyccea.evaluation.wrapper &mdash; PyCCEA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ab21f1d8" />
 
   
@@ -77,13 +77,16 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyccea.evaluation.wrapper</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationModel</span><span class="p">,</span> <span class="n">RegressionModel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationMetrics</span><span class="p">,</span> <span class="n">RegressionMetrics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.memory</span><span class="w"> </span><span class="kn">import</span> <span class="n">force_memory_release</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;y_pred contains classes&quot;</span><span class="p">)</span>
 
@@ -103,9 +106,13 @@
 <span class="sd">        is copied and fitted for each individual.</span>
 <span class="sd">    model : sklearn model object</span>
 <span class="sd">        Model that has been fitted to evaluate the current individual.</span>
-<span class="sd">    estimators : list of sklearn model objects</span>
+<span class="sd">    estimators : list of sklearn model objects, optional</span>
 <span class="sd">        Estimators used in the current evaluation. It is one when &#39;eval_mode&#39; is set to &quot;hold_out&quot;</span>
-<span class="sd">        and k when &#39;eval_mode&#39; is set to &quot;k_fold&quot; or &quot;leave_one_out&quot;.</span>
+<span class="sd">        and k when &#39;eval_mode&#39; is set to &quot;k_fold&quot; or &quot;leave_one_out&quot;. If &#39;store_estimators&#39; is </span>
+<span class="sd">        False, this attribute is not created.</span>
+<span class="sd">    _cache : collections.OrderedDict</span>
+<span class="sd">        Internal LRU cache mapping a packed-bit representation of &#39;solution&#39; to the evaluation</span>
+<span class="sd">        dict. The cache is bounded by &#39;cache_size&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">models</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;classification&quot;</span><span class="p">:</span> <span class="n">ClassificationModel</span><span class="p">,</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span> <span class="n">RegressionModel</span><span class="p">}</span>
@@ -118,7 +125,10 @@
             <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
             <span class="n">eval_function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
             <span class="n">eval_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">n_classes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">n_classes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">store_estimators</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">cache_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">use_subprocess</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
@@ -134,6 +144,16 @@
 <span class="sd">            Evaluation mode. It can be &#39;hold_out&#39;, &#39;leave_one_out&#39;, or &#39;k_fold&#39;.</span>
 <span class="sd">        n_classes : int, default None</span>
 <span class="sd">            Number of classes when task parameter is set to &#39;classification&#39;.</span>
+<span class="sd">        store_estimators : bool, default True</span>
+<span class="sd">            Whether to store the estimators used in the evaluation.</span>
+<span class="sd">        cache_size : int, default 0</span>
+<span class="sd">            Maximum number of distinct feature-subset evaluations to keep in an in-memory LRU</span>
+<span class="sd">            cache. Set to 0 or None to disable caching. This is useful when the evolutionary loop</span>
+<span class="sd">            revisits the same solution multiple time (e.g., due to elitism/crossover), avoiding</span>
+<span class="sd">            redundant model fits. Note: caching assumes evaluation is deterministic for a given</span>
+<span class="sd">            solution.</span>
+<span class="sd">        use_subprocess : bool, default False</span>
+<span class="sd">            Whether to evaluate in a subprocess to release native memory back to the OS.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Check if the chosen task is available</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">WrapperEvaluation</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -166,67 +186,160 @@
                 <span class="sa">f</span><span class="s2">&quot;The available evaluation modes are </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">WrapperEvaluation</span><span class="o">.</span><span class="n">eval_modes</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_mode</span> <span class="o">=</span> <span class="n">eval_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_estimators</span> <span class="o">=</span> <span class="n">store_estimators</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_subprocess</span> <span class="o">=</span> <span class="n">use_subprocess</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;task&quot;</span><span class="p">:</span> <span class="n">task</span><span class="p">,</span>
+            <span class="s2">&quot;model_type&quot;</span><span class="p">:</span> <span class="n">model_type</span><span class="p">,</span>
+            <span class="s2">&quot;eval_function&quot;</span><span class="p">:</span> <span class="n">eval_function</span><span class="p">,</span>
+            <span class="s2">&quot;eval_mode&quot;</span><span class="p">:</span> <span class="n">eval_mode</span><span class="p">,</span>
+            <span class="s2">&quot;n_classes&quot;</span><span class="p">:</span> <span class="n">n_classes</span><span class="p">,</span>
+            <span class="s2">&quot;store_estimators&quot;</span><span class="p">:</span> <span class="n">store_estimators</span><span class="p">,</span>
+            <span class="s2">&quot;cache_size&quot;</span><span class="p">:</span> <span class="n">cache_size</span><span class="p">,</span>
+            <span class="s2">&quot;use_subprocess&quot;</span><span class="p">:</span> <span class="n">use_subprocess</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># Optional bounded cache: avoids reffiting identifical feature subsets many times</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cache_size</span><span class="p">)</span> <span class="k">if</span> <span class="n">cache_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_size</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="c1"># Initialize logger with info level</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_subprocess</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_estimators</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Subprocess evaluation does not support storing estimators.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WrapperEvaluation.clone">
+<a class="viewcode-back" href="../../../pages/pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation.clone">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;WrapperEvaluation&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new evaluator with the same configuration.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">WrapperEvaluation</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_kwargs</span><span class="p">)</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_hold_out_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution_mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate an individual using hold_out validation (train/test).&quot;&quot;&quot;</span>
 
         <span class="c1"># Get model that has not been previously fitted</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="p">)</span>
-        <span class="c1"># Select subset of features in the training set</span>
-        <span class="n">X_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">X_train</span><span class="p">[:,</span> <span class="n">solution_mask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">y_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">y_train</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="c1"># Select subset of features in the test set</span>
-        <span class="n">X_test</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">X_test</span><span class="p">[:,</span> <span class="n">solution_mask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">y_test</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">y_test</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
         <span class="c1"># Train model with the current subset of features</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="o">=</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span> <span class="n">optimize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">estimators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="p">))</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
+            <span class="n">X_train</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">X_train</span><span class="p">[:,</span> <span class="n">solution_mask</span><span class="p">],</span>
+            <span class="n">y_train</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">y_train</span><span class="p">,</span>
+            <span class="n">optimize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_estimators</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span>
         <span class="c1"># Evaluate the individual</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span>
-            <span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span>
-            <span class="n">X_test</span><span class="o">=</span><span class="n">X_test</span><span class="p">,</span>
-            <span class="n">y_test</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span>
+            <span class="n">estimator</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span>
+            <span class="n">X_test</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">X_test</span><span class="p">[:,</span> <span class="n">solution_mask</span><span class="p">],</span>
+            <span class="n">y_test</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">y_test</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
         <span class="p">)</span>
         <span class="c1"># Get evaluation in the test set</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span><span class="o">.</span><span class="n">values</span>
 
+        <span class="k">del</span> <span class="n">model</span>
+        <span class="n">force_memory_release</span><span class="p">()</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_cross_validation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution_mask</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate an individual using cross-validation (leave-one-out or k-fold).&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">kfolds</span><span class="p">):</span>
             <span class="c1"># Get training and validations subsets built from the full training set</span>
-            <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">train_folds</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-            <span class="n">X_val</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">val_folds</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
-            <span class="c1"># Select subset of features in the training subset</span>
-            <span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[:,</span> <span class="n">solution_mask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="c1"># Select subset of features in the validation subset</span>
-            <span class="n">X_val</span> <span class="o">=</span> <span class="n">X_val</span><span class="p">[:,</span> <span class="n">solution_mask</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_val</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get_fold</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
             <span class="c1"># Get model that has not been previously fitted</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_model</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
             <span class="c1"># Train model with the current subset of features</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">X_train</span><span class="o">=</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span> <span class="n">optimize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">estimators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="p">))</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
+                <span class="n">X_train</span><span class="o">=</span><span class="n">X_train</span><span class="p">[:,</span> <span class="n">solution_mask</span><span class="p">],</span>
+                <span class="n">y_train</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span>
+                <span class="n">optimize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_estimators</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">estimators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="p">)</span>
             <span class="c1"># Evaluate the individual</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span>
-                <span class="n">estimator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span>
-                <span class="n">X_test</span><span class="o">=</span><span class="n">X_val</span><span class="p">,</span>
+                <span class="n">estimator</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="p">,</span>
+                <span class="n">X_test</span><span class="o">=</span><span class="n">X_val</span><span class="p">[:,</span> <span class="n">solution_mask</span><span class="p">],</span>
                 <span class="n">y_test</span><span class="o">=</span><span class="n">y_val</span><span class="p">,</span>
                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span>
             <span class="p">)</span>
             <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span>
-            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+            <span class="k">del</span> <span class="n">model</span>
+
         <span class="c1"># Calculate average performance over k folds</span>
         <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span><span class="o">/</span><span class="n">data</span><span class="o">.</span><span class="n">kfolds</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
 
+        <span class="k">del</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">X_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span>
+        <span class="n">force_memory_release</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_core</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate an individual without cache or subprocess.&quot;&quot;&quot;</span>
+       <span class="c1"># If no feature is selected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span> <span class="o">=</span> <span class="p">{</span><span class="n">metric</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span><span class="o">.</span><span class="n">metrics</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">solution</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span>
+
+        <span class="c1"># Boolean array used to filter which features will be used to fit the model</span>
+        <span class="n">solution_mask</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+
+        <span class="c1"># Hold-out validation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_mode</span> <span class="o">==</span> <span class="s2">&quot;hold_out&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_hold_out_validation</span><span class="p">(</span>
+                <span class="n">solution_mask</span><span class="o">=</span><span class="n">solution_mask</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="c1"># K-fold cross validation or leave-one-out cross validation</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;k_fold&quot;</span><span class="p">,</span> <span class="s2">&quot;leave_one_out&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cross_validation</span><span class="p">(</span>
+                <span class="n">solution_mask</span><span class="o">=</span><span class="n">solution_mask</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_in_subprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate in a forked subprocess and return evaluations.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;posix&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_core</span><span class="p">(</span><span class="n">solution</span><span class="o">=</span><span class="n">solution</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">read_fd</span><span class="p">,</span> <span class="n">write_fd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">pipe</span><span class="p">()</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">pid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">read_fd</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_core</span><span class="p">(</span><span class="n">solution</span><span class="o">=</span><span class="n">solution</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">payload</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">write_fd</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">payload</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;__error__&quot;</span><span class="p">:</span> <span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">)})</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">write_fd</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">write_fd</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">write_fd</span><span class="p">)</span>
+        <span class="n">chunks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">read_fd</span><span class="p">,</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chunk</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">read_fd</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">waitpid</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">data_bytes</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">chunks</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data_bytes</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;__error__&quot;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RunetimeError</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;__error__&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span>
+
 <div class="viewcode-block" id="WrapperEvaluation.evaluate">
 <a class="viewcode-back" href="../../../pages/pyccea.evaluation.html#pyccea.evaluation.wrapper.WrapperEvaluation.evaluate">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solution</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Evaluate an individual represented by a complete solution through the predictive</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate an individual represented by a complete solution through the predictive</span>
 <span class="sd">        performance of a machine learning model.</span>
 
 <span class="sd">        Parameters</span>
@@ -242,29 +355,34 @@
 <span class="sd">        : dict</span>
 <span class="sd">            Evaluation metrics.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Cache lookup (key is unique for fixed-length solutions)</span>
+        <span class="n">cache_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">packed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">packbits</span><span class="p">(</span><span class="n">solution</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+            <span class="n">cache_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">solution</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">packed</span><span class="o">.</span><span class="n">tobytes</span><span class="p">())</span>
+            <span class="n">cached</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cache_key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cached</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">move_to_end</span><span class="p">(</span><span class="n">cache_key</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">cached</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
         <span class="c1"># Estimator(s) used for the current evaluation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">estimators</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="c1"># If no feature is selected</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span> <span class="o">=</span> <span class="p">{</span><span class="n">metric</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_evaluator</span><span class="o">.</span><span class="n">metrics</span><span class="p">}</span>
-        <span class="k">if</span> <span class="n">solution</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span>
-        <span class="c1"># Boolean array used to filter which features will be used to fit the model</span>
-        <span class="n">solution_mask</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">store_estimators</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimators</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-        <span class="c1"># Hold-out validation</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_mode</span> <span class="o">==</span> <span class="s2">&quot;hold_out&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_hold_out_validation</span><span class="p">(</span>
-                <span class="n">solution_mask</span><span class="o">=</span><span class="n">solution_mask</span><span class="p">,</span>
-                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="c1"># K-fold cross validation or leave-one-out cross validation</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;k_fold&quot;</span><span class="p">,</span> <span class="s2">&quot;leave_one_out&quot;</span><span class="p">]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cross_validation</span><span class="p">(</span>
-                <span class="n">solution_mask</span><span class="o">=</span><span class="n">solution_mask</span><span class="p">,</span>
-                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="c1"># Evaluate in subprocess (if enabled)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_subprocess</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_in_subprocess</span><span class="p">(</span><span class="n">solution</span><span class="o">=</span><span class="n">solution</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_core</span><span class="p">(</span><span class="n">solution</span><span class="o">=</span><span class="n">solution</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluations</span></div>
+        <span class="c1"># Cache store (bounded)</span>
+        <span class="k">if</span> <span class="n">cache_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">move_to_end</span><span class="p">(</span><span class="n">cache_key</span><span class="p">)</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_size</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">popitem</span><span class="p">(</span><span class="n">last</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
 </div>
 
 </pre></div>

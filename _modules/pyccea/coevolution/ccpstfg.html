@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pyccea.coevolution.ccpstfg &mdash; PyCCEA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ab21f1d8" />
 
   
@@ -77,21 +77,24 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyccea.coevolution.ccpstfg</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">fastcluster</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">kneed</span><span class="w"> </span><span class="kn">import</span> <span class="n">KneeLocator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">KMeans</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.cluster.hierarchy</span><span class="w"> </span><span class="kn">import</span> <span class="n">fcluster</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cross_decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PLSRegression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">balanced_accuracy_score</span><span class="p">,</span> <span class="n">silhouette_score</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">..projection.vip</span><span class="w"> </span><span class="kn">import</span> <span class="n">VIP</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..coevolution.ccga</span><span class="w"> </span><span class="kn">import</span> <span class="n">CCGA</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..projection.cipls</span><span class="w"> </span><span class="kn">import</span> <span class="n">CIPLS</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">silhouette_score</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cross_decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PLSRegression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.memory</span><span class="w"> </span><span class="kn">import</span> <span class="n">force_memory_release</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..decomposition.ranking</span><span class="w"> </span><span class="kn">import</span> <span class="n">RankingFeatureGrouping</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">KMeans</span><span class="p">,</span> <span class="n">AgglomerativeClustering</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..decomposition.clustering</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClusteringFeatureGrouping</span>
 
 
@@ -114,8 +117,20 @@
 
     <span class="n">CLUSTERING_METHODS</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;k_means&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">KMeans</span><span class="p">,</span> <span class="p">{}),</span>
-        <span class="s2">&quot;agglomerative_clustering&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">AgglomerativeClustering</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;linkage&quot;</span><span class="p">:</span> <span class="s2">&quot;ward&quot;</span><span class="p">,</span> <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;euclidean&quot;</span><span class="p">})</span>
+        <span class="s2">&quot;agglomerative_clustering&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">fastcluster</span><span class="o">.</span><span class="n">linkage</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;ward&quot;</span><span class="p">,</span> <span class="s2">&quot;metric&quot;</span><span class="p">:</span> <span class="s2">&quot;euclidean&quot;</span><span class="p">}</span>
+        <span class="p">)</span>
     <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">conf</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the CCPSTFG algorithm.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clustering_model_type</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;decomposition&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;clustering_model_type&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clustering_model_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">CCPSTFG</span><span class="o">.</span><span class="n">CLUSTERING_METHODS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The clustering model type &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">clustering_model_type</span><span class="si">}</span><span class="s2">&#39; is not supported. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Supported methods are: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">CCPSTFG</span><span class="o">.</span><span class="n">CLUSTERING_METHODS</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_feature_clustering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection_model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Cluster the features according to their contribution to the components of the</span>
@@ -132,12 +147,20 @@
 <span class="sd">        feature_clusters : np.ndarray</span>
 <span class="sd">            Index of the cluster each feature belongs to.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">projection_model</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">projection_model</span><span class="p">)</span>
         <span class="n">X_train_normalized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_train</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">y_train_encoded</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">y_train_encoded</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
         <span class="n">projection_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">y_train_encoded</span><span class="p">)</span>
         <span class="c1"># Get the loadings of features on PLS components</span>
         <span class="n">feature_loadings</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">projection_model</span><span class="o">.</span><span class="n">x_loadings_</span><span class="p">)</span>
+
+        <span class="n">linkage_matrix</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Precompute the linkage matrix to avoid redundant distance calculations</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clustering_model_type</span> <span class="o">==</span> <span class="s2">&quot;agglomerative_clustering&quot;</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Computing linkage matrix using fastcluster...&quot;</span><span class="p">)</span>
+            <span class="n">clustering_method</span><span class="p">,</span> <span class="n">clustering_params</span> <span class="o">=</span> <span class="n">CCPSTFG</span><span class="o">.</span><span class="n">CLUSTERING_METHODS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clustering_model_type</span><span class="p">]</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">linkage_matrix</span> <span class="o">=</span> <span class="n">clustering_method</span><span class="p">(</span><span class="n">feature_loadings</span><span class="p">,</span> <span class="o">**</span><span class="n">clustering_params</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Done. Elapsed time: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;coevolution&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;n_subcomps&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;coevolution&quot;</span><span class="p">][</span><span class="s2">&quot;n_subcomps&quot;</span><span class="p">]</span>
@@ -145,7 +168,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Automatically choosing the number of subcomponents...&quot;</span><span class="p">)</span>
             <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_number_of_subcomponents</span><span class="p">(</span><span class="n">feature_loadings</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_number_of_subcomponents</span><span class="p">(</span><span class="n">feature_loadings</span><span class="p">,</span> <span class="n">linkage_matrix</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_n_subcomponents_tuning_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
         <span class="c1"># Update the subpopulation sizes after update the number of subcomponents</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span>
@@ -153,18 +176,17 @@
         <span class="c1"># Cluster features based on loadings.</span>
         <span class="c1"># Loadings indicate how strongly each feature contributes to each component.</span>
         <span class="c1"># Features with similar loadings on the same components are likely to be related.</span>
-        <span class="n">clustering_model_class</span><span class="p">,</span> <span class="n">clustering_params</span> <span class="o">=</span> <span class="n">CCPSTFG</span><span class="o">.</span><span class="n">CLUSTERING_METHODS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clustering_model_type</span><span class="p">]</span>
-        <span class="n">clustering_model</span> <span class="o">=</span> <span class="n">clustering_model_class</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="p">,</span> <span class="o">**</span><span class="n">clustering_params</span><span class="p">)</span>
-        <span class="n">feature_clusters</span> <span class="o">=</span> <span class="n">clustering_model</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">feature_loadings</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clustering_model_type</span> <span class="o">==</span> <span class="s2">&quot;agglomerative_clustering&quot;</span><span class="p">:</span>
+            <span class="c1"># Instead of fit and predict, simply prune the precomputed linkage matrix</span>
+            <span class="n">feature_clusters</span> <span class="o">=</span> <span class="n">fcluster</span><span class="p">(</span><span class="n">linkage_matrix</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;maxclust&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">clustering_method</span><span class="p">,</span> <span class="n">clustering_params</span> <span class="o">=</span> <span class="n">CCPSTFG</span><span class="o">.</span><span class="n">CLUSTERING_METHODS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clustering_model_type</span><span class="p">]</span>
+            <span class="n">clustering_model</span> <span class="o">=</span> <span class="n">clustering_method</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="p">,</span> <span class="o">**</span><span class="n">clustering_params</span><span class="p">)</span>
+            <span class="n">feature_clusters</span> <span class="o">=</span> <span class="n">clustering_model</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">feature_loadings</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">feature_clusters</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_best_number_of_components</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">projection_class</span><span class="p">,</span>
-            <span class="n">X_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-            <span class="n">y_train</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
-        <span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_best_number_of_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection_class</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the best number of components to keep by PLS decomposition.</span>
 
 <span class="sd">        The number of components will occur at the elbow point where the coefficient of</span>
@@ -175,41 +197,89 @@
 <span class="sd">        projection_class : sklearn model class</span>
 <span class="sd">            Partial Least Squares regression class. It can be the traditional version (PLS) or the</span>
 <span class="sd">            Covariance-free version (CIPLS).</span>
-<span class="sd">        X_train : np.ndarray</span>
-<span class="sd">            Train input data.</span>
-<span class="sd">        y_train : np.ndarray</span>
-<span class="sd">            Train output data.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        n_components : int</span>
 <span class="sd">            Best number of components to keep after the decomposition into a latent space.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">task_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;wrapper&quot;</span><span class="p">][</span><span class="s2">&quot;task&quot;</span><span class="p">]</span>
         <span class="n">max_n_pls_components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;decomposition&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_n_pls_components&quot;</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
-        <span class="n">n_components_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_n_pls_components</span><span class="p">,</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Search space (PLS components): </span><span class="si">{</span><span class="n">n_components_range</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">r_squared_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="c1"># Search space</span>
+        <span class="n">n_components_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_n_pls_components</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Search space (PLS components for </span><span class="si">{</span><span class="n">task_type</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">n_components_range</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">performance_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">n_components</span> <span class="ow">in</span> <span class="n">n_components_range</span><span class="p">:</span>
-            <span class="n">projection_model</span> <span class="o">=</span> <span class="n">projection_class</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">X_train_normalized</span> <span class="o">=</span> <span class="n">X_train</span> <span class="o">-</span> <span class="n">X_train</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">y_train_encoded</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-            <span class="n">projection_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">y_train_encoded</span><span class="p">)</span>
-            <span class="c1"># Sum the coefficient of determination of the prediction</span>
-            <span class="n">r_squared_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">projection_model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">y_train_encoded</span><span class="p">)))</span>
-            <span class="k">del</span> <span class="n">projection_model</span><span class="p">,</span> <span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">y_train_encoded</span>
-            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+
+            <span class="n">metric_folds</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">kfolds</span><span class="p">):</span>
+
+                <span class="c1"># Retrieve training and validation inputs and outputs</span>
+                <span class="n">X_train_fold</span><span class="p">,</span> <span class="n">y_train_fold</span><span class="p">,</span> <span class="n">X_val_fold</span><span class="p">,</span> <span class="n">y_val_fold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get_fold</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+                <span class="c1"># Apply centering to both training and validation folds</span>
+                <span class="n">X_train_fold_mean</span> <span class="o">=</span> <span class="n">X_train_fold</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">X_train_fold_centered</span> <span class="o">=</span> <span class="n">X_train_fold</span> <span class="o">-</span> <span class="n">X_train_fold_mean</span>
+                <span class="n">X_val_fold_centered</span> <span class="o">=</span> <span class="n">X_val_fold</span> <span class="o">-</span> <span class="n">X_train_fold_mean</span>  <span class="c1"># Use train mean on val data</span>
+
+                <span class="c1"># Handle multiclass classification target encoding (if needed)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">task_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y_train_fold</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">):</span>
+                    <span class="n">y_train_pls</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">y_train_fold</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">y_train_pls</span> <span class="o">=</span> <span class="n">y_train_fold</span>
+
+                <span class="c1"># Fit projection model</span>
+                <span class="n">projection_model</span> <span class="o">=</span> <span class="n">projection_class</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">projection_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_fold_centered</span><span class="p">,</span> <span class="n">y_train_pls</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">task_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;regression&quot;</span><span class="p">:</span>
+                    <span class="n">r2_score</span> <span class="o">=</span> <span class="n">projection_model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_val_fold_centered</span><span class="p">,</span> <span class="n">y_val_fold</span><span class="p">)</span>
+                    <span class="n">metric_folds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r2_score</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">task_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;classification&quot;</span><span class="p">:</span>
+                    <span class="c1"># Transform data to the PLS space</span>
+                    <span class="n">X_train_projected</span> <span class="o">=</span> <span class="n">projection_model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_train_fold_centered</span><span class="p">)</span>
+                    <span class="n">X_val_projected</span> <span class="o">=</span> <span class="n">projection_model</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_val_fold_centered</span><span class="p">)</span>
+                    <span class="c1"># Fit classifier on the projected training data</span>
+                    <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="o">.</span><span class="n">evaluator</span><span class="o">.</span><span class="n">base_model</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+                    <span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_projected</span><span class="p">,</span> <span class="n">y_train_fold</span><span class="p">)</span>
+                    <span class="c1"># Predict and evaluate on the projected validation data</span>
+                    <span class="n">y_pred_val</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_val_projected</span><span class="p">)</span>
+                    <span class="n">accuracy</span> <span class="o">=</span> <span class="n">balanced_accuracy_score</span><span class="p">(</span><span class="n">y_val_fold</span><span class="p">,</span> <span class="n">y_pred_val</span><span class="p">)</span>
+                    <span class="n">metric_folds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">accuracy</span><span class="p">)</span>
+                    <span class="k">del</span> <span class="n">model</span><span class="p">,</span> <span class="n">X_train_projected</span><span class="p">,</span> <span class="n">X_val_projected</span><span class="p">,</span> <span class="n">y_pred_val</span>
+
+            <span class="n">performance_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">metric_folds</span><span class="p">))</span>
+
+            <span class="k">del</span> <span class="n">metric_folds</span><span class="p">,</span> <span class="n">projection_model</span><span class="p">,</span> <span class="n">X_train_fold_centered</span><span class="p">,</span> <span class="n">X_val_fold_centered</span>
+            <span class="n">force_memory_release</span><span class="p">()</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_components</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">performance_value</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">for</span> <span class="n">n_components</span><span class="p">,</span> <span class="n">performance_value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">n_components_range</span><span class="p">,</span> <span class="n">performance_values</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
 
         <span class="c1"># Use kneed to find the knee/elbow point</span>
         <span class="n">kneedle</span> <span class="o">=</span> <span class="n">KneeLocator</span><span class="p">(</span>
-            <span class="n">n_components_range</span><span class="p">,</span> <span class="n">r_squared_values</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="s2">&quot;concave&quot;</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;increasing&quot;</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">n_components_range</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">performance_values</span><span class="p">,</span>
+            <span class="n">curve</span><span class="o">=</span><span class="s2">&quot;concave&quot;</span><span class="p">,</span>
+            <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;increasing&quot;</span>
         <span class="p">)</span>
-        <span class="n">n_components</span> <span class="o">=</span> <span class="n">kneedle</span><span class="o">.</span><span class="n">knee</span>
+        <span class="n">n_components</span> <span class="o">=</span> <span class="n">kneedle</span><span class="o">.</span><span class="n">knee</span> <span class="ow">or</span> <span class="n">n_components_range</span><span class="o">.</span><span class="n">start</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimized number of PLS components: </span><span class="si">{</span><span class="n">n_components</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">n_components</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_best_number_of_subcomponents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_loadings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_best_number_of_subcomponents</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">feature_loadings</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+            <span class="n">linkage_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the best number of subcomponents.</span>
 
 <span class="sd">        The number of subcomponents (clusters) will be the one that maximizes the silhouette</span>
@@ -219,6 +289,8 @@
 <span class="sd">        ----------</span>
 <span class="sd">        feature_loadings : np.ndarray</span>
 <span class="sd">            The absolute importance of terms to components.</span>
+<span class="sd">        linkage_matrix : np.ndarray, optional</span>
+<span class="sd">            The linkage matrix used for hierarchical clustering.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -226,34 +298,36 @@
 <span class="sd">            Best number of subcomponents to decompose the original problem.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">max_n_clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;decomposition&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_n_clusters&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-        <span class="n">n_clusters_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_n_clusters</span><span class="p">,</span> <span class="n">feature_loadings</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">n_features</span> <span class="o">=</span> <span class="n">feature_loadings</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n_clusters_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_n_clusters</span><span class="p">,</span> <span class="n">n_features</span><span class="p">))</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Search space (clusters): </span><span class="si">{</span><span class="n">n_clusters_range</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">silhouette_scores</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">n_clusters</span> <span class="ow">in</span> <span class="n">n_clusters_range</span><span class="p">:</span>
-            <span class="n">clustering_model_class</span><span class="p">,</span> <span class="n">clustering_params</span> <span class="o">=</span> <span class="n">CCPSTFG</span><span class="o">.</span><span class="n">CLUSTERING_METHODS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clustering_model_type</span><span class="p">]</span>
-            <span class="n">clustering_model</span> <span class="o">=</span> <span class="n">clustering_model_class</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span> <span class="o">**</span><span class="n">clustering_params</span><span class="p">)</span>
-            <span class="n">cluster_labels</span> <span class="o">=</span> <span class="n">clustering_model</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">feature_loadings</span><span class="p">)</span>
-            <span class="n">silhouette_avg</span> <span class="o">=</span> <span class="n">silhouette_score</span><span class="p">(</span><span class="n">feature_loadings</span><span class="p">,</span> <span class="n">cluster_labels</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">linkage_matrix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cluster_labels</span> <span class="o">=</span> <span class="n">fcluster</span><span class="p">(</span><span class="n">linkage_matrix</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;maxclust&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">clustering_method</span><span class="p">,</span> <span class="n">clustering_params</span> <span class="o">=</span> <span class="n">CCPSTFG</span><span class="o">.</span><span class="n">CLUSTERING_METHODS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clustering_model_type</span><span class="p">]</span>
+                <span class="n">clustering_model</span> <span class="o">=</span> <span class="n">clustering_method</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="n">n_clusters</span><span class="p">,</span> <span class="o">**</span><span class="n">clustering_params</span><span class="p">)</span>
+                <span class="n">cluster_labels</span> <span class="o">=</span> <span class="n">clustering_model</span><span class="o">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">feature_loadings</span><span class="p">)</span>
+                <span class="k">del</span> <span class="n">clustering_model</span>
+                <span class="n">force_memory_release</span><span class="p">()</span>
+            <span class="n">silhouette_avg</span> <span class="o">=</span> <span class="n">silhouette_score</span><span class="p">(</span>
+                <span class="n">X</span><span class="o">=</span><span class="n">feature_loadings</span><span class="p">,</span>
+                <span class="n">labels</span><span class="o">=</span><span class="n">cluster_labels</span><span class="p">,</span>
+                <span class="n">sample_size</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">n_features</span><span class="p">,</span> <span class="mi">10000</span><span class="p">)</span>  <span class="c1"># Use sampling to maintain silhouette computation feasible for large datasets</span>
+            <span class="p">)</span>
             <span class="n">silhouette_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">silhouette_avg</span><span class="p">)</span>
-            <span class="k">del</span> <span class="n">clustering_model</span>
-            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
 
-        <span class="n">silhouette_scores</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
-            <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">n_clusters_range</span><span class="p">,</span> <span class="n">silhouette_scores</span><span class="p">)),</span>
-            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;n_clusters&quot;</span><span class="p">,</span> <span class="s2">&quot;silhouette_score&quot;</span><span class="p">]</span>
-        <span class="p">)</span>
-
-        <span class="n">n_subcomps</span> <span class="o">=</span> <span class="n">silhouette_scores</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
-            <span class="n">silhouette_scores</span><span class="p">[</span><span class="s2">&quot;silhouette_score&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">idxmax</span><span class="p">(),</span> <span class="s2">&quot;n_clusters&quot;</span>
-        <span class="p">]</span>
+        <span class="c1"># Get the number of subcomponents that maximizes the silhouette score</span>
+        <span class="n">best_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">silhouette_scores</span><span class="p">)</span>
+        <span class="n">n_subcomps</span> <span class="o">=</span> <span class="n">n_clusters_range</span><span class="p">[</span><span class="n">best_idx</span><span class="p">]</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Optimized number of subcomponents: </span><span class="si">{</span><span class="n">n_subcomps</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">n_subcomps</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_best_quantile_to_remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">importances</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Gets the best quantile of the feature importance distribution to remove weak features.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the best quantile of the feature importance distribution to remove weak features.</span>
 
 <span class="sd">        The best quantile will be the one that, when its features are removed from a context</span>
 <span class="sd">        vector filled with 1&#39;s (selecting all remaining features), gives the best fitness value.</span>
@@ -279,21 +353,13 @@
         <span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Search space (quantile): </span><span class="si">{</span><span class="n">quantiles</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">quantile</span> <span class="ow">in</span> <span class="n">quantiles</span><span class="p">:</span>
-            <span class="n">data_q</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
             <span class="n">vip_threshold</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="n">importances</span><span class="p">,</span> <span class="n">quantile</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
             <span class="n">features_to_keep</span> <span class="o">=</span> <span class="n">importances</span> <span class="o">&gt;</span> <span class="n">vip_threshold</span>
-            <span class="c1"># Removing features from subsets and folds</span>
-            <span class="n">data_q</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="n">data_q</span><span class="o">.</span><span class="n">X_train</span><span class="p">[:,</span> <span class="n">features_to_keep</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">data_q</span><span class="o">.</span><span class="n">X_test</span> <span class="o">=</span> <span class="n">data_q</span><span class="o">.</span><span class="n">X_test</span><span class="p">[:,</span> <span class="n">features_to_keep</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data_q</span><span class="o">.</span><span class="n">kfolds</span><span class="p">):</span>
-                <span class="n">data_q</span><span class="o">.</span><span class="n">train_folds</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_q</span><span class="o">.</span><span class="n">train_folds</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">][:,</span> <span class="n">features_to_keep</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="n">data_q</span><span class="o">.</span><span class="n">val_folds</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_q</span><span class="o">.</span><span class="n">val_folds</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">][:,</span> <span class="n">features_to_keep</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="c1"># Build context vector with all remaining features</span>
-            <span class="n">context_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">data_q</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
-            <span class="n">metrics</span><span class="p">[</span><span class="n">quantile</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context_vector</span><span class="p">,</span> <span class="n">data_q</span><span class="p">)</span>
+            <span class="c1"># Build context vector with the remaining features</span>
+            <span class="n">metrics</span><span class="p">[</span><span class="n">quantile</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">features_to_keep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">del</span> <span class="n">data_q</span>
-            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+            <span class="k">del</span> <span class="n">features_to_keep</span>
+            <span class="n">force_memory_release</span><span class="p">()</span>
         <span class="c1"># Get the quantile that gives the best fitness value</span>
         <span class="n">metrics</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;quantile&quot;</span><span class="p">,</span> <span class="s2">&quot;fitness&quot;</span><span class="p">])</span>
         <span class="n">best_quantile</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;fitness&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">idxmax</span><span class="p">(),</span> <span class="s2">&quot;quantile&quot;</span><span class="p">]</span>
@@ -324,16 +390,16 @@
         <span class="n">features_to_keep</span> <span class="o">=</span> <span class="n">importances</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">vip_threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">removed_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">features_to_keep</span> <span class="o">==</span> <span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">removed_features</span><span class="p">)</span><span class="si">}</span><span class="s2"> features were removed.&quot;</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Remaining features: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">features_to_keep</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
         <span class="c1"># Removing features from subsets and folds</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_train</span><span class="p">[:,</span> <span class="n">features_to_keep</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_test</span><span class="p">[:,</span> <span class="n">features_to_keep</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">kfolds</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">train_folds</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">train_folds</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">][:,</span> <span class="n">features_to_keep</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">val_folds</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">val_folds</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">][:,</span> <span class="n">features_to_keep</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_train</span><span class="p">[:,</span> <span class="n">features_to_keep</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_test</span><span class="p">[:,</span> <span class="n">features_to_keep</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;_raw_X_train&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">_raw_X_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">_raw_X_train</span><span class="p">[:,</span> <span class="n">features_to_keep</span><span class="p">]</span>
 
         <span class="c1"># Importance of the remaining features</span>
-        <span class="n">importances</span> <span class="o">=</span> <span class="n">importances</span><span class="p">[</span><span class="n">features_to_keep</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">importances</span> <span class="o">=</span> <span class="n">importances</span><span class="p">[</span><span class="n">features_to_keep</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">importances</span>
 
@@ -348,17 +414,15 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        importances : np.ndarray (n_features,)</span>
+<span class="sd">         : np.ndarray (n_features,)</span>
 <span class="sd">            Importance of each feature based on its contribution to yield the latent space.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">projection_model</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">projection_model</span><span class="p">)</span>
         <span class="n">X_train_normalized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_train</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">y_train_encoded</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">y_train_encoded</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
         <span class="n">projection_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">y_train_encoded</span><span class="p">)</span>
         <span class="n">vip</span> <span class="o">=</span> <span class="n">VIP</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="n">projection_model</span><span class="p">)</span>
         <span class="n">vip</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-        <span class="n">importances</span> <span class="o">=</span> <span class="n">vip</span><span class="o">.</span><span class="n">importances</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">importances</span>
+        <span class="k">return</span> <span class="n">vip</span><span class="o">.</span><span class="n">importances</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_init_decomposer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate feature grouping method.&quot;&quot;&quot;</span>
@@ -378,9 +442,7 @@
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Automatically choosing the number of PLS components...&quot;</span><span class="p">)</span>
             <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="c1"># Get the best number of components to keep after projection using the Elbow method</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_number_of_components</span><span class="p">(</span>
-                <span class="n">projection_class</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">X_train</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">y_train</span>
-            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_number_of_components</span><span class="p">(</span><span class="n">projection_class</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_n_components_tuning_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
         <span class="c1"># Instantiate projection model object</span>
         <span class="n">projection_model</span> <span class="o">=</span> <span class="n">projection_class</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -394,7 +456,6 @@
 
         <span class="c1"># Instantiate feature grouping</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;clustering&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">clustering_model_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;decomposition&quot;</span><span class="p">][</span><span class="s2">&quot;clustering_model_type&quot;</span><span class="p">]</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Clustering model type: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">clustering_model_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">feature_clusters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_feature_clustering</span><span class="p">(</span><span class="n">projection_model</span><span class="o">=</span><span class="n">projection_model</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">decomposer</span> <span class="o">=</span> <span class="n">ClusteringFeatureGrouping</span><span class="p">(</span>
@@ -411,7 +472,7 @@
                 <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">feature_importances</span> <span class="o">=</span> <span class="n">importances</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_importances</span> <span class="o">=</span> <span class="n">importances</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tuning_time</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_n_components_tuning_time&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="o">+</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_quantile_tuning_time&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -438,7 +499,7 @@
         <span class="n">normalized_allocation_factor</span> <span class="o">=</span> <span class="n">allocation_factor</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">allocation_factor</span><span class="p">)</span>
         <span class="c1"># Update the subpopulation sizes based on the normalized allocation factor</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Subpopulation sizes in Round-Robin strategy: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">normalized_allocation_factor</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">normalized_allocation_factor</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">)</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Subpopulation sizes after resource allocation: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CCPSTFG.optimize">
@@ -450,8 +511,10 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;coevolution&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;optimized_resource_allocation&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Optimizing resource allocation...&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_allocate_subproblem_resources</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_memory_usage</span><span class="p">(</span><span class="n">stage</span><span class="o">=</span><span class="s2">&quot;After problem decomposition&quot;</span><span class="p">)</span>
         <span class="c1"># Initialize subpopulations</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_subpopulations</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_memory_usage</span><span class="p">(</span><span class="n">stage</span><span class="o">=</span><span class="s2">&quot;After subpopulation initialization&quot;</span><span class="p">)</span>
         <span class="c1"># Instantiate optimizers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_optimizers</span><span class="p">()</span>
 
@@ -463,7 +526,7 @@
         <span class="p">)</span>
         <span class="c1"># Select the globally best context vector</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_global_best</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_record_best_context_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="p">)</span>
         <span class="c1"># Save the order of features considered in the random feature grouping</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">best_feature_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_idxs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
@@ -489,34 +552,25 @@
                     <span class="n">fitness</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
                 <span class="p">)</span>
                 <span class="n">current_subpops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_subpop</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_memory_usage</span><span class="p">(</span><span class="n">stage</span><span class="o">=</span><span class="s2">&quot;After subpopulation evolution&quot;</span><span class="p">,</span> <span class="n">n_gen</span><span class="o">=</span><span class="n">n_gen</span><span class="p">)</span>
 
             <span class="c1"># Evaluate each individual of the evolved subpopulations</span>
-            <span class="n">current_fitness</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-            <span class="n">current_context_vectors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="p">):</span>
-                <span class="n">current_fitness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">())</span>
-                <span class="n">current_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">())</span>
-                <span class="c1"># Use best individuals from the previous generation (`self.current_best`) as</span>
-                <span class="c1"># collaborators for each individual in the current generation after evolve</span>
-                <span class="c1"># (`current_subpops`)</span>
-                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
-                    <span class="n">collaborators</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_collaborator</span><span class="o">.</span><span class="n">get_collaborators</span><span class="p">(</span>
-                        <span class="n">subpop_idx</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
-                        <span class="n">indiv_idx</span><span class="o">=</span><span class="n">j</span><span class="p">,</span>
-                        <span class="n">current_subpops</span><span class="o">=</span><span class="n">current_subpops</span><span class="p">,</span>
-                        <span class="n">current_best</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_best</span>
-                    <span class="p">)</span>
-                    <span class="n">context_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_collaborator</span><span class="o">.</span><span class="n">build_context_vector</span><span class="p">(</span><span class="n">collaborators</span><span class="p">)</span>
-                    <span class="c1"># Update the context vector</span>
-                    <span class="n">current_context_vectors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
-                    <span class="c1"># Update fitness</span>
-                    <span class="n">current_fitness</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context_vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+            <span class="n">current_fitness</span><span class="p">,</span> <span class="n">current_best_context_vectors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_evolved_subpopulations</span><span class="p">(</span>
+                <span class="n">collaborators_getter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subpop_idx</span><span class="p">,</span> <span class="n">indiv_idx</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_collaborator</span><span class="o">.</span><span class="n">get_collaborators</span><span class="p">(</span>
+                    <span class="n">subpop_idx</span><span class="o">=</span><span class="n">subpop_idx</span><span class="p">,</span>
+                    <span class="n">indiv_idx</span><span class="o">=</span><span class="n">indiv_idx</span><span class="p">,</span>
+                    <span class="n">current_subpops</span><span class="o">=</span><span class="n">current_subpops</span><span class="p">,</span>
+                    <span class="n">current_best</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_best</span>
+                <span class="p">),</span>
+                <span class="n">build_context_vector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">best_collaborator</span><span class="o">.</span><span class="n">build_context_vector</span>
+            <span class="p">)</span>
             <span class="c1"># Update subpopulations, context vectors and evaluations</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">subpops</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_subpops</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_fitness</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_context_vectors</span><span class="p">)</span>
-            <span class="k">del</span> <span class="n">current_subpops</span><span class="p">,</span> <span class="n">current_fitness</span><span class="p">,</span> <span class="n">current_context_vectors</span>
-            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subpops</span> <span class="o">=</span> <span class="n">current_subpops</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">current_fitness</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span> <span class="o">=</span> <span class="n">current_best_context_vectors</span>
+            <span class="k">del</span> <span class="n">current_subpops</span><span class="p">,</span> <span class="n">current_fitness</span><span class="p">,</span> <span class="n">current_best_context_vectors</span>
+            <span class="n">force_memory_release</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_memory_usage</span><span class="p">(</span><span class="n">stage</span><span class="o">=</span><span class="s2">&quot;After subpopulation evaluation&quot;</span><span class="p">,</span> <span class="n">n_gen</span><span class="o">=</span><span class="n">n_gen</span><span class="p">)</span>
 
             <span class="c1"># Get the best individual and context vector from each subpopulation</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">current_best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_individuals</span><span class="p">(</span>
@@ -542,7 +596,7 @@
                 <span class="p">)</span>
                 <span class="c1"># Update best context vector</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span> <span class="o">=</span> <span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_record_best_context_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="p">)</span>
                 <span class="c1"># Update best fitness</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">=</span> <span class="n">best_fitness</span>
             <span class="k">else</span><span class="p">:</span>
@@ -557,6 +611,7 @@
                         <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stagnation_counter</span><span class="si">}</span><span class="s2"> generations in a row.&quot;</span>
                     <span class="p">)</span>
                     <span class="k">break</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_memory_usage</span><span class="p">(</span><span class="n">stage</span><span class="o">=</span><span class="s2">&quot;After generation&quot;</span><span class="p">,</span> <span class="n">n_gen</span><span class="o">=</span><span class="n">n_gen</span><span class="p">)</span>
             <span class="c1"># Increase number of generations</span>
             <span class="n">n_gen</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="c1"># Update progress bar</span>

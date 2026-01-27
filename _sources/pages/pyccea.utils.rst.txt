@@ -3,8 +3,8 @@ pyccea.utils package
 
 .. automodule:: pyccea.utils
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Submodules
 ----------
@@ -14,45 +14,61 @@ pyccea.utils.config module
 
 .. automodule:: pyccea.utils.config
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.utils.datasets module
 ----------------------------
 
 .. automodule:: pyccea.utils.datasets
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.utils.mapping module
 ---------------------------
 
 .. automodule:: pyccea.utils.mapping
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
+
+pyccea.utils.memory module
+--------------------------
+
+.. automodule:: pyccea.utils.memory
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 pyccea.utils.metrics module
 ---------------------------
 
 .. automodule:: pyccea.utils.metrics
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.utils.models module
 --------------------------
 
 .. automodule:: pyccea.utils.models
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
+
+pyccea.utils.preprocessing module
+---------------------------------
+
+.. automodule:: pyccea.utils.preprocessing
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 pyccea.utils.stats module
 -------------------------
 
 .. automodule:: pyccea.utils.stats
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:

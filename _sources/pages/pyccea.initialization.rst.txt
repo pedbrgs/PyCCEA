@@ -3,8 +3,8 @@ pyccea.initialization package
 
 .. automodule:: pyccea.initialization
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 Submodules
 ----------
@@ -14,21 +14,21 @@ pyccea.initialization.binary module
 
 .. automodule:: pyccea.initialization.binary
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.initialization.build module
 ----------------------------------
 
 .. automodule:: pyccea.initialization.build
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:
 
 pyccea.initialization.continuous module
 ---------------------------------------
 
 .. automodule:: pyccea.initialization.continuous
    :members:
-   :show-inheritance:
    :undoc-members:
+   :show-inheritance:

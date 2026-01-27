@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>pyccea.coevolution.cceafs &mdash; PyCCEA  documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=ab21f1d8" />
 
   
@@ -77,11 +77,10 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyccea.coevolution.cceafs</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gc</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..coevolution.ccga</span><span class="w"> </span><span class="kn">import</span> <span class="n">CCGA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.memory</span><span class="w"> </span><span class="kn">import</span> <span class="n">force_memory_release</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..decomposition.static</span><span class="w"> </span><span class="kn">import</span> <span class="n">SequentialFeatureGrouping</span>
 
 
@@ -120,7 +119,7 @@
         <span class="p">)</span>
         <span class="c1"># Select the globally best context vector</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_global_best</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_record_best_context_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="p">)</span>
         <span class="c1"># Save the order of features considered in the random feature grouping</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">best_feature_idxs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_idxs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
@@ -148,32 +147,21 @@
                 <span class="n">current_subpops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_subpop</span><span class="p">)</span>
 
             <span class="c1"># Evaluate each individual of the evolved subpopulations</span>
-            <span class="n">current_fitness</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-            <span class="n">current_context_vectors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_subcomps</span><span class="p">):</span>
-                <span class="n">current_fitness</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">())</span>
-                <span class="n">current_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">())</span>
-                <span class="c1"># Use best individuals from the previous generation (`self.current_best`) as</span>
-                <span class="c1"># collaborators for each individual in the current generation after evolve</span>
-                <span class="c1"># (`current_subpops`)</span>
-                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subpop_sizes</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
-                    <span class="n">collaborators</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_collaborator</span><span class="o">.</span><span class="n">get_collaborators</span><span class="p">(</span>
-                        <span class="n">subpop_idx</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
-                        <span class="n">indiv_idx</span><span class="o">=</span><span class="n">j</span><span class="p">,</span>
-                        <span class="n">current_subpops</span><span class="o">=</span><span class="n">current_subpops</span><span class="p">,</span>
-                        <span class="n">current_best</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_best</span>
-                    <span class="p">)</span>
-                    <span class="n">context_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_collaborator</span><span class="o">.</span><span class="n">build_context_vector</span><span class="p">(</span><span class="n">collaborators</span><span class="p">)</span>
-                    <span class="c1"># Update the context vector</span>
-                    <span class="n">current_context_vectors</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
-                    <span class="c1"># Update fitness</span>
-                    <span class="n">current_fitness</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fitness_function</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">context_vector</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+            <span class="n">current_fitness</span><span class="p">,</span> <span class="n">current_best_context_vectors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_evolved_subpopulations</span><span class="p">(</span>
+                <span class="n">collaborators_getter</span><span class="o">=</span><span class="k">lambda</span> <span class="n">subpop_idx</span><span class="p">,</span> <span class="n">indiv_idx</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">best_collaborator</span><span class="o">.</span><span class="n">get_collaborators</span><span class="p">(</span>
+                    <span class="n">subpop_idx</span><span class="o">=</span><span class="n">subpop_idx</span><span class="p">,</span>
+                    <span class="n">indiv_idx</span><span class="o">=</span><span class="n">indiv_idx</span><span class="p">,</span>
+                    <span class="n">current_subpops</span><span class="o">=</span><span class="n">current_subpops</span><span class="p">,</span>
+                    <span class="n">current_best</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_best</span>
+                <span class="p">),</span>
+                <span class="n">build_context_vector</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">best_collaborator</span><span class="o">.</span><span class="n">build_context_vector</span>
+            <span class="p">)</span>
             <span class="c1"># Update subpopulations, context vectors and evaluations</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">subpops</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_subpops</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_fitness</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">current_context_vectors</span><span class="p">)</span>
-            <span class="k">del</span> <span class="n">current_subpops</span><span class="p">,</span> <span class="n">current_fitness</span><span class="p">,</span> <span class="n">current_context_vectors</span>
-            <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subpops</span> <span class="o">=</span> <span class="n">current_subpops</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="n">current_fitness</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">context_vectors</span> <span class="o">=</span> <span class="n">current_best_context_vectors</span>
+            <span class="k">del</span> <span class="n">current_subpops</span><span class="p">,</span> <span class="n">current_fitness</span><span class="p">,</span> <span class="n">current_best_context_vectors</span>
+            <span class="n">force_memory_release</span><span class="p">()</span>
 
             <span class="c1"># Get the best individual and context vector from each subpopulation</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">current_best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_best_individuals</span><span class="p">(</span>
@@ -210,7 +198,7 @@
                 <span class="p">)</span>
                 <span class="c1"># Update best context vector</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span> <span class="o">=</span> <span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">best_context_vectors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_record_best_context_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">best_context_vector</span><span class="p">)</span>
                 <span class="c1"># Update best fitness</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">best_fitness</span> <span class="o">=</span> <span class="n">best_fitness</span>
             <span class="k">else</span><span class="p">:</span>
