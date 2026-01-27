@@ -1,5 +1,3 @@
-import pytest
-from types import SimpleNamespace
 from pyccea.utils import memory
 from unittest.mock import MagicMock
 
@@ -35,10 +33,13 @@ def test_force_memory_release_posix_calls_maloc_trim(monkeypatch) -> None:
 
 def test_force_memory_release_posix_handles_cdll_error(monkeypatch) -> None:
     """Test posix path ignores CDLL errors."""
+    class FakeOS:
+        name = "posix"
+
     gc_mock = MagicMock()
     monkeypatch.setattr(memory, "gc", MagicMock(collect=gc_mock))
-    monkeypatch.setattr(memory, "os", SimpleNamespace(name="posix"))
-    monkeypatch.setattr(memory.ctypes, "CDLL", MagicMock(sideeffect=Exception("boom")))
+    monkeypatch.setattr(memory, "os", FakeOS())
+    monkeypatch.setattr(memory.ctypes, "CDLL", MagicMock(side_effect=Exception("boom")))
 
     memory.force_memory_release()
 
@@ -47,12 +48,15 @@ def test_force_memory_release_posix_handles_cdll_error(monkeypatch) -> None:
 
 def test_force_memory_release_posix_handles_malloc_trim_error(monkeypatch) -> None:
     """Test posix path ignores malloc trim errors."""
+    class FakeOS:
+        name = "posix"
+
     gc_mock = MagicMock()
     libc_mock = MagicMock()
     libc_mock.malloc_trim.side_effect = OSError("boom")
     monkeypatch.setattr(memory, "gc", MagicMock(collect=gc_mock))
-    monkeypatch.setattr(memory, "os", SimpleNamespace(name="posix"))
-    monkeypatch.setattr(memory.ctypes, "CDLL", MagicMock(sideeffect=libc_mock))
+    monkeypatch.setattr(memory, "os", FakeOS())
+    monkeypatch.setattr(memory.ctypes, "CDLL", MagicMock(return_value=libc_mock))
 
     memory.force_memory_release()
 
