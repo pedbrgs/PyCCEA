@@ -1,1 +1,1 @@
-* release: update readme and test workflow triggers (pedbrgs)
+* release: PyCCEA 1.1.0 version (pedbrgs)
