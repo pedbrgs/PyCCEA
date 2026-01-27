@@ -293,3 +293,28 @@ def test_subprocess_store_estimators_raises() -> None:
             use_subprocess=True,
             store_estimators=True
         )
+
+
+def test_wrapper_evaluation_clone_copies_config() -> None:
+    """Test clone returns new evaluator with the same configuration."""
+    evaluator = WrapperEvaluation(
+        task="classification",
+        n_classes=2,
+        eval_function="accuracy",
+        model_type="logistic_regression",
+        eval_mode="hold_out",
+        cache_size = 256,
+        use_subprocess=True,
+        store_estimators=False
+    )
+
+    cloned = evaluator.clone()
+
+    assert cloned is not evaluator
+    assert cloned.task == evaluator.task
+    assert cloned.model_type == evaluator.model_type
+    assert cloned.eval_function == evaluator.eval_function
+    assert cloned.eval_mode == evaluator.eval_mode
+    assert cloned.store_estimators == evaluator.store_estimators
+    assert cloned.cache_size == evaluator.cache_size
+    assert cloned.use_subprocess == evaluator.use_subprocess
