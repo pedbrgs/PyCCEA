@@ -592,7 +592,9 @@ preprocess the Leukemia 2 dataset according to the data loader configuration fil
 Custom datasets
 """""""""""""""
 
-Custom datasets are supported as long as they conform to the PyCCEA input schema (`.parquet` file with feature columns and a `label` column). To register a custom dataset at runtime, add an entry to `DataLoader` and execute the standard preprocessing, splitting, and normalization pipeline:
+Custom datasets are supported as long as they conform to the PyCCEA input schema (`.parquet` file 
+with feature columns and a `label` column). To register a custom dataset at runtime, add an entry 
+to `DataLoader` and execute the standard preprocessing, splitting, and normalization pipeline:
 
 ```python
 from pyccea.utils.datasets import DataLoader
@@ -615,7 +617,8 @@ dataloader = DataLoader(
 dataloader.get_ready()
 ```
 
-If you prefer ready-to-use data, additional datasets already normalized to the PyCCEA format are available in the [High-Dimensional datasets repository](https://github.com/pedbrgs/High-Dimensional-Datasets/).
+If you prefer ready-to-use data, additional datasets already normalized to the PyCCEA format are 
+available in the [High-Dimensional datasets repository](https://github.com/pedbrgs/High-Dimensional-Datasets/).
 
 CCEAs
 ^^^^^
