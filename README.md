@@ -58,21 +58,48 @@ with importlib.resources.open_text("pyccea.parameters", "dataloader.toml") as to
     data_conf = toml.load(toml_file)
 
 # Initialize the DataLoader with the specified dataset and configuration
-data = DataLoader(dataset="wdbc", conf=data_conf)
+dataloader = DataLoader(dataset="wdbc", conf=data_conf)
 # Prepare the dataset for the algorithm (e.g., preprocessing, splitting)
-data.get_ready()
+dataloader.get_ready()
 
 # Load algorithm-specific parameters
 with importlib.resources.open_text("pyccea.parameters", "ccfsrfg.toml") as toml_file:
     ccea_conf = toml.load(toml_file)
 
 # Initialize the cooperative co-evolutionary algorithm
-ccea = CCFSRFG1(data=data, conf=ccea_conf, verbose=False)
+ccea = CCFSRFG1(data=dataloader, conf=ccea_conf, verbose=False)
 # Start the optimization process
 ccea.optimize()
 ```
 
 The best feature subset found is stored in the attribute `best_context_vector`, a binary array where 1 indicates a selected feature and 0 indicates an unselected one.
+
+## :file_folder: Custom datasets
+
+Custom datasets are supported as long as they conform to the PyCCEA input schema (`.parquet` file with feature columns and a `label` column). To register a custom dataset at runtime, add an entry to `DataLoader` and execute the standard preprocessing, splitting, and normalization pipeline:
+
+```python
+from pyccea.utils.datasets import DataLoader
+
+# Path to your dataset in PyCCEA schema
+data_path = "./custom_data.parquet"
+dataset_name = "custom_data"
+
+# Register the dataset path and task
+DataLoader.DATASETS = {
+    "task": "classification"  # or regression
+    "file": data_path
+}
+
+# Load and prepare the dataset
+dataloader = DataLoader(
+    dataset_name=dataset_name,
+    conf=data_conf
+)
+dataloader.get_ready()
+```
+
+If you prefer ready-to-use data, additional datasets already normalized to the PyCCEA format are available in the [High-Dimensional datasets repository](https://github.com/pedbrgs/High-Dimensional-Datasets/).
 
 ## :books: Documentation
 
