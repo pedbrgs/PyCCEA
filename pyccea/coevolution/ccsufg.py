@@ -315,7 +315,7 @@ class CCSUFG(CCGA):
                     indiv_idx=indiv_idx,
                     current_subpops=current_subpops,
                     current_best=self.current_best
-                )
+                ),
                 build_context_vector=self.best_collaborator.build_context_vector
             )
             # Update subpopulations, context vectors and evaluations

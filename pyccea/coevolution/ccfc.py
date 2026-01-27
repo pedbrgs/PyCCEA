@@ -1,5 +1,4 @@
 import logging
-import numpy as np
 from tqdm import tqdm
 from ..coevolution.ccga import CCGA
 from sklearn.cluster import KMeans
@@ -82,7 +81,7 @@ class CCFC(CCGA):
                     indiv_idx=indiv_idx,
                     current_subpops=current_subpops,
                     current_best=self.current_best
-                )
+                ),
                 build_context_vector=self.best_collaborator.build_context_vector
             )
             # Update subpopulations, context vectors and evaluations
