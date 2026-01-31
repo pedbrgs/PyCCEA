@@ -418,7 +418,7 @@ class CCPSTFG(CCGA):
         normalized_allocation_factor = allocation_factor / np.sum(allocation_factor)
         # Update the subpopulation sizes based on the normalized allocation factor
         logging.info(f"Subpopulation sizes in Round-Robin strategy: {self.subpop_sizes}")
-        self.subpop_sizes = np.round(normalized_allocation_factor * sum(self.subpop_sizes)).astype(np.int8)
+        self.subpop_sizes = np.round(normalized_allocation_factor * sum(self.subpop_sizes)).astype(np.int32)
         logging.info(f"Subpopulation sizes after resource allocation: {self.subpop_sizes}")
 
     def optimize(self) -> None:
