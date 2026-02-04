@@ -172,14 +172,18 @@ indices.</p>
 <p>If you experiment with other CCEAs, such as <code class="docutils literal notranslate"><span class="pre">CCPSTFG</span></code>, be aware that some features may be
 removed before optimization. For those, you might need to filter out removed features before
 reordering:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a set of indices for features that were not removed</span>
-<span class="n">kept_feature_indices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feature_cols</span><span class="p">)))</span> <span class="o">-</span> <span class="n">ccea</span><span class="o">.</span><span class="n">removed_features</span>
-<span class="c1"># Select the original feature names corresponding to the kept indices</span>
-<span class="n">kept_feature_names</span> <span class="o">=</span> <span class="n">feature_cols</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">kept_feature_indices</span><span class="p">)]</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get original feature column names</span>
+<span class="n">feature_cols</span> <span class="o">=</span> <span class="n">dataloader</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span>
+<span class="c1"># Get feature indices</span>
+<span class="n">feature_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feature_cols</span><span class="p">))</span>
+<span class="c1"># Create a set of indices for features that were not removed</span>
+<span class="n">kept_feature_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">setdiff1d</span><span class="p">(</span><span class="n">feature_indices</span><span class="p">,</span> <span class="n">ccea</span><span class="o">.</span><span class="n">removed_features</span><span class="p">,</span> <span class="n">assume_unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="c1"># Reorder the kept features according to the algorithm&#39;s internal feature order</span>
-<span class="n">reordered_features</span> <span class="o">=</span> <span class="n">kept_feature_names</span><span class="p">[</span><span class="n">ccea</span><span class="o">.</span><span class="n">feature_idxs</span><span class="p">]</span>
+<span class="n">reordered_feature_indices</span> <span class="o">=</span> <span class="n">kept_feature_indices</span><span class="p">[</span><span class="n">ccea</span><span class="o">.</span><span class="n">feature_idxs</span><span class="p">]</span>
 <span class="c1"># Select features where best_context_vector == 1</span>
-<span class="n">selected_features</span> <span class="o">=</span> <span class="n">reordered_features</span><span class="p">[</span><span class="n">ccea</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="n">selected_feature_indices</span> <span class="o">=</span> <span class="n">reordered_feature_indices</span><span class="p">[</span><span class="n">ccea</span><span class="o">.</span><span class="n">best_context_vector</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="c1"># Get the selected feature columns with their original names</span>
+<span class="n">selected_features</span> <span class="o">=</span> <span class="n">feature_cols</span><span class="p">[</span><span class="n">selected_feature_indices</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Feel free to modify the configuration files or try different CCEAs to explore various scenarios.</p>

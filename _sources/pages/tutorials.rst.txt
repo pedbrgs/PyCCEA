@@ -102,14 +102,18 @@ reordering:
 
 .. code-block:: python
 
+    # Get original feature column names
+    feature_cols = dataloader.data.columns
+    # Get feature indices
+    feature_indices = np.arange(len(feature_cols))
     # Create a set of indices for features that were not removed
-    kept_feature_indices = set(range(len(feature_cols))) - ccea.removed_features
-    # Select the original feature names corresponding to the kept indices
-    kept_feature_names = feature_cols[list(kept_feature_indices)]
+    kept_feature_indices = np.setdiff1d(feature_indices, ccea.removed_features, assume_unique=True)
     # Reorder the kept features according to the algorithm's internal feature order
-    reordered_features = kept_feature_names[ccea.feature_idxs]
+    reordered_feature_indices = kept_feature_indices[ccea.feature_idxs]
     # Select features where best_context_vector == 1
-    selected_features = reordered_features[ccea.best_context_vector.astype(bool)].tolist()
+    selected_feature_indices = reordered_feature_indices[ccea.best_context_vector.astype(bool)].tolist()
+    # Get the selected feature columns with their original names
+    selected_features = feature_cols[selected_feature_indices]
 
 Feel free to modify the configuration files or try different CCEAs to explore various scenarios.
 
