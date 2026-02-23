@@ -167,7 +167,7 @@ def test_cache_hit_avoids_recompute(monkeypatch) -> None:
         store_estimators=False
     )
 
-    solution = np.array([0, 1, 0, 1, 1, 0, 0, 0], dtype=np.int8)
+    solution = np.array([0, 1, 0, 1, 1, 0, 0, 0], dtype=np.int32)
 
     r1 = evaluator.evaluate(solution=solution, data=None)
     r2 = evaluator.evaluate(solution=solution, data=None)
@@ -197,7 +197,7 @@ def test_cache_disabled(monkeypatch) -> None:
         store_estimators=False
     )
 
-    solution = np.array([0, 1, 0, 1, 1, 0, 0, 0], dtype=np.int8)
+    solution = np.array([0, 1, 0, 1, 1, 0, 0, 0], dtype=np.int32)
 
     _ = evaluator.evaluate(solution=solution, data=None)
     _ = evaluator.evaluate(solution=solution, data=None)
@@ -225,9 +225,9 @@ def test_cache_eviction(monkeypatch) -> None:
         store_estimators=False
     )
 
-    solution1 = np.array([0, 1, 0, 1, 1, 0, 0, 0], dtype=np.int8)
-    solution2 = np.array([1, 0, 1, 0, 0, 1, 0, 0], dtype=np.int8)
-    solution3 = np.array([1, 1, 0, 0, 1, 0, 0, 0], dtype=np.int8)
+    solution1 = np.array([0, 1, 0, 1, 1, 0, 0, 0], dtype=np.int32)
+    solution2 = np.array([1, 0, 1, 0, 0, 1, 0, 0], dtype=np.int32)
+    solution3 = np.array([1, 1, 0, 0, 1, 0, 0, 0], dtype=np.int32)
 
     _ = evaluator.evaluate(solution=solution1, data=None)  # cached
     _ = evaluator.evaluate(solution=solution2, data=None)  # cached

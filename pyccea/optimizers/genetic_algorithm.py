@@ -159,7 +159,7 @@ class BinaryGeneticAlgorithm():
             # Select the 'elite_size' best individuals of the current generation to be in the next
             # generation (elitism)
             n_bests = descending_order[:self.elite_size]
-            next_subpop = np.empty((self.subpop_size, self.n_features), dtype=np.int8)
+            next_subpop = np.empty((self.subpop_size, self.n_features), dtype=np.int32)
             next_subpop[:self.elite_size] = subpop[n_bests]
 
             # Perform (subpop_size - elite_size) tournament selections to build the next population

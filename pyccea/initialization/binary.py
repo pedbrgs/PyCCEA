@@ -23,7 +23,7 @@ class RandomBinaryInitialization(SubpopulationInitialization):
             position of the array, it indicates that the i-th feature should be considered and if
             there is a 0, it indicates that the feature should not be considered.
         """
-        subpop = np.random.randint(2, size=(subpop_size, subcomp_size), dtype=np.int8)
+        subpop = np.random.randint(2, size=(subpop_size, subcomp_size), dtype=np.int32)
         return subpop
 
     def _build_context_vector(
@@ -58,5 +58,5 @@ class RandomBinaryInitialization(SubpopulationInitialization):
             current_subpops=subpops,
         )
         # Build a context vector to evaluate a complete solution
-        context_vector = self.collaborator.build_context_vector(collaborators).astype(np.int8)
+        context_vector = self.collaborator.build_context_vector(collaborators).astype(np.int32)
         return context_vector
