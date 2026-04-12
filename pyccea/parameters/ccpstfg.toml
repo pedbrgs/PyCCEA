@@ -22,12 +22,14 @@ method = "best"
 task = "classification"
 cache_size = 2000
 model_type = "k_nearest_neighbors"
+use_subprocess = true
 
 [evaluation]
 fitness_function = "penalty"
 eval_function = "balanced_accuracy"
 eval_mode = "k_fold"
 weights = [1.00, 0.00]
+n_workers = 4
 
 [optimizer]
 method = "GA"
