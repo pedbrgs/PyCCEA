@@ -248,7 +248,7 @@ class WrapperEvaluation():
             return {}
         result = pickle.loads(data_bytes)
         if "__error__" in result:
-            raise RunetimeError(result["__error__"])
+            raise RuntimeError(result["__error__"])
         self.evaluations = result
         return result
 
